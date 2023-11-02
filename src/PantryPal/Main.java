@@ -28,10 +28,10 @@ class Recipe extends HBox { // extend HBox
 
     /*
      * Constructor for Recipe class
-     * 
+     *
      */
     Recipe(String title, int index, String mealType, ArrayList<String> ingredients,
-            ArrayList<String> recipeInstructions) {
+        ArrayList<String> recipeInstructions) {
         this.title = title;
         this.index = index;
         this.ingredients = ingredients;
@@ -66,11 +66,11 @@ class Recipe extends HBox { // extend HBox
 
     /*
      * Set Methods, think its in a different task
-     * 
+     *
      * void setTitle(Recipe recipe, String newTitle) { // Not for MS1, Assess
      * recipe.title = newTitle;
      * }
-     * 
+     *
      * void setMealType(Recipe recipe, String newMealType) {
      * recipe.mealType = newMealType;
      * }
@@ -105,17 +105,15 @@ class RecipeList extends HBox { // extends HBox?
     // }
     // }
 }
-
+/*
+ * Class Copied from Lab 1 for footer
+ */
 class Footer extends HBox {
     private Button addButton;
     private Button clearButton;
     private Button loadButton;
     private Button saveButton;
     private Button sortButton;
-
-    // TODO: Add a button called "loadButton" to load tasks from file
-    // TODO: Add a button called "saveButton" to save tasks to a file
-    // TODO: Add a button called "sortButton" to sort the tasks lexicographically
     Footer() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -126,6 +124,9 @@ class Footer extends HBox {
     }
 }
 
+/*
+ * Class Copied from Lab 1 for Header
+ */
 class Header extends HBox {
     Header() {
         this.setPrefSize(500, 60); // Size of the header
@@ -137,6 +138,9 @@ class Header extends HBox {
     }
 }
 
+/*
+ * Class Copied from Lab 1 for AppFrame
+ */
 class AppFrame extends BorderPane {
     private Header header;
     private Footer footer;
@@ -146,7 +150,7 @@ class AppFrame extends BorderPane {
         // Initialise the header Object
         header = new Header();
         // Create a recipelist Object to hold the tasks
-        taskList = new RecipeList();
+        recipeList = new RecipeList();
         // Initialise the Footer Object
         footer = new Footer();
 
@@ -162,7 +166,7 @@ class AppFrame extends BorderPane {
         // Initialise Button Variables through the getters in Footer
 
         // Call Event Listeners for the Buttons
-        addListeners();
+        //addListeners();
     }
     // public void addListeners()
     // {
@@ -186,6 +190,9 @@ class AppFrame extends BorderPane {
 
 }
 
+/*
+ * Class Copied from Lab 1 for Main
+ */
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
