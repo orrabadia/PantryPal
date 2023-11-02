@@ -6,9 +6,33 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Current File",
+            "name": "PantryPal",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "PantryPal.Main",
+            "vmArgs": "--module-path '/Users/om/Desktop/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+        
         }
+        // },
+        // {
+        //     "type": "java",
+        //     "name": "Main",
+        //     "request": "launch",
+        //     "mainClass": "src/PantryPal.Main",
+        //     "projectName": ""
+        // },
+        // {
+        //     "type": "java",
+        //     "name": "Footer$AppFrame$Main",
+        //     "request": "launch",
+        //     "mainClass": "PantryPal.Footer$AppFrame$Main",
+        //     "projectName": "cse-110-project-team-18_ad042cc0"
+        // },
+        // {
+        //     "type": "java",
+        //     "name": "PantryPal",
+        //     "request": "launch",
+        //     "mainClass": "src/PantryPal.Main",
+        //     "vmArgs": "--module-path '/Users/om/Desktop/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
+        // }
     ]
 }
