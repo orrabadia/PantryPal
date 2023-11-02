@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 class Recipe extends HBox { // extend HBox
-    private String title;
-    private int index; // for use in RecipeList
-    private String mealType;
+    private Text title;
+    private Label index; // for use in RecipeList
+    private Text mealType;
     private ArrayList<String> ingredients; // change to different data struct?
     private ArrayList<String> recipeInstructions; // change to different data struct?
     // add UI variables
@@ -30,28 +30,43 @@ class Recipe extends HBox { // extend HBox
      * Constructor for Recipe class
      *
      */
-    Recipe(String title, int index, String mealType, ArrayList<String> ingredients,
-        ArrayList<String> recipeInstructions) {
+    Recipe(Text title, Text mealType, ArrayList<String> ingredients, ArrayList<String> recipeInstructions) {
+        // is being displayed
         this.title = title;
-        this.index = index;
+        // not being displayed
         this.ingredients = ingredients;
         this.recipeInstructions = recipeInstructions;
         this.mealType = mealType;
 
+        // copied from lab 1, to display
         this.setPrefSize(500, 20); // sets size of task
         this.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");
+        index = new Label();
+        index.setText("");
+        index.setPrefSize(40, 20); // set size of Index label
+        index.setTextAlignment(TextAlignment.CENTER); // Set alignment of index label
+        index.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
+        index.setTextAlignment(TextAlignment.LEFT);
+        this.getChildren().add(index);
 
+        title.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
+        title.setTextAlignment(TextAlignment.LEFT);
+        this.getChildren().add(title);
     }
 
-    String getTitle(Recipe recipe) {
+    public void setRecipeIndex(int num){
+        this.index.setText(num + "");
+    }
+
+    Text getTitle(Recipe recipe) {
         return recipe.title;
     }
 
-    int getIndex(Recipe recipe) {
+    Label getIndex(Recipe recipe) {
         return recipe.index;
     }
 
-    String getMealType(Recipe recipe) {
+    Text getMealType(Recipe recipe) {
         return recipe.mealType;
     }
 
@@ -80,13 +95,12 @@ class Recipe extends HBox { // extend HBox
      * SetIngredients and RecipeInstructions more complex
      */
 
-    void setRecipeIndex(Recipe recipe, int newIndex) {
+    void setRecipeIndex(Recipe recipe, Label newIndex) {
         recipe.index = newIndex;
     }
 }
 
-class RecipeList extends HBox { // extends HBox?
-
+class RecipeList extends VBox { // extends HBox?
     // new RecipeList
     RecipeList() {
         // UI elements
@@ -95,6 +109,17 @@ class RecipeList extends HBox { // extends HBox?
         this.setStyle("-fx-background-color: #F0F8FF;");
     }
 
+    public void updateRecipeIndices() {
+        int index = 1;
+        for (int i = 0; i < this.getChildren().size(); i++) {
+            if (this.getChildren().get(i) instanceof Recipe) {
+                ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
+                index++;
+            }
+        }
+    }
+
+    //add when delete implementing
     // public void updateRecipeIndices() {
     // int index = 1;
     // for (int i = 0; i < this.getChildren(i); i++) {
@@ -105,15 +130,12 @@ class RecipeList extends HBox { // extends HBox?
     // }
     // }
 }
+
 /*
  * Class Copied from Lab 1 for footer
  */
 class Footer extends HBox {
-    private Button addButton;
-    private Button clearButton;
-    private Button loadButton;
-    private Button saveButton;
-    private Button sortButton;
+    private Button newRecipeButton;
     Footer() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -121,6 +143,15 @@ class Footer extends HBox {
         // set a default style for buttons - background color, font size, italics
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
+
+        newRecipeButton = new Button("new Recipe");
+        newRecipeButton.setStyle(defaultButtonStyle);
+        this.getChildren().add(newRecipeButton);
+        this.setAlignment(Pos.CENTER);
+    }
+
+    public Button getNewRecipeButton(){
+        return newRecipeButton;
     }
 }
 
@@ -145,6 +176,7 @@ class AppFrame extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
+    private Button newRecipeButton;
 
     AppFrame() {
         // Initialise the header Object
@@ -164,29 +196,23 @@ class AppFrame extends BorderPane {
         // Add footer to the bottom of the BorderPane
         this.setBottom(footer);
         // Initialise Button Variables through the getters in Footer
+        newRecipeButton = footer.getNewRecipeButton();
 
         // Call Event Listeners for the Buttons
-        //addListeners();
+        addListeners();
     }
-    // public void addListeners()
-    // {
-    // /* // Add button functionality
-    // addButton.setOnAction(e -> {
-    // // Create a new task
-    // Task task = new Task();
-    // // Add task to tasklist
-    // taskList.getChildren().add(task);
-    // // Add doneButtonToggle to the Done button
-    // Button doneButton = task.getDoneButton();
-    // doneButton.setOnAction(e1 -> {
-    // // Call toggleDone on click
-    // task.toggleDone();
-    // });
-    // // Update task indices
-    // taskList.updateTaskIndices();
-    // });
+
+    public void addListeners()
+    {
+    newRecipeButton.setOnAction(e -> {
+        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
+        Recipe recipe = new Recipe(new Text("title"), new Text("meal"), new ArrayList<>(), new ArrayList<>());
+        // Add task to tasklist
+        recipeList.getChildren().add(recipe);
+        recipeList.updateRecipeIndices();
+    });
     // */
-    // }
+    }
 
 }
 
