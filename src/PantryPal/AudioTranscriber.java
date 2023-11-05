@@ -18,7 +18,7 @@ public class AudioTranscriber extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         // Setting the Layout of the Window (Flow Pane)
-        AppFrame root = new AppFrame();
+        RecordAppFrame root = new RecordAppFrame();
 
         // Set the title of the app
         primaryStage.setTitle("Transcriber");

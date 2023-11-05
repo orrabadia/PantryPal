@@ -11,7 +11,7 @@ import javax.sound.sampled.*;
 import java.net.*;
 import org.json.*;
 
-class AppFrame extends FlowPane {
+class RecordAppFrame extends FlowPane {
     private Button startButton;
     private Button stopButton;
     private AudioFormat audioFormat;
@@ -24,7 +24,7 @@ class AppFrame extends FlowPane {
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
 
-    AppFrame() throws IOException, URISyntaxException {
+    RecordAppFrame() throws IOException, URISyntaxException {
         // Set properties for the flowpane
         this.setPrefSize(370, 120);
         this.setPadding(new Insets(5, 0, 5, 5));
@@ -74,7 +74,7 @@ class AppFrame extends FlowPane {
     }
 
     public void transcribe() throws IOException, URISyntaxException {
-        String[] arguments = {"/Users/thuando/Desktop/UCSDCoursework/CSE110/Transcriber/recording.wav"};
+        String[] arguments = {"./recording.wav"};
         Whisper.main(arguments);
     }
 
@@ -150,7 +150,7 @@ public class AudioRecorder extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         // Setting the Layout of the Window (Flow Pane)
-        AppFrame root = new AppFrame();
+        RecordAppFrame root = new RecordAppFrame();
 
         // Set the title of the app
         primaryStage.setTitle("Audio Recorder");
