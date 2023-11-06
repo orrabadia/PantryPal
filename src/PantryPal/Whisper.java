@@ -10,6 +10,10 @@ public class Whisper {
     //private static final String FILE_PATH = "./Guy Yelling Among Us.mp3";
 
     public static void main(String[] args) throws IOException, URISyntaxException {
+        whisperapi(args);
+    }
+
+    public static String whisperapi(String[] args) throws IOException, URISyntaxException {
     // Create file object from file path
     File file = new File(args[0]);
     
@@ -54,17 +58,17 @@ public class Whisper {
     // Get response code
     int responseCode = connection.getResponseCode();
     
-    
+    String ret = "ERRROR";
     // Check response code and handle response accordingly
     if (responseCode == HttpURLConnection.HTTP_OK) {
-        handleSuccessResponse(connection);
+        ret =  handleSuccessResponse(connection);
     } else {
         handleErrorResponse(connection);
     }
     
-    
     // Disconnect connection
     connection.disconnect();
+    return ret;
     }
 
     // Helper method to write a parameter to the output stream in multipart form data format
@@ -110,7 +114,7 @@ public class Whisper {
     }
 
     // Helper method to handle a successful response
-    private static void handleSuccessResponse(HttpURLConnection connection)
+    private static String handleSuccessResponse(HttpURLConnection connection)
     throws IOException, JSONException {
     BufferedReader in = new BufferedReader(
         new InputStreamReader(connection.getInputStream())
@@ -131,6 +135,7 @@ public class Whisper {
 
     // Print the transcription result
     System.out.println("Transcription Result: " + generatedText);
+    return generatedText;
     }
 
     // Helper method to handle an error response
@@ -149,6 +154,5 @@ public class Whisper {
     System.out.println("Error Result: " + errorResult);
     }
         
-    
     
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.net.*;
 
 import javax.management.RuntimeErrorException;
 
@@ -261,13 +262,8 @@ class AppFrame extends BorderPane {
         // Initialise Button Variables through the getters in Footer
         newRecipeButton = footer.getNewRecipeButton();
 
-        // Call Event Listeners for the Buttons
-        addListeners();
-    }
+        //INITIALIZE IT WITH ONE FOR NOW, because we cannot create yet
 
-    public void addListeners()
-    {
-    newRecipeButton.setOnAction(e -> {
         // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
         //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
         ArrayList<String> ingredients = new ArrayList<>();
@@ -279,7 +275,16 @@ class AppFrame extends BorderPane {
         // Add task to tasklist
         recipeList.getChildren().add(recipe);
         recipeList.updateRecipeIndices();
+
+        // Call Event Listeners for the Buttons
+        addListeners();
+    }
+
+    public void addListeners()
+    {
+    newRecipeButton.setOnAction(e -> {
         //TODO: when adding new page, link to navhandler and create a navhandler method for new page
+        handler.recordMeal();
     });
     
     }
@@ -381,6 +386,7 @@ class RecipeDisplay extends BorderPane {
 class NavigationHandler{
     public static final String RECIPE_LIST = "RecipeList";
     public static final String DISPLAY_RECIPE = "DisplayRecipe";
+    public static final String RECORD_MEALTYPE = "RecordMealType";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
     NavigationHandler(Stage primaryStage){
@@ -437,6 +443,25 @@ class NavigationHandler{
         } else {
             throw new RuntimeErrorException(null);
         }
+    }
+
+    void recordMeal(){
+
+        Scene r = pageList.get(RECORD_MEALTYPE);
+        //new page for recording meal
+        try {
+            RecordAppFrame mealrecorder = new RecordAppFrame(this);
+            //Scene mealrecord = new Scene(mealrecorder, 370, 120);
+            Scene mealrecord = new Scene(mealrecorder, 370, 400);
+            pageList.put(RECORD_MEALTYPE, mealrecord);
+        } catch (IOException e1) {
+            System.out.println(e1);
+        } catch (URISyntaxException e2) {
+            System.out.println(e2);
+        }
+        //switches to mealtype page
+        r = pageList.get(RECORD_MEALTYPE);
+        primaryStage.setScene(r);
     }
 }
 

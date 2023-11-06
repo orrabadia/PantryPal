@@ -12,11 +12,16 @@ import java.net.*;
 import org.json.*;
 
 class RecordAppFrame extends FlowPane {
+    private NavigationHandler handler;
     private Button startButton;
     private Button stopButton;
+    private Button backButton;
+    private Button continueButton;
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
     private Label recordingLabel;
+    private Label transcriptionLabel;
+    private Label instructions;
     Thread t;
 
     // Set a default style for buttons and fields - background color, font size,
@@ -24,7 +29,7 @@ class RecordAppFrame extends FlowPane {
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
 
-    RecordAppFrame() throws IOException, URISyntaxException {
+    RecordAppFrame(NavigationHandler handler) throws IOException, URISyntaxException {
         // Set properties for the flowpane
         this.setPrefSize(370, 120);
         this.setPadding(new Insets(5, 0, 5, 5));
@@ -32,7 +37,10 @@ class RecordAppFrame extends FlowPane {
         this.setHgap(10);
         this.setPrefWrapLength(170);
 
+        this.handler = handler;
+
         // Add the buttons and text fields
+        instructions = new Label("Please record your meal type");
         startButton = new Button("Start");
         startButton.setStyle(defaultButtonStyle);
 
@@ -43,6 +51,12 @@ class RecordAppFrame extends FlowPane {
         recordingLabel.setStyle(defaultLabelStyle);
 
         this.getChildren().addAll(startButton, stopButton, recordingLabel);
+
+        backButton = new Button("Back");
+        this.getChildren().add(backButton);
+
+        transcriptionLabel = new Label("Please say the meal type you want:");
+        this.getChildren().add(transcriptionLabel);
 
         // Get the audio format
         audioFormat = getAudioFormat();
@@ -60,8 +74,12 @@ class RecordAppFrame extends FlowPane {
         // Stop Button
         stopButton.setOnAction(e -> {
             stopRecording();
+            //RESULT OF TRANSCRIPTION STORED HERE
+            String transcription = "";
             try {
-                transcribe();
+                transcription = transcribe();
+                Label l = (Label)this.getChildren().get(this.getChildren().size()-1);
+                l.setText("Meal Type:" + transcription);
             }
             catch (IOException e1){
                 System.err.println("IOException");
@@ -69,13 +87,21 @@ class RecordAppFrame extends FlowPane {
             catch (URISyntaxException e2){
                 System.err.println("URISyntaxException");
             }
-
+            continueButton = new Button("Continue");
+            this.getChildren().add(continueButton);
+            continueButton.setOnAction(e1->{
+                System.out.println("Unimplemented");
+            });
         });
+
+        //go back on back button
+        backButton.setOnAction(e->{handler.menu();});
+
     }
 
-    public void transcribe() throws IOException, URISyntaxException {
+    public String transcribe() throws IOException, URISyntaxException {
         String[] arguments = {"./recording.wav"};
-        Whisper.main(arguments);
+        return Whisper.whisperapi(arguments);
     }
 
     private AudioFormat getAudioFormat() {
@@ -149,20 +175,21 @@ public class AudioRecorder extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        // Setting the Layout of the Window (Flow Pane)
-        RecordAppFrame root = new RecordAppFrame();
+        // // Setting the Layout of the Window (Flow Pane)
+        // RecordAppFrame root = new RecordAppFrame();
 
-        // Set the title of the app
-        primaryStage.setTitle("Audio Recorder");
-        // Create scene of mentioned size with the border pane
-        primaryStage.setScene(new Scene(root, 370, 120));
-        // Make window non-resizable
-        primaryStage.setResizable(false);
-        // Show the app
-        primaryStage.show();
+        // // Set the title of the app
+        // primaryStage.setTitle("Audio Recorder");
+        // // Create scene of mentioned size with the border pane
+        // primaryStage.setScene(new Scene(root, 370, 120));
+        // // Make window non-resizable
+        // primaryStage.setResizable(false);
+        // // Show the app
+        // primaryStage.show();
     }
 
     public static void main(String[] args) {
-        launch(args);
+        // launch(args);
+        System.out.println("This should never be run on its own, only used for RecordAppFrame");
     }
 }

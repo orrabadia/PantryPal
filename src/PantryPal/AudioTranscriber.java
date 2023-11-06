@@ -31,6 +31,7 @@ public class AudioTranscriber extends Application {
 
     }
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
+        System.out.println("This should never be run on its own, only used for RecordAppFrame");
     }
 }
