@@ -38,6 +38,12 @@ public class Story1Test {
         javafx.application.Platform.exit();
      }
 
+     @AfterEach
+     public void clearrecipes(){
+        //clear recipe list each time
+        appFrame.getRecipeList().getChildren().clear();
+     }
+
 
     @Test 
     public void testNoRecipes() {

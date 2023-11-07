@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Story1UnitTests {
     private static AppFrame appFrame;
-    private static Recipe rog;
 
 
     @BeforeAll
@@ -34,13 +33,6 @@ public class Story1UnitTests {
         //declare og test recipe and start javafx
         javafx.application.Platform.startup(() -> { });
         appFrame = new AppFrame();
-        ArrayList<String> instructions = new ArrayList<>();
-        ArrayList<String> ingredients = new ArrayList<>();
-        instructions.add("Make the food");
-        ingredients.add("Food");
-        Text title = new Text("Test Recipe 1");
-        Text mealType = new Text("Lunch");
-        rog = new Recipe(title, mealType, ingredients, instructions);
      }
 
      @AfterAll
@@ -72,21 +64,31 @@ public class Story1UnitTests {
     @Test 
     //test creating a recipe and seeing if you can access all its fields
     public void testRecipe(){
-        Recipe r = rog;
-
+        //make new recipe with these fields
         ArrayList<String> instructions = new ArrayList<>();
         ArrayList<String> ingredients = new ArrayList<>();
         instructions.add("Make the food");
         ingredients.add("Food");
+        Text title = new Text("Test Recipe 1");
+        Text mealType = new Text("Lunch");
 
-        assertEquals(r.getTitle().getText(), rog.getTitle().getText());
-        assertEquals(r.getMealType().getText(), rog.getMealType().getText());
-        assertEquals(r.getRecipeInstructions(), rog.getRecipeInstructions());
-        assertEquals(r.getIngredients(), rog.getIngredients());
+        Recipe r = new Recipe(title, mealType, ingredients, instructions);
+        //test if can access fields unchanged
+        assertEquals(r.getTitle().getText(), "Test Recipe 1");
+        assertEquals(r.getMealType().getText(), "Lunch");
+        assertEquals(r.getRecipeInstructions(), instructions);
+        assertEquals(r.getIngredients(), ingredients);
     }
     @Test 
     //this tests that the recipe list can add and contain recipes, and that we can get them unchanged
     public void testRecipeList() {
+        ArrayList<String> instructions = new ArrayList<>();
+        ArrayList<String> ingredients = new ArrayList<>();
+        instructions.add("Make the food");
+        ingredients.add("Food");
+        Text title = new Text("Test Recipe 1");
+        Text mealType = new Text("Lunch");
+        Recipe rog = new Recipe(title, mealType, ingredients, instructions);
 
         //add 2 recipes
         appFrame.debugAddRecipe("Test Recipe 1", "Lunch", rog.getIngredients(), rog.getRecipeInstructions());
@@ -100,7 +102,7 @@ public class Story1UnitTests {
         assertEquals(r.getIngredients(), rog.getIngredients());
 
 
-        //test if they are ordered correctly when adding
+        //test if they are ordered correctly when adding(second one added should be second)
         Recipe r1 = (Recipe)appFrame.getRecipeList().getChildren().get(1);
         assertEquals(r1.getTitle().getText(), "Test Recipe 2");
     }
