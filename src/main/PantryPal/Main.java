@@ -1,5 +1,6 @@
 package PantryPal;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
@@ -8,8 +9,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.text.TextAlignment;
 import javafx.geometry.Insets;
 import javafx.scene.text.*;
 import java.io.*;
@@ -57,24 +56,24 @@ class Recipe extends HBox { // extend HBox
         this.index.setText(num + "");
     }
 
-    Text getTitle(Recipe recipe) {
-        return recipe.title;
+    Text getTitle() {
+        return this.title;
     }
 
-    Label getIndex(Recipe recipe) {
-        return recipe.index;
+    Label getIndex() {
+        return this.index;
     }
 
-    Text getMealType(Recipe recipe) {
-        return recipe.mealType;
+    Text getMealType() {
+        return this.mealType;
     }
 
-    ArrayList<String> getIngredients(Recipe recipe) {
-        return recipe.ingredients;
+    ArrayList<String> getIngredients() {
+        return this.ingredients;
     }
 
-    ArrayList<String> getRecipeInstructions(Recipe recipe) {
-        return recipe.recipeInstructions;
+    ArrayList<String> getRecipeInstructions() {
+        return this.recipeInstructions;
         // may want to print in a certain manner
     }
 
@@ -201,16 +200,24 @@ class AppFrame extends BorderPane {
         addListeners();
     }
 
+    public RecipeList getRecipeList(){
+        return this.recipeList;
+    }
+
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-        Recipe recipe = new Recipe(new Text("title"), new Text("meal"), new ArrayList<>(), new ArrayList<>());
-        // Add task to tasklist
-        recipeList.getChildren().add(recipe);
-        recipeList.updateRecipeIndices();
+        this.debugAddRecipe("Test Recipe 1", "Lunch", new ArrayList<String>(), new ArrayList<String>());
     });
     // */
+    }
+
+    public void debugAddRecipe(String title, String meal, ArrayList<String> instructions, ArrayList<String> recipeinstructions){
+        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
+        Recipe recipe = new Recipe(new Text(title), new Text(meal),instructions, recipeinstructions);
+        // Add recipe to recipelist
+        recipeList.getChildren().add(recipe);
+        recipeList.updateRecipeIndices();
     }
 
 }
@@ -236,5 +243,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+        Platform.setImplicitExit(false);
     }
 }
