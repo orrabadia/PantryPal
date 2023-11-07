@@ -23,7 +23,9 @@ repositories {
 javafx {
     version = "21"
     modules = [ 'javafx.controls', 'javafx.fxml']
-    platform = "mac"
+    //platform = "mac-aarch64"
+    //platform = "windows"
+    platform = "linux"
 }
 
 dependencies {
