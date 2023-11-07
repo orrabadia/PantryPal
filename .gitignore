@@ -3,7 +3,7 @@
 
 # Log file
 *.log
-
+/.gradle
 .DS_Store
 
 # BlueJ files
@@ -11,6 +11,10 @@
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+
+### Gradle ###
+.gradle
+/build/
 
 # Package Files #
 *.jar
