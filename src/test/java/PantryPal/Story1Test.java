@@ -30,12 +30,13 @@ public class Story1Test {
      public static void setUp() {
         //appFrame = new AppFrame();
         javafx.application.Platform.startup(() -> { });
+        //Platform.setImplicitExit(false);
         appFrame = new AppFrame();
      }
 
      @AfterAll
      public static void tearDown() {
-        javafx.application.Platform.exit();
+        //javafx.application.Platform.exit();
      }
 
      @AfterEach
