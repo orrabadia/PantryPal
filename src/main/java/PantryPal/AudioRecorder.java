@@ -100,7 +100,7 @@ class RecordAppFrame extends FlowPane {
     }
 
     public String transcribe() throws IOException, URISyntaxException {
-        return Whisper.whisperTranscribe("./recording.wav");
+        return WhisperApi.whisperTranscribe("./recording.wav");
     }
 
     private AudioFormat getAudioFormat() {
