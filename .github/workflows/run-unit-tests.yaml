@@ -29,12 +29,12 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Install libgtk-3-0
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-0
+      - name: Install xvfb
+        run: sudo apt-get update && sudo apt-get install xvfb
 
       # build everything (includes running unit tests)
-      - name: Execute Gradle build
-        run: ./gradlew build
+      - name: Execute Gradle build with xvfb
+        run: xvfb-run ./gradlew build
 
       # report the results
       - name: Publish Test Report
