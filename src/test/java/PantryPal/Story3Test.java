@@ -59,4 +59,17 @@ public class Story3Test {
         // see whether we switched pages by 
         assertEquals(appFrame.handler.primaryStage, pageList.get(RECORD_MEALTYPE));
     }
+
+    @Test 
+    // test to see whether the function linkd to the "New Recipe" button brings you to the Record MealType page
+    public void testFilePresent() {
+        //this is what is linked to add recipe button
+        appFrame.handler.recordMeal();
+        // click the start button
+
+        //click the stop button
+
+        // see whether the  
+        assertEquals(appFrame.handler.primaryStage, pageList.get(RECORD_MEALTYPE));
+    }
 }

@@ -9,10 +9,6 @@ public class Whisper {
     private static final String MODEL = "whisper-1";
     //private static final String FILE_PATH = "./Guy Yelling Among Us.mp3";
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        whisperapi(args);
-    }
-
     public static String whisperapi(String[] args) throws IOException, URISyntaxException {
     // Create file object from file path
     File file = new File(args[0]);
