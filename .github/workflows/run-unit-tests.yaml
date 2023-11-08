@@ -29,6 +29,9 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
+      - name: Install libgtk-3-0
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-0
+
       # build everything (includes running unit tests)
       - name: Execute Gradle build
         run: ./gradlew build
