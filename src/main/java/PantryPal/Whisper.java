@@ -1,5 +1,8 @@
 package PantryPal;
 
-public class Whisper {
-    
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+interface Whisper {
+    String whisperTranscribe(String fileName) throws IOException, URISyntaxException;
 }
