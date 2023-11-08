@@ -30,6 +30,7 @@ public class Story1Test {
      public static void setUp() {
         //appFrame = new AppFrame();
         javafx.application.Platform.startup(() -> { });
+        System.setProperty("java.awt.headless", "true");
         //Platform.setImplicitExit(false);
         appFrame = new AppFrame();
      }

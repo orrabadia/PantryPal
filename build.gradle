@@ -25,7 +25,7 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml']
     //platform = "mac-aarch64"
     //platform = "windows"
-    platform = "linux"
+    //platform = "linux"
 }
 
 dependencies {
@@ -40,3 +40,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// junitPlatformTest {
+//     jvmArgs "-Dheadless=true"
+// }
