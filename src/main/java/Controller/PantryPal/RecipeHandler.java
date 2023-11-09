@@ -16,5 +16,9 @@ public class RecipeHandler {
         this.list.remove(title);
     }
 
+    public RecipeList getRecipeList(){
+        return this.list;
+    }
+
     //add methods later for edit
 }

@@ -26,7 +26,7 @@ public class TestAll {
         rHandler = new RecipeHandler(rList);
         //this represents the initial app where no recipes are in the recipelist
         //every time you click add it adds to list, so this represents the list
-        //TODO: update the list?
+        //the displayed list is gotten from the recipelist instance
      }
 
      @AfterEach
