@@ -1,4 +1,4 @@
-package Model.PantryPal;
+package PantryPal;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.net.*;
+import javax.sound.sampled.*;
 
 import javax.management.RuntimeErrorException;
 
@@ -463,6 +464,98 @@ class NavigationHandler{
         r = pageList.get(RECORD_MEALTYPE);
         primaryStage.setScene(r);
     }
+}
+
+class RecordAppFrame extends FlowPane {
+    private NavigationHandler handler;
+    private Button startButton;
+    private Button stopButton;
+    private Button backButton;
+    private Button continueButton;
+    private AudioFormat audioFormat;
+    private Label recordingLabel;
+    private Label transcriptionLabel;
+    private Label instructions;
+    Thread t;
+    RecordHandler rHandler;
+
+    // Set a default style for buttons and fields - background color, font size,
+    // italics
+    String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
+    String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
+
+    RecordAppFrame(NavigationHandler handler) throws IOException, URISyntaxException {
+        // Set properties for the flowpane
+        this.setPrefSize(370, 120);
+        this.setPadding(new Insets(5, 0, 5, 5));
+        this.setVgap(10);
+        this.setHgap(10);
+        this.setPrefWrapLength(170);
+
+        this.handler = handler;
+
+        // Add the buttons and text fields
+        instructions = new Label("Please record your meal type");
+        startButton = new Button("Start");
+        startButton.setStyle(defaultButtonStyle);
+
+        stopButton = new Button("Stop");
+        stopButton.setStyle(defaultButtonStyle);
+
+        recordingLabel = new Label("Recording...");
+        recordingLabel.setStyle(defaultLabelStyle);
+
+        this.getChildren().addAll(startButton, stopButton, recordingLabel);
+
+        backButton = new Button("Back");
+        this.getChildren().add(backButton);
+
+        transcriptionLabel = new Label("Please say the meal type you want:");
+        this.getChildren().add(transcriptionLabel);
+
+        // Add the listeners to the buttons
+        addListeners();
+    }
+
+    public void addListeners() {
+        // Start Button
+        startButton.setOnAction(e -> {
+            rHandler = new RecordHandler();
+            recordingLabel.setVisible(true);
+            rHandler.record();
+            
+        });
+
+        // Stop Button
+        stopButton.setOnAction(e -> {
+            recordingLabel.setVisible(false);
+            
+            //RESULT OF TRANSCRIPTION STORED HERE
+            String transcription = "";
+            try {
+                transcription = rHandler.stop();
+                Label l = (Label)this.getChildren().get(this.getChildren().size()-1);
+                l.setText("Meal Type:" + transcription);
+            }
+            catch (IOException e1){
+                System.err.println("IOException");
+            }
+            catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+            }
+            continueButton = new Button("Continue");
+            this.getChildren().add(continueButton);
+            continueButton.setOnAction(e1->{
+                System.out.println("Unimplemented");
+            });
+        });
+
+        //go back on back button
+        backButton.setOnAction(e->{handler.menu();});
+
+    }
+
+    
 }
 
 /*

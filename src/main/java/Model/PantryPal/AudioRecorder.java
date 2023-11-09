@@ -8,95 +8,28 @@ import javafx.scene.layout.FlowPane;
 import javafx.geometry.Insets;
 import java.io.*;
 import javax.sound.sampled.*;
+
 import java.net.*;
 import org.json.*;
 
-class RecordAppFrame extends FlowPane {
-    private NavigationHandler handler;
-    private Button startButton;
-    private Button stopButton;
-    private Button backButton;
-    private Button continueButton;
-    private AudioFormat audioFormat;
+public class AudioRecorder extends Application {
+
     private TargetDataLine targetDataLine;
-    private Label recordingLabel;
-    private Label transcriptionLabel;
-    private Label instructions;
-    Thread t;
 
-    // Set a default style for buttons and fields - background color, font size,
-    // italics
-    String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
-    String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
+    @Override
+    public void start(Stage primaryStage) throws Exception {
 
-    RecordAppFrame(NavigationHandler handler) throws IOException, URISyntaxException {
-        // Set properties for the flowpane
-        this.setPrefSize(370, 120);
-        this.setPadding(new Insets(5, 0, 5, 5));
-        this.setVgap(10);
-        this.setHgap(10);
-        this.setPrefWrapLength(170);
+        // // Setting the Layout of the Window (Flow Pane)
+        // RecordAppFrame root = new RecordAppFrame();
 
-        this.handler = handler;
-
-        // Add the buttons and text fields
-        instructions = new Label("Please record your meal type");
-        startButton = new Button("Start");
-        startButton.setStyle(defaultButtonStyle);
-
-        stopButton = new Button("Stop");
-        stopButton.setStyle(defaultButtonStyle);
-
-        recordingLabel = new Label("Recording...");
-        recordingLabel.setStyle(defaultLabelStyle);
-
-        this.getChildren().addAll(startButton, stopButton, recordingLabel);
-
-        backButton = new Button("Back");
-        this.getChildren().add(backButton);
-
-        transcriptionLabel = new Label("Please say the meal type you want:");
-        this.getChildren().add(transcriptionLabel);
-
-        // Get the audio format
-        audioFormat = getAudioFormat();
-
-        // Add the listeners to the buttons
-        addListeners();
-    }
-
-    public void addListeners() throws IOException, URISyntaxException {
-        // Start Button
-        startButton.setOnAction(e -> {
-            startRecording();
-        });
-
-        // Stop Button
-        stopButton.setOnAction(e -> {
-            stopRecording();
-            //RESULT OF TRANSCRIPTION STORED HERE
-            String transcription = "";
-            try {
-                transcription = transcribe();
-                Label l = (Label)this.getChildren().get(this.getChildren().size()-1);
-                l.setText("Meal Type:" + transcription);
-            }
-            catch (IOException e1){
-                System.err.println("IOException");
-            }
-            catch (URISyntaxException e2){
-                System.err.println("URISyntaxException");
-            }
-            continueButton = new Button("Continue");
-            this.getChildren().add(continueButton);
-            continueButton.setOnAction(e1->{
-                System.out.println("Unimplemented");
-            });
-        });
-
-        //go back on back button
-        backButton.setOnAction(e->{handler.menu();});
-
+        // // Set the title of the app
+        // primaryStage.setTitle("Audio Recorder");
+        // // Create scene of mentioned size with the border pane
+        // primaryStage.setScene(new Scene(root, 370, 120));
+        // // Make window non-resizable
+        // primaryStage.setResizable(false);
+        // // Show the app
+        // primaryStage.show();
     }
 
     public String transcribe() throws IOException, URISyntaxException {
@@ -137,12 +70,11 @@ class RecordAppFrame extends FlowPane {
                         // the format of the TargetDataLine
                         DataLine.Info dataLineInfo = new DataLine.Info(
                                 TargetDataLine.class,
-                                audioFormat);
+                                getAudioFormat());
                         // the TargetDataLine used to capture audio data from the microphone
                         targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-                        targetDataLine.open(audioFormat);
+                        targetDataLine.open(getAudioFormat());
                         targetDataLine.start();
-                        recordingLabel.setVisible(true);
 
                         // the AudioInputStream that will be used to write the audio data to a file
                         AudioInputStream audioInputStream = new AudioInputStream(
@@ -154,7 +86,6 @@ class RecordAppFrame extends FlowPane {
                                 audioInputStream,
                                 AudioFileFormat.Type.WAVE,
                                 audioFile);
-                        recordingLabel.setVisible(false);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -163,28 +94,9 @@ class RecordAppFrame extends FlowPane {
             t.start();
     }
 
-    private void stopRecording() {
+    public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
-    }
-}
-
-public class AudioRecorder extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-        // // Setting the Layout of the Window (Flow Pane)
-        // RecordAppFrame root = new RecordAppFrame();
-
-        // // Set the title of the app
-        // primaryStage.setTitle("Audio Recorder");
-        // // Create scene of mentioned size with the border pane
-        // primaryStage.setScene(new Scene(root, 370, 120));
-        // // Make window non-resizable
-        // primaryStage.setResizable(false);
-        // // Show the app
-        // primaryStage.show();
     }
 
     public static void main(String[] args) {
