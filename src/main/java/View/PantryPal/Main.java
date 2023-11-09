@@ -19,7 +19,7 @@ import java.util.List;
 
 import javax.management.RuntimeErrorException;
 
-class Recipe extends HBox { // extend HBox
+class UIRecipe extends HBox { // extend HBox
     private NavigationHandler handler;
     private Text title;
     private Label index; // for use in RecipeList
@@ -33,7 +33,7 @@ class Recipe extends HBox { // extend HBox
      * Constructor for Recipe class
      *
      */
-    Recipe(Text title, Text mealType, ArrayList<String> ingredients, ArrayList<String> recipeInstructions, NavigationHandler handler) {
+    UIRecipe(Text title, Text mealType, ArrayList<String> ingredients, ArrayList<String> recipeInstructions, NavigationHandler handler) {
         this.handler = handler;
         // is being displayed
         this.title = title;
@@ -85,12 +85,12 @@ class Recipe extends HBox { // extend HBox
         return this.title;
     }
 
-    Label getIndex(Recipe recipe) {
-        return recipe.index;
+    Label getIndex() {
+        return this.index;
     }
 
-    Text getMealType(Recipe recipe) {
-        return recipe.mealType;
+    Text getMealType() {
+        return this.mealType;
     }
 
     ArrayList<String> getIngredients() {
@@ -122,14 +122,14 @@ class Recipe extends HBox { // extend HBox
      * SetIngredients and RecipeInstructions more complex
      */
 
-    void setRecipeIndex(Recipe recipe, Label newIndex) {
+    void setRecipeIndex(UIRecipe recipe, Label newIndex) {
         recipe.index = newIndex;
     }
 }
 
-class RecipeList extends VBox { // extends HBox?
+class UIRecipeList extends VBox { // extends HBox?
     // new RecipeList
-    RecipeList() {
+    UIRecipeList() {
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -139,11 +139,14 @@ class RecipeList extends VBox { // extends HBox?
     public void updateRecipeIndices() {
         int index = 1;
         for (int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof Recipe) {
-                ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
+            if (this.getChildren().get(i) instanceof UIRecipe) {
+                ((UIRecipe) this.getChildren().get(i)).setRecipeIndex(index);
                 index++;
             }
         }
+    }
+
+    public void listRemove(String title) {
     }
 
     //add when delete implementing
@@ -235,16 +238,18 @@ class Header extends HBox {
 class AppFrame extends BorderPane {
     private Header header;
     private ListFooter footer;
-    private RecipeList recipeList;
+    private UIRecipeList recipeList;
     private Button newRecipeButton;
-    private NavigationHandler handler;
+    private NavigationHandler nHandler;
+    private RecipeList list;
+    private RecipeHandler rHandler;
 
     AppFrame(NavigationHandler handler) {
-        this.handler = handler;
+        this.nHandler = handler;
         // Initialise the header Object
         header = new Header("Recipe List");
         // Create a recipelist Object to hold the tasks
-        recipeList = new RecipeList();
+        recipeList = new UIRecipeList();
         // Initialise the Footer Object
         footer = new ListFooter();
 
@@ -270,18 +275,37 @@ class AppFrame extends BorderPane {
     newRecipeButton.setOnAction(e -> {
         // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
         //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
-        ArrayList<String> ingredients = new ArrayList<>();
-        ingredients.add("hot dogs");
-        ArrayList<String> instructions = new ArrayList<>();
-        instructions.add("1.freeze hot dogs");
-        instructions.add("2.eat");
-        Recipe recipe = new Recipe(new Text("Hot Dog Ice Cream"), new Text("Lunch"), ingredients, instructions, this.handler);
-        // Add task to tasklist
-        recipeList.getChildren().add(recipe);
-        recipeList.updateRecipeIndices();
+        String title = "Test Recipe 1";
+        String mealtype = "Lunch";
+        String ingredients = "food";
+        String instructions = "cook food";
+        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
+        
+        this.rHandler.addRecipe(r);
+        this.debugAddRecipe("Test Recipe 1", "Lunch", new ArrayList<String>(), new ArrayList<String>());
         //TODO: when adding new page, link to navhandler and create a navhandler method for new page
     });
     
+    }
+
+    public void debugAddRecipe(String title, String meal, ArrayList<String> ingredients, ArrayList<String> recipeinstructions){
+        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
+        UIRecipe recipe = new UIRecipe(new Text(title), new Text(meal),ingredients, recipeinstructions, this.nHandler);
+        // Add recipe to recipelist
+        recipeList.getChildren().add(recipe);
+        recipeList.updateRecipeIndices();
+    }
+
+    public NavigationHandler getNavHandler(){
+        return this.nHandler;
+    }
+
+    public RecipeHandler getRecipeHandler(){
+        return this.rHandler;
+    }
+
+    public UIRecipeList getRecipeList(){
+        return this.recipeList;
     }
 
 }
@@ -296,7 +320,7 @@ class RecipeDisplay extends BorderPane {
     private Button backButton;
 
     private NavigationHandler handler;
-    private Recipe r;
+    private UIRecipe r;
 
     RecipeDisplay(NavigationHandler handler) {
         this.handler = handler;
@@ -383,8 +407,7 @@ class NavigationHandler{
     public static final String DISPLAY_RECIPE = "DisplayRecipe";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
-    NavigationHandler(Stage primaryStage){
-        this.primaryStage = primaryStage;
+    NavigationHandler(){
         this.pageList = new HashMap<>();
         pageList.put(DISPLAY_RECIPE, null);
         //initialize this to blank, we will fill in each time
@@ -407,10 +430,6 @@ class NavigationHandler{
             // Set the title of the Recipe Page
             primaryStage.setTitle("PantryPal");
             primaryStage.setScene(RecipeList);
-            // Make window non-resizable
-            primaryStage.setResizable(false);
-            // Show the app
-            primaryStage.show();
         } catch (Exception e) {
             throw e;
         }
@@ -420,7 +439,7 @@ class NavigationHandler{
      * takes a recipe, link this with new recipe button
      * creates new recipe page, adds to map, displays it
      */
-    void displayRecipe(Recipe r){
+    void displayRecipe(UIRecipe r){
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
@@ -438,6 +457,10 @@ class NavigationHandler{
             throw new RuntimeErrorException(null);
         }
     }
+
+    void setStage(Stage s){
+        this.primaryStage = s;
+    }
 }
 
 /*
@@ -449,14 +472,22 @@ public class Main extends Application {
 
         //navigation handler to change scenes
         //this contains a map of all pages
-        NavigationHandler handler = new NavigationHandler(primaryStage);
+        //appframe is initialized without navhandler
+        //set its thing to primarystage
+        NavigationHandler handler = new NavigationHandler();
+        handler.setStage(primaryStage);
         //each UI element must have access to handler if it wants to do navigation
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
         
-        //handler initializes by adding recipe list to pagelist and displaying it
+        //handler initializes by adding recipe list to pagelist
         handler.initialize(recipeList);
+
+        // Make window non-resizable
+        primaryStage.setResizable(false);
+        // Show the app
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
