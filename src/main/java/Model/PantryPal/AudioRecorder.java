@@ -12,25 +12,9 @@ import javax.sound.sampled.*;
 import java.net.*;
 import org.json.*;
 
-public class AudioRecorder extends Application {
+public class AudioRecorder {
 
     private TargetDataLine targetDataLine;
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-        // // Setting the Layout of the Window (Flow Pane)
-        // RecordAppFrame root = new RecordAppFrame();
-
-        // // Set the title of the app
-        // primaryStage.setTitle("Audio Recorder");
-        // // Create scene of mentioned size with the border pane
-        // primaryStage.setScene(new Scene(root, 370, 120));
-        // // Make window non-resizable
-        // primaryStage.setResizable(false);
-        // // Show the app
-        // primaryStage.show();
-    }
 
     // public String transcribe() throws IOException, URISyntaxException {
     //     return WhisperApi.whisperTranscribe("./recording.wav");

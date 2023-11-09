@@ -12,30 +12,30 @@ import javafx.scene.text.TextAlignment;
 import javafx.geometry.Insets;
 import javafx.scene.text.*;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.net.*;
+import javax.sound.sampled.*;
 
 import javax.management.RuntimeErrorException;
-import javax.sound.sampled.AudioFormat;
 
-class UIRecipe extends HBox { // extend HBox
+class Recipe extends HBox { // extend HBox
     private NavigationHandler handler;
     private Text title;
     private Label index; // for use in RecipeList
     private Text mealType;
     private Button displayButton;
-    private String ingredients; // change to different data struct?
-    private String recipeInstructions; // change to different data struct?
+    private ArrayList<String> ingredients; // change to different data struct?
+    private ArrayList<String> recipeInstructions; // change to different data struct?
     // add UI variables
 
     /*
      * Constructor for Recipe class
      *
      */
-    UIRecipe(Text title, Text mealType, String ingredients, String recipeInstructions, NavigationHandler handler) {
+    Recipe(Text title, Text mealType, ArrayList<String> ingredients, ArrayList<String> recipeInstructions, NavigationHandler handler) {
         this.handler = handler;
         // is being displayed
         this.title = title;
@@ -87,19 +87,19 @@ class UIRecipe extends HBox { // extend HBox
         return this.title;
     }
 
-    Label getIndex() {
-        return this.index;
+    Label getIndex(Recipe recipe) {
+        return recipe.index;
     }
 
-    Text getMealType() {
-        return this.mealType;
+    Text getMealType(Recipe recipe) {
+        return recipe.mealType;
     }
 
-    String getIngredients() {
+    ArrayList<String> getIngredients() {
         return this.ingredients;
     }
 
-    String getRecipeInstructions() {
+    ArrayList<String> getRecipeInstructions() {
         return this.recipeInstructions;
         // may want to print in a certain manner
     }
@@ -124,46 +124,27 @@ class UIRecipe extends HBox { // extend HBox
      * SetIngredients and RecipeInstructions more complex
      */
 
-    void setRecipeIndex(UIRecipe recipe, Label newIndex) {
+    void setRecipeIndex(Recipe recipe, Label newIndex) {
         recipe.index = newIndex;
     }
 }
 
-class UIRecipeList extends VBox { // extends HBox?
-    private RecipeList rList;
-    private NavigationHandler nHandler;
+class RecipeList extends VBox { // extends HBox?
     // new RecipeList
-    UIRecipeList(RecipeList rList, NavigationHandler nHandler) {
-        this.rList = rList;
-        this.nHandler = nHandler;
+    RecipeList() {
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
         this.setStyle("-fx-background-color: #F0F8FF;");
     }
 
-    //taken from lab 1
     public void updateRecipeIndices() {
         int index = 1;
         for (int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof UIRecipe) {
-                ((UIRecipe) this.getChildren().get(i)).setRecipeIndex(index);
+            if (this.getChildren().get(i) instanceof Recipe) {
+                ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
                 index++;
             }
-        }
-    }
-
-    public void updateList(NavigationHandler nHandler){
-        this.getChildren().clear();
-        ArrayList<Recipe> list = rList.getList();
-        for(Recipe r : list){
-            String title = r.getTitle();
-            String mealType = r.getMealType();
-            String ingredients = r.getIngredients();
-            String instructions = r.getInstructions();
-            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            this.getChildren().add(uiR);
-            this.updateRecipeIndices();
         }
     }
 
@@ -256,22 +237,17 @@ class Header extends HBox {
 class AppFrame extends BorderPane {
     private Header header;
     private ListFooter footer;
-    private UIRecipeList recipeList;
+    private RecipeList recipeList;
     private Button newRecipeButton;
-    private NavigationHandler nHandler;
-    private RecipeList list;
-    private RecipeHandler rHandler;
+    private NavigationHandler handler;
 
     AppFrame(NavigationHandler handler) {
-        this.nHandler = handler;
+        this.handler = handler;
         // Initialise the header Object
         header = new Header("Recipe List");
-        //create new recipelist and handler
-        list = new RecipeList();
-        rHandler = new RecipeHandler(list);
-        //create ui recipe list to display recipes
-        recipeList = new UIRecipeList(list,nHandler);
-        // Initialise the recipelist footer Object
+        // Create a recipelist Object to hold the tasks
+        recipeList = new RecipeList();
+        // Initialise the Footer Object
         footer = new ListFooter();
 
         ScrollPane Scroller = new ScrollPane(recipeList);
@@ -287,6 +263,20 @@ class AppFrame extends BorderPane {
         // Initialise Button Variables through the getters in Footer
         newRecipeButton = footer.getNewRecipeButton();
 
+        //INITIALIZE IT WITH ONE FOR NOW, because we cannot create yet
+
+        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
+        //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
+        ArrayList<String> ingredients = new ArrayList<>();
+        ingredients.add("hot dogs");
+        ArrayList<String> instructions = new ArrayList<>();
+        instructions.add("1.freeze hot dogs");
+        instructions.add("2.eat");
+        Recipe recipe = new Recipe(new Text("Hot Dog Ice Cream"), new Text("Lunch"), ingredients, instructions, this.handler);
+        // Add task to tasklist
+        recipeList.getChildren().add(recipe);
+        recipeList.updateRecipeIndices();
+
         // Call Event Listeners for the Buttons
         addListeners();
     }
@@ -294,47 +284,188 @@ class AppFrame extends BorderPane {
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-        //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
-        String title = "Test Recipe 1";
-        String mealtype = "Lunch";
-        String ingredients = "food";
-        String instructions = "cook food";
-        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-        
-        //send to controller
-        this.rHandler.addRecipe(r);
-        this.recipeList.updateList(nHandler);
-
-        //send to record page, and also add a recipe for test purposes
-        nHandler.recordMeal();
+        //TODO: when adding new page, link to navhandler and create a navhandler method for new page
+        handler.recordMeal();
     });
     
     }
 
-    // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
-    //     // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-    //     UIRecipe recipe = new UIRecipe(new Text(title), new Text(meal),ingredients, recipeinstructions, this.nHandler);
-    //     // Add recipe to recipelist
-    //     recipeList.getChildren().add(recipe);
-    //     recipeList.updateRecipeIndices();
-    // }
+}
 
-    public NavigationHandler getNavHandler(){
-        return this.nHandler;
+/**
+ * Page for detailed recipe display
+ */
+class RecipeDisplay extends BorderPane {
+    private Header header;
+    private DisplayFooter footer;
+    private Button editButton;
+    private Button backButton;
+
+    private NavigationHandler handler;
+    private Recipe r;
+
+    RecipeDisplay(NavigationHandler handler) {
+        this.handler = handler;
+        // Initialise the header Object
+        //header = new Header(r.getTitle().getText());
+        header = new Header("YOU SHOULDNT BE HERE");
+        // Initialise the Footer Object
+        footer = new DisplayFooter();
+
+        // Create a VBox in the center
+        VBox centerBox = new VBox();
+        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
+
+        // Create two scrollable boxes with text
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
+        ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
+        // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
+        // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
+
+        centerBox.getChildren().addAll(scrollPane1, scrollPane2);
+
+        // Set the VBox in the center of the BorderPane
+        this.setCenter(centerBox);
+        // Add header to the top of the BorderPane
+        this.setTop(header);
+        // Add footer to the bottom of the BorderPane
+        this.setBottom(footer);
+        // Initialise Button Variables through the getters in Footer
+
+        // Call Event Listeners for the Buttons
+        addListeners();
     }
 
-    public RecipeHandler getRecipeHandler(){
-        return this.rHandler;
+    public void setTitle(String s){
+        //called when displaying from handler, handler has blank one by default
+        //access header settext
+        header.setTitle(s);
     }
 
-    public UIRecipeList getRecipeList(){
-        return this.recipeList;
+    public void setIngredients(String s){
+        //called when displaying from handler, handler has blank one by default
+        VBox v = (VBox)this.getCenter();
+        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
+        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
+        TextField textField = (TextField) scroll1.getContent();
+        textField.setText(s);
+    }
+
+    public void setInstructions(String s){
+        //called when displaying from handler, handler has blank one by default
+        VBox v = (VBox)this.getCenter();
+        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
+        ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
+        TextField textField = (TextField) scroll2.getContent();
+        textField.setText(s);
+
+    }
+
+    public void addListeners()
+    {
+        Button backButton = footer.getBackButton();
+        backButton.setOnAction(e ->{
+            handler.menu();
+        });
+    }
+
+    // Helper method to create a scrollable text box
+    private ScrollPane createScrollableBox(String content) {
+        TextField textArea = new TextField(content);
+
+        ScrollPane scrollPane = new ScrollPane(textArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        return scrollPane;
     }
 
 }
 
-//ui page for recording
+/**class to handle navigation, has map of all scenes and pointer to primarystage
+ * */
+class NavigationHandler{
+    public static final String RECIPE_LIST = "RecipeList";
+    public static final String DISPLAY_RECIPE = "DisplayRecipe";
+    public static final String RECORD_MEALTYPE = "RecordMealType";
+    private Stage primaryStage;
+    private HashMap<String, Scene> pageList;
+    NavigationHandler(Stage primaryStage){
+        this.primaryStage = primaryStage;
+        this.pageList = new HashMap<>();
+        pageList.put(DISPLAY_RECIPE, null);
+        //initialize this to blank, we will fill in each time
+        RecipeDisplay display = new RecipeDisplay(this);
+        Scene details = new Scene(display, 500,600);
+        pageList.put(DISPLAY_RECIPE, details);
+    }
+
+    boolean showRecipeList(){
+        boolean ret = false;
+
+        return ret;
+    }
+    /**called when initializing, takes a scene(in this case the recipelist) and shows it
+     * */
+    void initialize(Scene RecipeList){
+
+        try {
+            pageList.put("RecipeList", RecipeList);
+            // Set the title of the Recipe Page
+            primaryStage.setTitle("PantryPal");
+            primaryStage.setScene(RecipeList);
+            // Make window non-resizable
+            primaryStage.setResizable(false);
+            // Show the app
+            primaryStage.show();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    /**
+     * takes a recipe, link this with new recipe button
+     * creates new recipe page, adds to map, displays it
+     */
+    void displayRecipe(Recipe r){
+        //get the display page and set its content
+        Scene s = pageList.get(DISPLAY_RECIPE);
+        RecipeDisplay rd = (RecipeDisplay)s.getRoot();
+        rd.setTitle(r.getTitle().getText());
+        rd.setIngredients(r.getIngredients().toString());
+        rd.setInstructions(r.getRecipeInstructions().toString());
+        primaryStage.setScene(s);
+    }
+
+    void menu(){
+        Scene f = pageList.get(RECIPE_LIST);
+        if(f != null){
+            primaryStage.setScene(f);
+        } else {
+            throw new RuntimeErrorException(null);
+        }
+    }
+
+    void recordMeal(){
+
+        Scene r = pageList.get(RECORD_MEALTYPE);
+        //new page for recording meal
+        try {
+            RecordAppFrame mealrecorder = new RecordAppFrame(this);
+            //Scene mealrecord = new Scene(mealrecorder, 370, 120);
+            Scene mealrecord = new Scene(mealrecorder, 370, 400);
+            pageList.put(RECORD_MEALTYPE, mealrecord);
+        } catch (IOException e1) {
+            System.out.println(e1);
+        } catch (URISyntaxException e2) {
+            System.out.println(e2);
+        }
+        //switches to mealtype page
+        r = pageList.get(RECORD_MEALTYPE);
+        primaryStage.setScene(r);
+    }
+}
+
 class RecordAppFrame extends FlowPane {
     private NavigationHandler handler;
     private Button startButton;
@@ -429,96 +560,6 @@ class RecordAppFrame extends FlowPane {
     
 }
 
-/**
- * Page for detailed recipe display
- */
-class RecipeDisplay extends BorderPane {
-    private Header header;
-    private DisplayFooter footer;
-    private Button editButton;
-    private Button backButton;
-
-    private NavigationHandler handler;
-    private UIRecipe r;
-
-    RecipeDisplay(NavigationHandler handler) {
-        this.handler = handler;
-        // Initialise the header Object
-        //header = new Header(r.getTitle().getText());
-        header = new Header("YOU SHOULDNT BE HERE");
-        // Initialise the Footer Object
-        footer = new DisplayFooter();
-
-        // Create a VBox in the center
-        VBox centerBox = new VBox();
-        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
-
-        // Create two scrollable boxes with text
-        ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
-        ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
-        // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
-        // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
-
-        centerBox.getChildren().addAll(scrollPane1, scrollPane2);
-
-        // Set the VBox in the center of the BorderPane
-        this.setCenter(centerBox);
-        // Add header to the top of the BorderPane
-        this.setTop(header);
-        // Add footer to the bottom of the BorderPane
-        this.setBottom(footer);
-        // Initialise Button Variables through the getters in Footer
-
-        // Call Event Listeners for the Buttons
-        addListeners();
-    }
-
-    public void setTitle(String s){
-        //called when displaying from handler, handler has blank one by default
-        //access header settext
-        header.setTitle(s);
-    }
-
-    public void setIngredients(String s){
-        //called when displaying from handler, handler has blank one by default
-        VBox v = (VBox)this.getCenter();
-        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
-        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
-        TextField textField = (TextField) scroll1.getContent();
-        textField.setText(s);
-    }
-
-    public void setInstructions(String s){
-        //called when displaying from handler, handler has blank one by default
-        VBox v = (VBox)this.getCenter();
-        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
-        ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
-        TextField textField = (TextField) scroll2.getContent();
-        textField.setText(s);
-
-    }
-
-    public void addListeners()
-    {
-        Button backButton = footer.getBackButton();
-        backButton.setOnAction(e ->{
-            handler.menu();
-        });
-    }
-
-    // Helper method to create a scrollable text box
-    private ScrollPane createScrollableBox(String content) {
-        TextField textArea = new TextField(content);
-
-        ScrollPane scrollPane = new ScrollPane(textArea);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        return scrollPane;
-    }
-
-}
-
 /*
  * Class Copied from Lab 1 for Main
  */
@@ -528,22 +569,14 @@ public class Main extends Application {
 
         //navigation handler to change scenes
         //this contains a map of all pages
-        //appframe is initialized without navhandler
-        //set its thing to primarystage
-        NavigationHandler handler = new NavigationHandler();
-        handler.setStage(primaryStage);
+        NavigationHandler handler = new NavigationHandler(primaryStage);
         //each UI element must have access to handler if it wants to do navigation
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
         
-        //handler initializes by adding recipe list to pagelist
+        //handler initializes by adding recipe list to pagelist and displaying it
         handler.initialize(recipeList);
-
-        // Make window non-resizable
-        primaryStage.setResizable(false);
-        // Show the app
-        primaryStage.show();
     }
 
     public static void main(String[] args) {

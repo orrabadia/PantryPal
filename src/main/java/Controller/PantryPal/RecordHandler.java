@@ -5,11 +5,12 @@ import java.io.*;
 import java.net.*;
 
 public class RecordHandler {
-
+    private AudioRecorder ar;
     AudioRecorder audioRecorder;
 
+    //accept arguemtn, and thats how you decide to mock or not
     RecordHandler() {
-
+        ar = new AudioRecorder();
     }
 
     RecordHandler(RecordAppFrame recordAppFrame) {
@@ -17,12 +18,12 @@ public class RecordHandler {
     }
 
     public void record() {
-        audioRecorder = new AudioRecorder();
-        audioRecorder.startRecording();
+        //audioRecorder = new AudioRecorder();
+        ar.startRecording();
     }
 
     public void stop() {
-        audioRecorder.stopRecording();
+        ar.stopRecording();
         //return audioRecorder.transcribe();
         //return "";
     }
