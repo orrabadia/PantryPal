@@ -32,9 +32,9 @@ public class AudioRecorder extends Application {
         // primaryStage.show();
     }
 
-    public String transcribe() throws IOException, URISyntaxException {
-        return WhisperApi.whisperTranscribe("./recording.wav");
-    }
+    // public String transcribe() throws IOException, URISyntaxException {
+    //     return WhisperApi.whisperTranscribe("./recording.wav");
+    // }
 
     private AudioFormat getAudioFormat() {
         // the number of samples of audio per second.

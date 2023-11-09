@@ -21,8 +21,9 @@ public class RecordHandler {
         audioRecorder.startRecording();
     }
 
-    public String stop() throws IOException, URISyntaxException {
+    public void stop() {
         audioRecorder.stopRecording();
-        return audioRecorder.transcribe();
+        //return audioRecorder.transcribe();
+        //return "";
     }
 }

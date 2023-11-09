@@ -478,6 +478,7 @@ class RecordAppFrame extends FlowPane {
     private Label instructions;
     Thread t;
     RecordHandler rHandler;
+    WhisperHandler wHandler;
 
     // Set a default style for buttons and fields - background color, font size,
     // italics
@@ -529,11 +530,12 @@ class RecordAppFrame extends FlowPane {
         // Stop Button
         stopButton.setOnAction(e -> {
             recordingLabel.setVisible(false);
-            
+            rHandler.stop();
             //RESULT OF TRANSCRIPTION STORED HERE
             String transcription = "";
             try {
-                transcription = rHandler.stop();
+                wHandler = new WhisperHandler();
+                transcription = wHandler.transcribe();
                 Label l = (Label)this.getChildren().get(this.getChildren().size()-1);
                 l.setText("Meal Type:" + transcription);
             }

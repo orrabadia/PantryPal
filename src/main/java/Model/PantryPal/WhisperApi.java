@@ -9,7 +9,7 @@ public class WhisperApi implements Whisper {
     private static final String MODEL = "whisper-1";
     //private static final String FILE_PATH = "./Guy Yelling Among Us.mp3";
 
-    public static String whisperTranscribe(String fileName) throws IOException, URISyntaxException {
+    public String whisperTranscribe(String fileName) throws IOException, URISyntaxException {
     // Create file object from file path
     File file = new File(fileName);
     
