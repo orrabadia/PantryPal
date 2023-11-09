@@ -2,6 +2,9 @@ package PantryPal;
 
 // imports for unit tests
 import org.junit.jupiter.api.Test;
+
+import Model.PantryPal.AppFrame;
+
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

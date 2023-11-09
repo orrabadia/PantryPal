@@ -1,4 +1,4 @@
-package PantryPal;
+package Model.PantryPal;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
