@@ -16,7 +16,7 @@ public class RecordHandler {
         ar = new MockRecorder();
     }
 
-    public void record() {
+    public void record() throws IOException {
         //audioRecorder = new AudioRecorder();
         ar.startRecording();
     }

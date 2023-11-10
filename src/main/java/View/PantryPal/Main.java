@@ -392,7 +392,12 @@ class RecordAppFrame extends FlowPane {
         startButton.setOnAction(e -> {
             rHandler = new RecordHandler();
             recordingLabel.setVisible(true);
-            rHandler.record();
+            try {
+                rHandler.record();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             
         });
 

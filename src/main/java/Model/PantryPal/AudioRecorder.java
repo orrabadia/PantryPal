@@ -20,7 +20,7 @@ public class AudioRecorder implements Recorder {
     //     return WhisperApi.whisperTranscribe("./recording.wav");
     // }
 
-    private AudioFormat getAudioFormat() {
+    public AudioFormat getAudioFormat() {
         // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -45,7 +45,7 @@ public class AudioRecorder implements Recorder {
                 bigEndian);
     }
 
-    public void startRecording() {
+    public void startRecording() throws IOException {
         Thread t = new Thread(
             new Runnable() {
                 @Override
