@@ -6,7 +6,6 @@ import java.net.*;
 
 public class RecordHandler {
     private AudioRecorder ar;
-    AudioRecorder audioRecorder;
 
     //accept arguemtn, and thats how you decide to mock or not
     RecordHandler() {
