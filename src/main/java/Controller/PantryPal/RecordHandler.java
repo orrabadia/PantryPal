@@ -5,15 +5,15 @@ import java.io.*;
 import java.net.*;
 
 public class RecordHandler {
-    private AudioRecorder ar;
+    private Recorder ar;
 
     //accept arguemtn, and thats how you decide to mock or not
     RecordHandler() {
         ar = new AudioRecorder();
     }
 
-    RecordHandler(RecordAppFrame recordAppFrame) {
-    
+    RecordHandler(boolean mock) {
+        ar = new MockRecorder();
     }
 
     public void record() {

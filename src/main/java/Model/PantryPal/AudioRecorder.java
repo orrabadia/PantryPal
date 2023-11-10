@@ -12,7 +12,7 @@ import javax.sound.sampled.*;
 import java.net.*;
 import org.json.*;
 
-public class AudioRecorder {
+public class AudioRecorder implements Recorder {
 
     private TargetDataLine targetDataLine;
 
