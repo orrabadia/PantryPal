@@ -36,14 +36,14 @@ public class TestAll {
      }
 
     //story 1, test the gettitle and add and delete
-    @Test 
+    @Test
     //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS1RecipeAdd() {
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler, title1, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 1);
@@ -55,7 +55,7 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler, title1, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 1);
@@ -63,7 +63,7 @@ public class TestAll {
         assertEquals(rList.size(), 0);
     }
 
-    @Test 
+    @Test
     //test that you can get the title(this is used to display in the ui)
     public void unitTestS1RecipeDisplay(){
         String title1 = "Test Recipe 1";
@@ -71,8 +71,8 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler, title1, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe(rHandler, title2, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         //add two and check if you can get title, maybe 2 messes it up
@@ -81,14 +81,14 @@ public class TestAll {
     }
 
 
-    @Test 
+    @Test
     public void storyTestS1NoRecipes() {
         //at start, should be no recipes
         int initialRecipeCount = rList.size();
         assertEquals(initialRecipeCount, 0);
     }
 
-    @Test 
+    @Test
     //having recipes should increase recipe count(these are displayed)
     public void storyTestS1ExistRecipe() {
         //add 2 recipes, 2 should be displayed
@@ -96,14 +96,14 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler,title, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe(rHandler,"Test Recipe 2", mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         assertEquals(rList.size(), 2);
     }
 
-    @Test 
+    @Test
     //if remove recipes, count should go down(because UI displays this list none should be displayed in UI)
     //actual delete UI functionality with recipe is for later, just want to make sure nothing will be displayed
     public void storyTestS1RemovedRecipes() {
@@ -113,12 +113,12 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler, title1, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe(rHandler, title2, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         assertEquals(rList.size(), 2);
-        //delete 
+        //delete
         rList.remove(title1);
         assertEquals(rList.size(), 1);
         rList.remove(title2);
@@ -133,8 +133,8 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
+        Recipe r1= new Recipe(rHandler, title1, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe(rHandler, title2, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         //add two and check if you can get title, maybe 2 messes it up

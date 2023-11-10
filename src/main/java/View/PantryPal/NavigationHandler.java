@@ -53,6 +53,9 @@ class NavigationHandler{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
+
+        rd.setR(r);
+
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
@@ -71,6 +74,7 @@ class NavigationHandler{
     void setStage(Stage s){
         this.primaryStage = s;
     }
+
 
     //STORY 3, RECORDMEAL
     void recordMeal(){

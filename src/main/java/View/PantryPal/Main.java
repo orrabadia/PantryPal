@@ -29,8 +29,8 @@ class UIRecipe extends HBox { // extend HBox
     private Button displayButton;
     private String ingredients; // change to different data struct?
     private String recipeInstructions; // change to different data struct?
+    private Recipe recipe;
     // add UI variables
-
     /*
      * Constructor for Recipe class
      *
@@ -99,6 +99,14 @@ class UIRecipe extends HBox { // extend HBox
         return this.ingredients;
     }
 
+    void setRecipe(Recipe recipe){
+        this.recipe = recipe;
+    }
+
+    Recipe getRecipe(){
+        return this.recipe;
+    }
+
     String getRecipeInstructions() {
         return this.recipeInstructions;
         // may want to print in a certain manner
@@ -162,6 +170,7 @@ class UIRecipeList extends VBox { // extends HBox?
             String ingredients = r.getIngredients();
             String instructions = r.getInstructions();
             UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+            uiR.setRecipe(r);
             this.getChildren().add(uiR);
             this.updateRecipeIndices();
         }
@@ -206,6 +215,8 @@ class ListFooter extends HBox {
 class DisplayFooter extends HBox {
     private Button editButton;
     private Button backButton;
+    private Button deleteButton;
+
     DisplayFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -216,8 +227,11 @@ class DisplayFooter extends HBox {
 
         editButton = new Button("Edit");
         backButton = new Button("Back");
+        deleteButton = new Button("Delete");
+        deleteButton.setStyle(defaultButtonStyle);
         editButton.setStyle(defaultButtonStyle);
         backButton.setStyle(defaultButtonStyle);
+        this.getChildren().add(deleteButton);
         this.getChildren().add(editButton);
         this.getChildren().add(backButton);
         this.setAlignment(Pos.CENTER);
@@ -228,6 +242,9 @@ class DisplayFooter extends HBox {
     }
     public Button getBackButton(){
         return backButton;
+    }
+    public Button getDeleteButton(){
+        return deleteButton;
     }
 }
 
@@ -300,8 +317,8 @@ class AppFrame extends BorderPane {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-        
+        Recipe r = new Recipe( this.rHandler, title, mealtype, ingredients, instructions);
+
         //send to controller
         this.rHandler.addRecipe(r);
         this.recipeList.updateList(nHandler);
@@ -309,7 +326,7 @@ class AppFrame extends BorderPane {
         //send to record page, and also add a recipe for test purposes
         nHandler.recordMeal();
     });
-    
+
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -393,7 +410,7 @@ class RecordAppFrame extends FlowPane {
             rHandler = new RecordHandler();
             recordingLabel.setVisible(true);
             rHandler.record();
-            
+
         });
 
         // Stop Button
@@ -426,7 +443,7 @@ class RecordAppFrame extends FlowPane {
 
     }
 
-    
+
 }
 
 /**
@@ -473,6 +490,10 @@ class RecipeDisplay extends BorderPane {
         addListeners();
     }
 
+    public void setR(UIRecipe recipe){
+        this.r = recipe;
+    }
+
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
         //access header settext
@@ -504,12 +525,19 @@ class RecipeDisplay extends BorderPane {
         backButton.setOnAction(e ->{
             handler.menu();
         });
+
+        Button deleteButton = footer.getDeleteButton();
+        deleteButton.setOnAction(e ->{
+            this.r.getRecipe().getRHandler().deleteRecipe(this.r.getRecipe().getTitle());
+
+            //then call update UI recipe
+            handler.menu();
+        });
     }
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
         TextField textArea = new TextField(content);
-
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
@@ -536,7 +564,7 @@ public class Main extends Application {
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
-        
+
         //handler initializes by adding recipe list to pagelist
         handler.initialize(recipeList);
 
