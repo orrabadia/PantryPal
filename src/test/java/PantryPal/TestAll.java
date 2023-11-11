@@ -11,14 +11,25 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
 
+//import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 
 public class TestAll {
     private RecipeList rList;
     private RecipeHandler rHandler;
+    private RecordHandler recordHandler;
+    private WhisperHandler whisperHandler;
 
      @BeforeEach
      public void initialize(){
@@ -27,7 +38,21 @@ public class TestAll {
         //this represents the initial app where no recipes are in the recipelist
         //every time you click add it adds to list, so this represents the list
         //the displayed list is gotten from the recipelist instance
+
+        // creates a new RecordHandler (with MockRecorder)
+        recordHandler = new RecordHandler(true);
+
+        whisperHandler = new WhisperHandler(true);
      }
+
+    public void deleteRecording() {
+        String fileName = "recording.wav";
+        File file = new File(fileName);
+
+        if (file.exists()) {
+            file.delete();
+        }
+    }
 
      @AfterEach
      public void clearrecipes(){
@@ -145,4 +170,124 @@ public class TestAll {
         assertEquals(r.getInstructions(), "cook food");
     }
 
+    // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
+    @Test 
+    //this tests that the recipe list can add recipes(this is called when you push button)
+    public void unitTestS3Record() {
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+    }
+
+    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // it in Whisper and see whether it's text matches what it should be
+    // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
+    @Test 
+    //this tests that the recipe list can add recipes(this is called when you push button)
+    public void unitTestS3Whisper() {
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        try {
+            assertEquals( "Dinner", whisperHandler.transcribe());
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+    }
+
+    @Test 
+    // tests the combined functionality of record and transcribe
+    public void storyTestS3MealType() {
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        try {
+            assertEquals( "Dinner", whisperHandler.transcribe());
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+    }
 }

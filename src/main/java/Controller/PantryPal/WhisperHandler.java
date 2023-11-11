@@ -15,7 +15,6 @@ public class WhisperHandler {
     }
 
     public String transcribe() throws IOException, URISyntaxException {
-        whisper = new WhisperApi();
         return whisper.whisperTranscribe("./recording.wav");
     }
 }
