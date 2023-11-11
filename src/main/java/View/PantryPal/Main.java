@@ -420,28 +420,44 @@ class RecordAppFrame extends FlowPane {
             rHandler.stop();
             //RESULT OF TRANSCRIPTION STORED HERE
             String transcription = "";
-            try {
-                wHandler = new WhisperHandler();
-                transcription = wHandler.transcribe();
-                l.setText("Meal Type:" + transcription);
-            }
-            catch (IOException e1){
-                System.err.println("IOException");
-            }
-            catch (URISyntaxException e2){
-                System.err.println("URISyntaxException");
-            }
+            
             if (name == "meal") {  
+                try {
+                    wHandler = new WhisperHandler();
+                    transcription = wHandler.transcribe();
+                    l.setText("Meal Type:" + transcription);
+                }
+                catch (IOException e1){
+                    System.err.println("IOException");
+                }
+                catch (URISyntaxException e2){
+                    System.err.println("URISyntaxException");
+                }
                 continueButton = new Button("Continue");
                 this.getChildren().add(continueButton);
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients();
                 });
+                 //go back on back button
+                backButton.setOnAction(e2->{handler.menu();});
+            }
+            else {
+                try {
+                    wHandler = new WhisperHandler();
+                    transcription = wHandler.transcribe();
+                    l.setText("Ingredients:" + transcription);
+                }
+                catch (IOException e1){
+                    System.err.println("IOException");
+                }
+                catch (URISyntaxException e2){
+                    System.err.println("URISyntaxException");
+                }
+
             }
         });
 
-        //go back on back button
-        backButton.setOnAction(e->{handler.menu();});
+       
 
     }
 
