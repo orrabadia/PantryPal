@@ -431,7 +431,8 @@ class RecordAppFrame extends FlowPane {
             rHandler.stop();
             //RESULT OF TRANSCRIPTION STORED HERE
             String transcription = "";
-            
+            continueButton = new Button("Continue");
+            this.getChildren().add(continueButton);
             if (name == "meal") {  
                 try {
                     wHandler = new WhisperHandler();
@@ -446,8 +447,6 @@ class RecordAppFrame extends FlowPane {
                 catch (URISyntaxException e2){
                     System.err.println("URISyntaxException");
                 }
-                continueButton = new Button("Continue");
-                this.getChildren().add(continueButton);
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients(recipe);
                 });
@@ -465,6 +464,9 @@ class RecordAppFrame extends FlowPane {
                 catch (URISyntaxException e2){
                     System.err.println("URISyntaxException");
                 }
+                continueButton.setOnAction(e1->{
+                    System.out.println("Not implemented for ChatGPT generated page yet");
+                });
             }
         });
 
