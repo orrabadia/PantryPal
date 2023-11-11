@@ -30,6 +30,7 @@ public class TestAll {
     private RecipeHandler rHandler;
     private RecordHandler recordHandler;
     private WhisperHandler whisperHandler;
+    private Recipe recipe;
 
      @BeforeEach
      public void initialize(){
@@ -43,6 +44,8 @@ public class TestAll {
         recordHandler = new RecordHandler(true);
 
         whisperHandler = new WhisperHandler(true);
+
+        recipe = new Recipe();
      }
 
     public void deleteRecording() {
@@ -172,7 +175,6 @@ public class TestAll {
 
     // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
     @Test 
-    //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS3Record() {
         try {
                 recordHandler.record();
@@ -187,9 +189,7 @@ public class TestAll {
 
     // Story 3, test that the "functionality" of getting recording.wav and processing
     // it in Whisper and see whether it's text matches what it should be
-    // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
     @Test 
-    //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS3Whisper() {
         File audioFile = new File("recording.wav");
         
@@ -236,8 +236,17 @@ public class TestAll {
         }
     }
 
+    // Story 3, test whether our program saves a user's meal type info
+    // Here we separately test for whether our program can save a meal type
+    // without the funcitonality of Record or Whisper (we can test all of them in the story test)
     @Test 
-    // tests the combined functionality of record and transcribe
+    public void unitTestS3SaveMealType() {
+        recipe.setMealType("Dinner");
+        assertEquals("Dinner", recipe.getMealType());
+    }
+
+    @Test 
+    // tests the combined functionality of record and transcribe and saving meal type
     public void storyTestS3MealType() {
         try {
                 recordHandler.record();
@@ -280,8 +289,9 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
+        String transcription = "";
         try {
-            assertEquals( "Dinner", whisperHandler.transcribe());
+            transcription = whisperHandler.transcribe();
         }
         catch (IOException e1) {
             System.err.println("IOException");
@@ -289,6 +299,9 @@ public class TestAll {
         catch (URISyntaxException e2){
                 System.err.println("URISyntaxException");
         }
+        assertEquals( "Dinner", transcription);
+        recipe.setMealType(transcription);
+        assertEquals("Dinner", recipe.getMealType());
     }
 
     @Test 

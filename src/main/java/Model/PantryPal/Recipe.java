@@ -5,6 +5,12 @@ public class Recipe {
     private String mealType;
     private String ingredients;
     private String instructions;
+    Recipe() {
+        title="";
+        mealType="";
+        ingredients="";
+        instructions="";
+    }
     Recipe(String title, String mealType, String ingredients, String instructions){
         this.title = title;
         this.mealType = mealType;
@@ -25,5 +31,18 @@ public class Recipe {
 
     public String getInstructions(){
         return this.instructions;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setMealType(String mealType) {
+        this.mealType = mealType;
+    }
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 }
