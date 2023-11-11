@@ -361,8 +361,9 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
+        String transcription = "";
         try {
-            assertEquals( "Dinner", whisperHandler.transcribe());
+            transcription = whisperHandler.transcribe();
         }
         catch (IOException e1) {
             System.err.println("IOException");
@@ -370,5 +371,8 @@ public class TestAll {
         catch (URISyntaxException e2){
                 System.err.println("URISyntaxException");
         }
+        assertEquals( "Dinner", transcription);
+        recipe.setMealType(transcription);
+        assertEquals("Dinner", recipe.getMealType());
     }
 }
