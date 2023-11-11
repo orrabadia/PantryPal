@@ -454,6 +454,9 @@ class RecordAppFrame extends FlowPane {
                     System.err.println("URISyntaxException");
                 }
 
+
+                //go back to the meal type page
+                backButton.setOnAction(e2->{handler.recordMeal();});
             }
         });
 
