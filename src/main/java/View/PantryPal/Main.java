@@ -97,8 +97,8 @@ class UIRecipe extends HBox { // extend HBox
         return this.ingredients;
     }
 
-<<<<<<< Updated upstream
-=======
+
+
     void setRecipe(Recipe recipe){
         this.recipe = recipe;
     }
@@ -107,7 +107,7 @@ class UIRecipe extends HBox { // extend HBox
         return this.recipe;
     }
 
->>>>>>> Stashed changes
+
     String getRecipeInstructions() {
         return this.recipeInstructions;
         // may want to print in a certain manner
