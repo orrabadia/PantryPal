@@ -290,4 +290,72 @@ public class TestAll {
                 System.err.println("URISyntaxException");
         }
     }
+
+    @Test 
+    // tests a rerecord situation, where the user doesn't like the result of the first 
+    // record they did and rerecord again
+    public void storyTestS3Rerecord() {
+        // first record
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+
+        // second record
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        assertEquals(true, file.exists());
+
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        try {
+            assertEquals( "Dinner", whisperHandler.transcribe());
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+    }
 }
