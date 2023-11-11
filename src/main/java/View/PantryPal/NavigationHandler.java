@@ -74,11 +74,11 @@ class NavigationHandler{
     }
 
     //STORY 3, RECORDMEAL
-    void recordMeal(Recipe recipe){
+    void recordMeal(CreateHandler createHandler){
         Scene r = pageList.get(RECORD_MEALTYPE);
         //new page for recording meal
         try {
-            RecordAppFrame mealrecorder = new RecordAppFrame(this, "meal", recipe);
+            RecordAppFrame mealrecorder = new RecordAppFrame(this, "meal", createHandler);
             //Scene mealrecord = new Scene(mealrecorder, 370, 120);
             Scene mealrecord = new Scene(mealrecorder, 370, 400);
             pageList.put(RECORD_MEALTYPE, mealrecord);
@@ -93,11 +93,11 @@ class NavigationHandler{
     }
 
     //Story 4, Record Ingredients
-    void recordIngredients(Recipe recipe) {
+    void recordIngredients(CreateHandler createHandler) {
         Scene r = pageList.get(RECORD_INGREDIENTS);
         //new page for recording ingredients
         try {
-            RecordAppFrame ingredientrecorder = new RecordAppFrame(this, "ingredients", recipe);
+            RecordAppFrame ingredientrecorder = new RecordAppFrame(this, "ingredients", createHandler);
             //Scene mealrecord = new Scene(mealrecorder, 370, 120);
             Scene ingredientrecord = new Scene(ingredientrecorder, 370, 400);
             pageList.put(RECORD_INGREDIENTS, ingredientrecord);

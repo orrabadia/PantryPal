@@ -30,7 +30,7 @@ public class TestAll {
     private RecipeHandler rHandler;
     private RecordHandler recordHandler;
     private WhisperHandler whisperHandler;
-    private Recipe recipe;
+    private CreateHandler createHandler;
 
      @BeforeEach
      public void initialize(){
@@ -45,7 +45,7 @@ public class TestAll {
 
         whisperHandler = new WhisperHandler(true);
 
-        recipe = new Recipe();
+        createHandler = new CreateHandler();
      }
 
     public void deleteRecording() {
@@ -241,8 +241,8 @@ public class TestAll {
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
     @Test 
     public void unitTestS3SaveMealType() {
-        recipe.setMealType("Dinner");
-        assertEquals("Dinner", recipe.getMealType());
+        createHandler.getRecipe().setMealType("Dinner");
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
     @Test 
@@ -300,8 +300,8 @@ public class TestAll {
                 System.err.println("URISyntaxException");
         }
         assertEquals( "Dinner", transcription);
-        recipe.setMealType(transcription);
-        assertEquals("Dinner", recipe.getMealType());
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
     @Test 
@@ -372,8 +372,8 @@ public class TestAll {
                 System.err.println("URISyntaxException");
         }
         assertEquals( "Dinner", transcription);
-        recipe.setMealType(transcription);
-        assertEquals("Dinner", recipe.getMealType());
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
     // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
@@ -444,8 +444,8 @@ public class TestAll {
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
     @Test 
     public void unitTestS4SaveIngredients() {
-        recipe.setIngredients("Corn, Peas, Carrots, Chicken");
-        assertEquals("Corn, Peas, Carrots, Chicken", recipe.getIngredients());
+        createHandler.getRecipe().setIngredients("Corn, Peas, Carrots, Chicken");
+        assertEquals("Corn, Peas, Carrots, Chicken", createHandler.getRecipe().getIngredients());
     }
 
     @Test 
@@ -503,8 +503,8 @@ public class TestAll {
                 System.err.println("URISyntaxException");
         }
         assertEquals( "Dinner", transcription);
-        recipe.setIngredients(transcription);
-        assertEquals("Dinner", recipe.getIngredients());
+        createHandler.getRecipe().setIngredients(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getIngredients());
     }
 
     @Test 
@@ -575,7 +575,7 @@ public class TestAll {
                 System.err.println("URISyntaxException");
         }
         assertEquals( "Dinner", transcription);
-        recipe.setIngredients(transcription);
-        assertEquals("Dinner", recipe.getIngredients());
+        createHandler.getRecipe().setIngredients(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getIngredients());
     }
 }

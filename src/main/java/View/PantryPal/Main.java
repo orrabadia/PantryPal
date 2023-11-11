@@ -307,8 +307,8 @@ class AppFrame extends BorderPane {
         this.recipeList.updateList(nHandler);
 
         //send to record page, and also add a recipe for test purposes
-        Recipe recipe = new Recipe();
-        nHandler.recordMeal(recipe);
+        CreateHandler createHandler = new CreateHandler();
+        nHandler.recordMeal(createHandler);
     });
     
     }
@@ -351,14 +351,14 @@ class RecordAppFrame extends FlowPane {
     WhisperHandler wHandler;
     Label l;
     String name;
-    Recipe recipe;
+    CreateHandler createHandler;
 
     // Set a default style for buttons and fields - background color, font size,
     // italics
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
 
-    RecordAppFrame(NavigationHandler handler, String name, Recipe recipe) throws IOException, URISyntaxException {
+    RecordAppFrame(NavigationHandler handler, String name, CreateHandler createHandler) throws IOException, URISyntaxException {
         // Set properties for the flowpane
         this.setPrefSize(370, 120);
         this.setPadding(new Insets(5, 0, 5, 5));
@@ -370,7 +370,7 @@ class RecordAppFrame extends FlowPane {
 
         this.name = name;
 
-        this.recipe = recipe;
+        this.createHandler = createHandler;
         // Add the buttons and text fields
 
         startButton = new Button("Start");
@@ -396,7 +396,7 @@ class RecordAppFrame extends FlowPane {
             instructions = new Label("Please list your ingredients");
             transcriptionLabel = new Label("Please say the ingredients you will use:");
             //go back to the meal type page
-            backButton.setOnAction(e2->{handler.recordMeal(recipe);});
+            backButton.setOnAction(e2->{handler.recordMeal(createHandler);});
             Button cancelButton = new Button("Cancel");
             cancelButton.setOnAction(e3->{handler.menu();});
             this.getChildren().add(cancelButton);
@@ -440,8 +440,8 @@ class RecordAppFrame extends FlowPane {
                 try {
                     wHandler = new WhisperHandler();
                     transcription = wHandler.transcribe();
-                    recipe.setMealType(transcription);
-                    l.setText("Meal Type:" + recipe.getMealType());
+                    createHandler.getRecipe().setMealType(transcription);
+                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
                     
                 }
                 catch (IOException e1){
@@ -451,15 +451,15 @@ class RecordAppFrame extends FlowPane {
                     System.err.println("URISyntaxException");
                 }
                 continueButton.setOnAction(e1->{
-                    handler.recordIngredients(recipe);
+                    handler.recordIngredients(createHandler);
                 });
             }
             else {
                 try {
                     wHandler = new WhisperHandler();
                     transcription = wHandler.transcribe();
-                    recipe.setIngredients(transcription);
-                    l.setText("Ingredients:" + recipe.getIngredients());
+                    createHandler.getRecipe().setIngredients(transcription);
+                    l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
                 }
                 catch (IOException e1){
                     System.err.println("IOException");
