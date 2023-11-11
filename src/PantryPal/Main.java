@@ -1,6 +1,6 @@
 package PantryPal;
+
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
@@ -9,6 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextAlignment;
 import javafx.geometry.Insets;
 import javafx.scene.text.*;
 import java.io.*;
@@ -17,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 class Recipe extends HBox { // extend HBox
-    private Text title;
-    private Label index; // for use in RecipeList
-    private Text mealType;
+    private String title;
+    private int index; // for use in RecipeList
+    private String mealType;
     private ArrayList<String> ingredients; // change to different data struct?
     private ArrayList<String> recipeInstructions; // change to different data struct?
     // add UI variables
@@ -28,52 +30,37 @@ class Recipe extends HBox { // extend HBox
      * Constructor for Recipe class
      *
      */
-    Recipe(Text title, Text mealType, ArrayList<String> ingredients, ArrayList<String> recipeInstructions) {
-        // is being displayed
+    Recipe(String title, int index, String mealType, ArrayList<String> ingredients,
+        ArrayList<String> recipeInstructions) {
         this.title = title;
-        // not being displayed
+        this.index = index;
         this.ingredients = ingredients;
         this.recipeInstructions = recipeInstructions;
         this.mealType = mealType;
 
-        // copied from lab 1, to display
         this.setPrefSize(500, 20); // sets size of task
         this.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");
-        index = new Label();
-        index.setText("");
-        index.setPrefSize(40, 20); // set size of Index label
-        index.setTextAlignment(TextAlignment.CENTER); // Set alignment of index label
-        index.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the task
-        index.setTextAlignment(TextAlignment.LEFT);
-        this.getChildren().add(index);
 
-        title.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;");
-        title.setTextAlignment(TextAlignment.LEFT);
-        this.getChildren().add(title);
     }
 
-    public void setRecipeIndex(int num){
-        this.index.setText(num + "");
+    String getTitle(Recipe recipe) {
+        return recipe.title;
     }
 
-    Text getTitle() {
-        return this.title;
+    int getIndex(Recipe recipe) {
+        return recipe.index;
     }
 
-    Label getIndex() {
-        return this.index;
+    String getMealType(Recipe recipe) {
+        return recipe.mealType;
     }
 
-    Text getMealType() {
-        return this.mealType;
+    ArrayList<String> getIngredients(Recipe recipe) {
+        return recipe.ingredients;
     }
 
-    ArrayList<String> getIngredients() {
-        return this.ingredients;
-    }
-
-    ArrayList<String> getRecipeInstructions() {
-        return this.recipeInstructions;
+    ArrayList<String> getRecipeInstructions(Recipe recipe) {
+        return recipe.recipeInstructions;
         // may want to print in a certain manner
     }
 
@@ -93,12 +80,13 @@ class Recipe extends HBox { // extend HBox
      * SetIngredients and RecipeInstructions more complex
      */
 
-    void setRecipeIndex(Recipe recipe, Label newIndex) {
+    void setRecipeIndex(Recipe recipe, int newIndex) {
         recipe.index = newIndex;
     }
 }
 
-class RecipeList extends VBox { // extends HBox?
+class RecipeList extends HBox { // extends HBox?
+
     // new RecipeList
     RecipeList() {
         // UI elements
@@ -107,17 +95,6 @@ class RecipeList extends VBox { // extends HBox?
         this.setStyle("-fx-background-color: #F0F8FF;");
     }
 
-    public void updateRecipeIndices() {
-        int index = 1;
-        for (int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof Recipe) {
-                ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
-                index++;
-            }
-        }
-    }
-
-    //add when delete implementing
     // public void updateRecipeIndices() {
     // int index = 1;
     // for (int i = 0; i < this.getChildren(i); i++) {
@@ -128,12 +105,15 @@ class RecipeList extends VBox { // extends HBox?
     // }
     // }
 }
-
 /*
  * Class Copied from Lab 1 for footer
  */
 class Footer extends HBox {
-    private Button newRecipeButton;
+    private Button addButton;
+    private Button clearButton;
+    private Button loadButton;
+    private Button saveButton;
+    private Button sortButton;
     Footer() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -141,15 +121,6 @@ class Footer extends HBox {
         // set a default style for buttons - background color, font size, italics
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
-
-        newRecipeButton = new Button("new Recipe");
-        newRecipeButton.setStyle(defaultButtonStyle);
-        this.getChildren().add(newRecipeButton);
-        this.setAlignment(Pos.CENTER);
-    }
-
-    public Button getNewRecipeButton(){
-        return newRecipeButton;
     }
 }
 
@@ -174,7 +145,6 @@ class AppFrame extends BorderPane {
     private Header header;
     private Footer footer;
     private RecipeList recipeList;
-    private Button newRecipeButton;
 
     AppFrame() {
         // Initialise the header Object
@@ -194,31 +164,29 @@ class AppFrame extends BorderPane {
         // Add footer to the bottom of the BorderPane
         this.setBottom(footer);
         // Initialise Button Variables through the getters in Footer
-        newRecipeButton = footer.getNewRecipeButton();
 
         // Call Event Listeners for the Buttons
-        addListeners();
+        //addListeners();
     }
-
-    public RecipeList getRecipeList(){
-        return this.recipeList;
-    }
-
-    public void addListeners()
-    {
-    newRecipeButton.setOnAction(e -> {
-        this.debugAddRecipe("Test Recipe 1", "Lunch", new ArrayList<String>(), new ArrayList<String>());
-    });
+    // public void addListeners()
+    // {
+    // /* // Add button functionality
+    // addButton.setOnAction(e -> {
+    // // Create a new task
+    // Task task = new Task();
+    // // Add task to tasklist
+    // taskList.getChildren().add(task);
+    // // Add doneButtonToggle to the Done button
+    // Button doneButton = task.getDoneButton();
+    // doneButton.setOnAction(e1 -> {
+    // // Call toggleDone on click
+    // task.toggleDone();
+    // });
+    // // Update task indices
+    // taskList.updateTaskIndices();
+    // });
     // */
-    }
-
-    public void debugAddRecipe(String title, String meal, ArrayList<String> instructions, ArrayList<String> recipeinstructions){
-        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-        Recipe recipe = new Recipe(new Text(title), new Text(meal),instructions, recipeinstructions);
-        // Add recipe to recipelist
-        recipeList.getChildren().add(recipe);
-        recipeList.updateRecipeIndices();
-    }
+    // }
 
 }
 
@@ -243,6 +211,5 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        //Platform.setImplicitExit(false);
     }
 }
