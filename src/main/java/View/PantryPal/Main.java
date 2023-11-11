@@ -349,13 +349,14 @@ class RecordAppFrame extends FlowPane {
     RecordHandler rHandler;
     WhisperHandler wHandler;
     Label l;
+    String name;
 
     // Set a default style for buttons and fields - background color, font size,
     // italics
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
 
-    RecordAppFrame(NavigationHandler handler) throws IOException, URISyntaxException {
+    RecordAppFrame(NavigationHandler handler, String name) throws IOException, URISyntaxException {
         // Set properties for the flowpane
         this.setPrefSize(370, 120);
         this.setPadding(new Insets(5, 0, 5, 5));
@@ -365,8 +366,18 @@ class RecordAppFrame extends FlowPane {
 
         this.handler = handler;
 
+        this.name = name;
+
+        if (name == "meal") {
+            instructions = new Label("Please record your meal type");
+            transcriptionLabel = new Label("Please say the meal type you want:");
+        }
+        else {
+            instructions = new Label("Please list your ingredients");
+            transcriptionLabel = new Label("Please say the ingredients you will use:");
+        }
         // Add the buttons and text fields
-        instructions = new Label("Please record your meal type");
+
         startButton = new Button("Start");
         startButton.setStyle(defaultButtonStyle);
 
@@ -381,7 +392,6 @@ class RecordAppFrame extends FlowPane {
         backButton = new Button("Back");
         this.getChildren().add(backButton);
 
-        transcriptionLabel = new Label("Please say the meal type you want:");
         this.getChildren().add(transcriptionLabel);
 
         l = (Label)this.getChildren().get(this.getChildren().size()-1);
@@ -393,13 +403,18 @@ class RecordAppFrame extends FlowPane {
     public void addListeners() {
         // Start Button
         startButton.setOnAction(e -> {
-            rHandler = new RecordHandler();
-            recordingLabel.setVisible(true);
-            try {
-                rHandler.record();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+            if (name == "meal") { 
+                rHandler = new RecordHandler();
+                recordingLabel.setVisible(true);
+                try {
+                    rHandler.record();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+            else {
+
             }
             
         });
@@ -421,11 +436,13 @@ class RecordAppFrame extends FlowPane {
             catch (URISyntaxException e2){
                 System.err.println("URISyntaxException");
             }
-            continueButton = new Button("Continue");
-            this.getChildren().add(continueButton);
-            continueButton.setOnAction(e1->{
-                System.out.println("Unimplemented");
-            });
+            if (name == "meal") {  
+                continueButton = new Button("Continue");
+                this.getChildren().add(continueButton);
+                continueButton.setOnAction(e1->{
+                    System.out.println("Unimplemented");
+                });
+            }
         });
 
         //go back on back button
