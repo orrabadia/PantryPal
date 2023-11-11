@@ -5,19 +5,13 @@ public class Recipe {
     private String mealType;
     private String ingredients;
     private String instructions;
-    private RecipeHandler rHandler;
-    Recipe(RecipeHandler rHandler, String title, String mealType, String ingredients, String instructions){
-        this.rHandler = rHandler;
+    Recipe(String title, String mealType, String ingredients, String instructions){
         this.title = title;
         this.mealType = mealType;
         this.ingredients = ingredients;
         this.instructions = instructions;
     }
 
-    public RecipeHandler getRHandler(){
-        return this.rHandler;
-    }
-    
     public String getTitle(){
         return this.title;
     }

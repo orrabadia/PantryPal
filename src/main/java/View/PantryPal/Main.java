@@ -29,7 +29,6 @@ class UIRecipe extends HBox { // extend HBox
     private Button displayButton;
     private String ingredients; // change to different data struct?
     private String recipeInstructions; // change to different data struct?
-    private Recipe recipe;
     // add UI variables
     /*
      * Constructor for Recipe class
@@ -99,14 +98,6 @@ class UIRecipe extends HBox { // extend HBox
         return this.ingredients;
     }
 
-    void setRecipe(Recipe recipe){
-        this.recipe = recipe;
-    }
-
-    Recipe getRecipe(){
-        return this.recipe;
-    }
-
     String getRecipeInstructions() {
         return this.recipeInstructions;
         // may want to print in a certain manner
@@ -170,7 +161,6 @@ class UIRecipeList extends VBox { // extends HBox?
             String ingredients = r.getIngredients();
             String instructions = r.getInstructions();
             UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            uiR.setRecipe(r);
             this.getChildren().add(uiR);
             this.updateRecipeIndices();
         }
@@ -317,7 +307,7 @@ class AppFrame extends BorderPane {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r = new Recipe( this.rHandler, title, mealtype, ingredients, instructions);
+        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
 
         //send to controller
         this.rHandler.addRecipe(r);
@@ -490,9 +480,10 @@ class RecipeDisplay extends BorderPane {
         addListeners();
     }
 
-    public void setR(UIRecipe recipe){
+     public void setR(UIRecipe recipe){
         this.r = recipe;
     }
+
 
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
@@ -528,8 +519,11 @@ class RecipeDisplay extends BorderPane {
 
         Button deleteButton = footer.getDeleteButton();
         deleteButton.setOnAction(e ->{
-            this.r.getRecipe().getRHandler().deleteRecipe(this.r.getRecipe().getTitle());
+            AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
 
+            mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            mainAppFrame.getRecipeList().updateList(handler);
+            // getChildrenUnmodifiable().get(1).getContent());
             //then call update UI recipe
             handler.menu();
         });

@@ -26,6 +26,10 @@ class NavigationHandler{
         pageList.put(DISPLAY_RECIPE, details);
     }
 
+    HashMap<String, Scene> getMap(){
+        return this.pageList;
+    }
+
     boolean showRecipeList(){
         boolean ret = false;
 
@@ -53,9 +57,7 @@ class NavigationHandler{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
-
         rd.setR(r);
-
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
