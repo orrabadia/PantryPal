@@ -375,4 +375,76 @@ public class TestAll {
         recipe.setMealType(transcription);
         assertEquals("Dinner", recipe.getMealType());
     }
+
+    // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
+    @Test 
+    public void unitTestS4Record() {
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+    }
+
+    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // it in Whisper and see whether it's text matches what it should be
+    @Test 
+    public void unitTestS4Whisper() {
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        try {
+            assertEquals( "Dinner", whisperHandler.transcribe());
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+    }
+
+    // Story 4, test whether our program saves a user's ingredient info
+    // Here we separately test for whether our program can save ingredients
+    // without the funcitonality of Record or Whisper (we can test all of them in the story test)
+    @Test 
+    public void unitTestS4SaveIngredients() {
+        recipe.setIngredients("Corn, Peas, Carrots, Chicken");
+        assertEquals("Corn, Peas, Carrots, Chicken", recipe.getIngredients());
+    }
 }
