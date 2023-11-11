@@ -371,15 +371,6 @@ class RecordAppFrame extends FlowPane {
         this.name = name;
 
         this.recipe = recipe;
-
-        if (name == "meal") {
-            instructions = new Label("Please record your meal type");
-            transcriptionLabel = new Label("Please say the meal type you want:");
-        }
-        else {
-            instructions = new Label("Please list your ingredients");
-            transcriptionLabel = new Label("Please say the ingredients you will use:");
-        }
         // Add the buttons and text fields
 
         startButton = new Button("Start");
@@ -391,14 +382,30 @@ class RecordAppFrame extends FlowPane {
         recordingLabel = new Label("Recording...");
         recordingLabel.setStyle(defaultLabelStyle);
 
-        this.getChildren().addAll(startButton, stopButton, recordingLabel);
-
         backButton = new Button("Back");
-        this.getChildren().add(backButton);
+
+
+
+        if (name == "meal") {
+            instructions = new Label("Please record your meal type");
+            transcriptionLabel = new Label("Please say the meal type you want:");
+            //go back on back button
+            backButton.setOnAction(e2->{handler.menu();});
+        }
+        else {
+            instructions = new Label("Please list your ingredients");
+            transcriptionLabel = new Label("Please say the ingredients you will use:");
+            //go back to the meal type page
+            backButton.setOnAction(e2->{handler.recordMeal(recipe);});
+        }
+
+        this.getChildren().addAll(startButton, stopButton, recordingLabel);
 
         this.getChildren().add(transcriptionLabel);
 
         l = (Label)this.getChildren().get(this.getChildren().size()-1);
+
+        this.getChildren().add(backButton);
 
         // Add the listeners to the buttons
         addListeners();
@@ -444,8 +451,6 @@ class RecordAppFrame extends FlowPane {
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients(recipe);
                 });
-                 //go back on back button
-                backButton.setOnAction(e2->{handler.menu();});
             }
             else {
                 try {
@@ -460,10 +465,6 @@ class RecordAppFrame extends FlowPane {
                 catch (URISyntaxException e2){
                     System.err.println("URISyntaxException");
                 }
-
-
-                //go back to the meal type page
-                backButton.setOnAction(e2->{handler.recordMeal(recipe);});
             }
         });
 
