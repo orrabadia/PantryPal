@@ -403,8 +403,7 @@ class RecordAppFrame extends FlowPane {
     public void addListeners() {
         // Start Button
         startButton.setOnAction(e -> {
-            if (name == "meal") { 
-                rHandler = new RecordHandler();
+            rHandler = new RecordHandler();
                 recordingLabel.setVisible(true);
                 try {
                     rHandler.record();
@@ -412,10 +411,6 @@ class RecordAppFrame extends FlowPane {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-            }
-            else {
-
-            }
             
         });
 
@@ -440,7 +435,7 @@ class RecordAppFrame extends FlowPane {
                 continueButton = new Button("Continue");
                 this.getChildren().add(continueButton);
                 continueButton.setOnAction(e1->{
-                    System.out.println("Unimplemented");
+                    handler.recordIngredients();
                 });
             }
         });

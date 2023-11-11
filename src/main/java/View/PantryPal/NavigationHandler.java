@@ -15,6 +15,7 @@ class NavigationHandler{
     public static final String RECIPE_LIST = "RecipeList";
     public static final String DISPLAY_RECIPE = "DisplayRecipe";
     public static final String RECORD_MEALTYPE = "RecordMealType";
+    public static final String RECORD_INGREDIENTS = "RecordIngredients";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
     NavigationHandler(){
@@ -89,6 +90,25 @@ class NavigationHandler{
         }
         //switches to mealtype page
         r = pageList.get(RECORD_MEALTYPE);
+        primaryStage.setScene(r);
+    }
+
+    //Story 4, Record Ingredients
+    void recordIngredients() {
+        Scene r = pageList.get(RECORD_INGREDIENTS);
+        //new page for recording ingredients
+        try {
+            RecordAppFrame ingredientrecorder = new RecordAppFrame(this, "ingredients");
+            //Scene mealrecord = new Scene(mealrecorder, 370, 120);
+            Scene ingredientrecord = new Scene(ingredientrecorder, 370, 400);
+            pageList.put(RECORD_INGREDIENTS, ingredientrecord);
+        } catch (IOException e1) {
+            System.out.println(e1);
+        } catch (URISyntaxException e2) {
+            System.out.println(e2);
+        }
+        //switches to ingredient page
+        r = pageList.get(RECORD_INGREDIENTS);
         primaryStage.setScene(r);
     }
 }
