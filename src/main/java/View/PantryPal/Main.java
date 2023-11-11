@@ -397,6 +397,9 @@ class RecordAppFrame extends FlowPane {
             transcriptionLabel = new Label("Please say the ingredients you will use:");
             //go back to the meal type page
             backButton.setOnAction(e2->{handler.recordMeal(recipe);});
+            Button cancelButton = new Button("Cancel");
+            cancelButton.setOnAction(e3->{handler.menu();});
+            this.getChildren().add(cancelButton);
         }
 
         this.getChildren().addAll(startButton, stopButton, recordingLabel);
