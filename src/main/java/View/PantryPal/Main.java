@@ -307,7 +307,8 @@ class AppFrame extends BorderPane {
         this.recipeList.updateList(nHandler);
 
         //send to record page, and also add a recipe for test purposes
-        nHandler.recordMeal();
+        CreateHandler createHandler = new CreateHandler();
+        nHandler.recordMeal(createHandler);
     });
     
     }
@@ -349,13 +350,15 @@ class RecordAppFrame extends FlowPane {
     RecordHandler rHandler;
     WhisperHandler wHandler;
     Label l;
+    String name;
+    CreateHandler createHandler;
 
-    // Set a default style for buttons and fields - background color, font size,
+// Set a default style for buttons and fields - background color, font size,
     // italics
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
 
-    RecordAppFrame(NavigationHandler handler) throws IOException, URISyntaxException {
+    RecordAppFrame(NavigationHandler handler, String name, CreateHandler createHandler) throws IOException, URISyntaxException {
         // Set properties for the flowpane
         this.setPrefSize(370, 120);
         this.setPadding(new Insets(5, 0, 5, 5));
@@ -365,8 +368,11 @@ class RecordAppFrame extends FlowPane {
 
         this.handler = handler;
 
+        this.name = name;
+
+        this.createHandler = createHandler;
         // Add the buttons and text fields
-        instructions = new Label("Please record your meal type");
+
         startButton = new Button("Start");
         startButton.setStyle(defaultButtonStyle);
 
@@ -376,15 +382,24 @@ class RecordAppFrame extends FlowPane {
         recordingLabel = new Label("Recording...");
         recordingLabel.setStyle(defaultLabelStyle);
 
+        backButton = new Button("Back");
+
+
+
+        if (name == "meal") {
+            instructions = new Label("Please record your meal type");
+            transcriptionLabel = new Label("Please say the meal type you want:");
+            //go back on back button
+            backButton.setOnAction(e2->{handler.menu();});
+        }
+
         this.getChildren().addAll(startButton, stopButton, recordingLabel);
 
-        backButton = new Button("Back");
-        this.getChildren().add(backButton);
-
-        transcriptionLabel = new Label("Please say the meal type you want:");
         this.getChildren().add(transcriptionLabel);
 
         l = (Label)this.getChildren().get(this.getChildren().size()-1);
+
+        this.getChildren().add(backButton);
 
         // Add the listeners to the buttons
         addListeners();
@@ -410,26 +425,27 @@ class RecordAppFrame extends FlowPane {
             rHandler.stop();
             //RESULT OF TRANSCRIPTION STORED HERE
             String transcription = "";
-            try {
-                wHandler = new WhisperHandler();
-                transcription = wHandler.transcribe();
-                l.setText("Meal Type:" + transcription);
-            }
-            catch (IOException e1){
-                System.err.println("IOException");
-            }
-            catch (URISyntaxException e2){
-                System.err.println("URISyntaxException");
-            }
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
-            continueButton.setOnAction(e1->{
-                System.out.println("Unimplemented");
-            });
+            if (name == "meal") {  
+                try {
+                    wHandler = new WhisperHandler();
+                    transcription = wHandler.transcribe();
+                    createHandler.getRecipe().setMealType(transcription);
+                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
+                    
+                }
+                catch (IOException e1){
+                    System.err.println("IOException");
+                }
+                catch (URISyntaxException e2){
+                    System.err.println("URISyntaxException");
+                }
+                continueButton.setOnAction(e1->{
+                    System.out.println("Not implemented yet");
+                });
+            }
         });
-
-        //go back on back button
-        backButton.setOnAction(e->{handler.menu();});
 
     }
 

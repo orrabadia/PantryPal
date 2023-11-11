@@ -73,12 +73,11 @@ class NavigationHandler{
     }
 
     //STORY 3, RECORDMEAL
-    void recordMeal(){
-
+    void recordMeal(CreateHandler createHandler){
         Scene r = pageList.get(RECORD_MEALTYPE);
         //new page for recording meal
         try {
-            RecordAppFrame mealrecorder = new RecordAppFrame(this);
+            RecordAppFrame mealrecorder = new RecordAppFrame(this, "meal", createHandler);
             //Scene mealrecord = new Scene(mealrecorder, 370, 120);
             Scene mealrecord = new Scene(mealrecorder, 370, 400);
             pageList.put(RECORD_MEALTYPE, mealrecord);
