@@ -348,6 +348,7 @@ class RecordAppFrame extends FlowPane {
     Thread t;
     RecordHandler rHandler;
     WhisperHandler wHandler;
+    Label l;
 
     // Set a default style for buttons and fields - background color, font size,
     // italics
@@ -383,6 +384,8 @@ class RecordAppFrame extends FlowPane {
         transcriptionLabel = new Label("Please say the meal type you want:");
         this.getChildren().add(transcriptionLabel);
 
+        l = (Label)this.getChildren().get(this.getChildren().size()-1);
+
         // Add the listeners to the buttons
         addListeners();
     }
@@ -410,7 +413,6 @@ class RecordAppFrame extends FlowPane {
             try {
                 wHandler = new WhisperHandler();
                 transcription = wHandler.transcribe();
-                Label l = (Label)this.getChildren().get(this.getChildren().size()-1);
                 l.setText("Meal Type:" + transcription);
             }
             catch (IOException e1){
