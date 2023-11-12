@@ -188,7 +188,7 @@ public class TestAll {
     }
 
     // Story 3, test that the "functionality" of getting recording.wav and processing
-    // it in Whisper and see whether it's text matches what it should be
+    // it in Whisper and test whether it's text matches what it should be
     @Test 
     public void unitTestS3Whisper() {
         File audioFile = new File("recording.wav");
