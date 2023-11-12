@@ -1,5 +1,7 @@
 package PantryPal;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
@@ -12,6 +14,7 @@ import javafx.stage.Stage;
 class NavigationHandler{
     public static final String RECIPE_LIST = "RecipeList";
     public static final String DISPLAY_RECIPE = "DisplayRecipe";
+    public static final String RECORD_MEALTYPE = "RecordMealType";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
     NavigationHandler(){
@@ -67,5 +70,24 @@ class NavigationHandler{
 
     void setStage(Stage s){
         this.primaryStage = s;
+    }
+
+    //STORY 3, RECORDMEAL
+    void recordMeal(CreateHandler createHandler){
+        Scene r = pageList.get(RECORD_MEALTYPE);
+        //new page for recording meal
+        try {
+            RecordAppFrame mealrecorder = new RecordAppFrame(this, "meal", createHandler);
+            //Scene mealrecord = new Scene(mealrecorder, 370, 120);
+            Scene mealrecord = new Scene(mealrecorder, 370, 400);
+            pageList.put(RECORD_MEALTYPE, mealrecord);
+        } catch (IOException e1) {
+            System.out.println(e1);
+        } catch (URISyntaxException e2) {
+            System.out.println(e2);
+        }
+        //switches to mealtype page
+        r = pageList.get(RECORD_MEALTYPE);
+        primaryStage.setScene(r);
     }
 }

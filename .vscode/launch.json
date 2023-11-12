@@ -6,41 +6,81 @@
     "configurations": [
         {
             "type": "java",
-            "name": "PantryPal(WINDOWS)",
+            "name": "AudioTranscriber",
             "request": "launch",
-            "mainClass": "PantryPal.Main",
-            "vmArgs": "--module-path '${workspaceFolder}/lib/WINDOWS' --add-modules javafx.controls,javafx.fxml"
-
+            "mainClass": "PantryPal.AudioTranscriber",
+            "projectName": "cse-110-project-team-18_b5750f85"
         },
         {
             "type": "java",
-            "name": "PantryPal(OSX)",
+            "name": "AudioRecorder",
+            "request": "launch",
+            "mainClass": "PantryPal.AudioRecorder",
+            "projectName": "cse-110-project-team-18_b5750f85",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.java.PantryPal.Main",
+            "projectName": "cse-110-project-team-18_b5750f85",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "AudioRecorder",
+            "request": "launch",
+            "mainClass": "main.java.PantryPal.AudioRecorder",
+            "projectName": "cse-110-project-team-18_b5750f85",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "AudioRecorder",
+            "request": "launch",
+            "mainClass": "PantryPal.AudioRecorder",
+            "projectName": "cse-110-project-team-18",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "AudioRecorder",
+            "request": "launch",
+            "mainClass": "AudioRecorder",
+            "projectName": "cse-110-project-team-18",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "AudioTranscriber",
+            "request": "launch",
+            "mainClass": "PantryPal.AudioTranscriber",
+            "projectName": "cse-110-project-team-18_ea9e9cda",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "AudioRecorder",
+            "request": "launch",
+            "mainClass": "PantryPal.AudioRecorder",
+            "projectName": "cse-110-project-team-18_ea9e9cda",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Whisper",
+            "request": "launch",
+            "mainClass": "PantryPal.Whisper",
+            "projectName": "cse-110-project-team-18_ea9e9cda",
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules json-20230227"
+        },
+        {
+            "type": "java",
+            "name": "PantryPal",
             "request": "launch",
             "mainClass": "PantryPal.Main",
-            "vmArgs": "--module-path '${workspaceFolder}/lib/OSX' --add-modules javafx.controls,javafx.fxml"
-
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         }
-        // },
-        // {
-        //     "type": "java",
-        //     "name": "Main",
-        //     "request": "launch",
-        //     "mainClass": "src/PantryPal.Main",
-        //     "projectName": ""
-        // },
-        // {
-        //     "type": "java",
-        //     "name": "Footer$AppFrame$Main",
-        //     "request": "launch",
-        //     "mainClass": "PantryPal.Footer$AppFrame$Main",
-        //     "projectName": "cse-110-project-team-18_ad042cc0"
-        // },
-        // {
-        //     "type": "java",
-        //     "name": "PantryPal",
-        //     "request": "launch",
-        //     "mainClass": "src/PantryPal.Main",
-        //     "vmArgs": "--module-path '/Users/om/Desktop/javafx-sdk-21/lib' --add-modules javafx.controls,javafx.fxml"
-        // }
     ]
 }
