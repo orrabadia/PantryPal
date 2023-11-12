@@ -188,7 +188,7 @@ public class TestAll {
     }
 
     // Story 3, test that the "functionality" of getting recording.wav and processing
-    // it in Whisper and see whether it's text matches what it should be
+    // it in Whisper and test whether it's text matches what it should be
     @Test 
     public void unitTestS3Whisper() {
         File audioFile = new File("recording.wav");
@@ -674,7 +674,7 @@ public class TestAll {
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
         try {
-            assertEquals( "Dinner", whisperHandler.transcribe());
+            transcription = whisperHandler.transcribe();
         }
         catch (IOException e1) {
             System.err.println("IOException");
@@ -682,8 +682,12 @@ public class TestAll {
         catch (URISyntaxException e2){
                 System.err.println("URISyntaxException");
         }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
+    
     // Story 4, test whether our program saves a user's ingredient info
     // Here we separately test for whether our program can save ingredients
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
