@@ -31,6 +31,7 @@ public class TestAll {
     private RecordHandler recordHandler;
     private WhisperHandler whisperHandler;
     private CreateHandler createHandler;
+    private GPTHandler gptHandler;
 
      @BeforeEach
      public void initialize(){
@@ -46,6 +47,8 @@ public class TestAll {
         whisperHandler = new WhisperHandler(true);
 
         createHandler = new CreateHandler();
+
+        gptHandler = new GPTHandler(true);
      }
 
     public void deleteRecording() {
@@ -577,5 +580,38 @@ public class TestAll {
         assertEquals( "Dinner", transcription);
         createHandler.getRecipe().setIngredients(transcription);
         assertEquals("Dinner", createHandler.getRecipe().getIngredients());
+    }
+
+    // Story 5, test that after you press the continue button on the ingredients page
+    // it begins to generate a recipe from the info earlier given
+    // here we assume that we created a blank recipe and filled in the mealtype and
+    // ingredients as we went, like in the actual app
+    @Test 
+    public void unitTestS5Generate() {
+        // simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Lunch");
+        // simulates us setting the recipe's ingredients when user says mealtype
+        createHandler.getRecipe().setIngredients("food");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+        
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        
     }
 }

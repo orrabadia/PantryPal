@@ -379,7 +379,7 @@ class GPTResultsDisplay extends BorderPane{
         centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
 
         // Create two scrollable boxes with text
-        ScrollPane scrollPane1 = createScrollableBox("Ingredients:" +cHandler.getRecipe().getIngredients());
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients: " +cHandler.getRecipe().getIngredients());
         ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
 
         centerBox.getChildren().addAll(scrollPane1, scrollPane2);
