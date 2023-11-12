@@ -353,7 +353,7 @@ class RecordAppFrame extends FlowPane {
     String name;
     CreateHandler createHandler;
 
-    // Set a default style for buttons and fields - background color, font size,
+// Set a default style for buttons and fields - background color, font size,
     // italics
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
