@@ -331,7 +331,7 @@ class AppFrame extends BorderPane {
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
     });
-    
+
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -435,7 +435,7 @@ class GPTResultsDisplay extends BorderPane{
             UIRecipeList uiList = rlist.getRecipeList();
             uiList.updateList(nHandler);
             nHandler.menu();
-            
+
         });
         Button cancelButton = footer.getCancelButton();
         cancelButton.setOnAction(e->{
@@ -544,7 +544,7 @@ class RecordAppFrame extends FlowPane {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-            
+
         });
 
         // Stop Button
@@ -555,13 +555,13 @@ class RecordAppFrame extends FlowPane {
             String transcription = "";
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
-            if (name == "meal") {  
+            if (name == "meal") {
                 try {
                     wHandler = new WhisperHandler();
                     transcription = wHandler.transcribe();
                     createHandler.getRecipe().setMealType(transcription);
                     l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
-                    
+
                 }
                 catch (IOException e1){
                     System.err.println("IOException");
@@ -606,11 +606,11 @@ class RecordAppFrame extends FlowPane {
             }
         });
 
-       
+
 
     }
 
-    
+
 }
 
 /**
@@ -655,6 +655,10 @@ class RecipeDisplay extends BorderPane {
 
         // Call Event Listeners for the Buttons
         addListeners();
+    }
+
+    public void setUIR(UIRecipe recipe){
+        this.r = recipe;
     }
 
     public void setTitle(String s){
@@ -720,7 +724,7 @@ public class Main extends Application {
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
-        
+
         //handler initializes by adding recipe list to pagelist
         handler.initialize(recipeList);
 

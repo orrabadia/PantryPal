@@ -55,6 +55,7 @@ class NavigationHandler{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
+        rd.setUIR(r);
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
