@@ -484,7 +484,6 @@ class RecipeDisplay extends BorderPane {
         this.r = recipe;
     }
 
-
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
         //access header settext
