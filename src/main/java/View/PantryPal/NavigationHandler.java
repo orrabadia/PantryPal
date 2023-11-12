@@ -32,6 +32,11 @@ class NavigationHandler{
 
         return ret;
     }
+
+    HashMap<String, Scene> getMap(){
+        return this.pageList;
+    }
+
     /**called when initializing, takes a scene(in this case the recipelist) and shows it
      * */
     void initialize(Scene RecipeList){
@@ -54,11 +59,14 @@ class NavigationHandler{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
+        rd.setR(r);
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
         primaryStage.setScene(s);
     }
+
+
 
     void menu(){
         Scene f = pageList.get(RECIPE_LIST);
