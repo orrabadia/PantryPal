@@ -376,6 +376,251 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
+    @Test 
+    // integration test of stories 1-3
+    // Story 1: No recipes
+    // Story 3: Record
+
+    public void integrationTest1() {
+        // story 1
+        //at start, should be no recipes
+        int initialRecipeCount = rList.size();
+        assertEquals(initialRecipeCount, 0);
+        // story 3
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
+    }
+
+    @Test 
+    // integration test of stories 1-3
+    // Story 1: (inserted it before hand but sneakily) Exist recipe
+    // Story 2: Expand details of recipe (just make sure that recipe details match)
+    // Story 3: Rerecord
+
+    public void integrationTest2() {
+        // story 1
+        //add 2 recipes, 2 should be displayed
+        String title = "Test Recipe 1";
+        String mealtype = "Lunch";
+        String ingredients = "food";
+        String instructions = "cook food";
+        Recipe r1= new Recipe(title, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
+        rHandler.addRecipe(r1);
+        rHandler.addRecipe(r2);
+        assertEquals(rList.size(), 2);
+
+        // story 2
+        //add two and check if you can get title, maybe 2 messes it up
+        Recipe r = rList.get(title);
+        assertEquals(r.getTitle(), "Test Recipe 1");
+        assertEquals(r.getMealType(), "Lunch");
+        assertEquals(r.getIngredients(), "food");
+        assertEquals(r.getInstructions(), "cook food");
+
+        // story 3
+        // first record
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+
+        // second record
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        assertEquals(true, file.exists());
+
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
+    }
+
+     @Test 
+    // integration test of stories 1-3
+    // Story 1: remove preexisting recipes (2 to 0)
+    // Story 3: Record
+
+    public void integrationTest3() {
+        // Story 1
+        //add 2 recipes, 2 should be displayed
+        String title1 = "Test Recipe 1";
+        String title2 = "Test Recipe 2";
+        String mealtype = "Lunch";
+        String ingredients = "food";
+        String instructions = "cook food";
+        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
+        rHandler.addRecipe(r1);
+        rHandler.addRecipe(r2);
+        assertEquals(rList.size(), 2);
+        //delete 
+        rList.remove(title1);
+        assertEquals(rList.size(), 1);
+        rList.remove(title2);
+        assertEquals(rList.size(), 0);
+
+
+        // Story 3
+        try {
+                recordHandler.record();
+            } 
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        File audioFile = new File("recording.wav");
+        
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+        
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
+    }
+
     // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
     @Test 
     public void unitTestS4Record() {
