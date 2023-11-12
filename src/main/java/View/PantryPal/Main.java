@@ -301,7 +301,7 @@ class AppFrame extends BorderPane {
         String ingredients = "food";
         String instructions = "cook food";
         Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-        
+
         //send to controller
         this.rHandler.addRecipe(r);
         this.recipeList.updateList(nHandler);
@@ -310,7 +310,7 @@ class AppFrame extends BorderPane {
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
     });
-    
+
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -425,7 +425,7 @@ class RecordAppFrame extends FlowPane {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-            
+
         });
 
         // Stop Button
@@ -436,13 +436,13 @@ class RecordAppFrame extends FlowPane {
             String transcription = "";
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
-            if (name == "meal") {  
+            if (name == "meal") {
                 try {
                     wHandler = new WhisperHandler();
                     transcription = wHandler.transcribe();
                     createHandler.getRecipe().setMealType(transcription);
                     l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
-                    
+
                 }
                 catch (IOException e1){
                     System.err.println("IOException");
@@ -473,11 +473,11 @@ class RecordAppFrame extends FlowPane {
             }
         });
 
-       
+
 
     }
 
-    
+
 }
 
 /**
@@ -506,7 +506,9 @@ class RecipeDisplay extends BorderPane {
 
         // Create two scrollable boxes with text
         ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
+        ((TextField)scrollPane1.getContent()).setEditable(false);
         ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
+        ((TextField)scrollPane2.getContent()).setEditable(false);
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
@@ -553,7 +555,49 @@ class RecipeDisplay extends BorderPane {
     {
         Button backButton = footer.getBackButton();
         backButton.setOnAction(e ->{
-            handler.menu();
+             if (this.footer.getEditButton().getText() == "Back"){
+                handler.menu();
+             } else {
+                this.footer.getBackButton().setText("Back");
+                this.footer.getEditButton().setText("Edit");
+                //add revert back to orriginal instructions
+             }
+        });
+
+        Button editButton = footer.getEditButton();
+        editButton.setOnAction(e -> {
+
+            if (this.footer.getEditButton().getText() == "Edit") {
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
+                this.footer.getEditButton().setText("Save");
+                this.footer.getBackButton().setText("Cancel");
+            } else {
+                if (this.footer.getEditButton().getText() == "Save") {
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                    this.footer.getEditButton().setText("Edit");
+                    this.footer.getBackButton().setText("Back");
+                }
+            }
+        });
+
+
+
+
+            //this.footer.getEditButton().getText() == ""; -> do this ...
+            this.footer.getBackButton().setText("Cancel");
+            //create new display with these changes:
+                //make instructions field editable
+                //change edit button to save
+                //change back to cancel -> goes back to regular display (unedited display recipe)
+            //  deleteButton.setOnAction(e ->{
+            // AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
+
+            // mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            // mainAppFrame.getRecipeList().updateList(handler);
+
+
         });
     }
 
@@ -587,7 +631,7 @@ public class Main extends Application {
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
-        
+
         //handler initializes by adding recipe list to pagelist
         handler.initialize(recipeList);
 
