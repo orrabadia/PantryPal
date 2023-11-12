@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.text.TextAlignment;
 import javafx.geometry.Insets;
 import javafx.scene.text.*;
@@ -136,6 +137,7 @@ class UIRecipeList extends VBox { // extends HBox?
     UIRecipeList(RecipeList rList, NavigationHandler nHandler) {
         this.rList = rList;
         this.nHandler = nHandler;
+        this.updateList(nHandler);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -231,6 +233,34 @@ class DisplayFooter extends HBox {
     }
 }
 
+class GPTFooter extends HBox {
+    private Button saveButton;
+    private Button cancelButton;
+    GPTFooter() {
+        this.setPrefSize(500, 60);
+        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setSpacing(15);
+        // set a default style for buttons - background color, font size, italics
+        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+        this.setAlignment(Pos.CENTER); // aligning the buttons to center
+
+        saveButton = new Button("Save");
+        cancelButton = new Button("Cancel");
+        saveButton.setStyle(defaultButtonStyle);
+        cancelButton.setStyle(defaultButtonStyle);
+        this.getChildren().add(saveButton);
+        this.getChildren().add(cancelButton);
+        this.setAlignment(Pos.CENTER);
+    }
+
+    public Button getSaveButton(){
+        return saveButton;
+    }
+    public Button getCancelButton(){
+        return cancelButton;
+    }
+}
+
 /*
  * Class Copied from Lab 1 for Header
  */
@@ -268,6 +298,8 @@ class AppFrame extends BorderPane {
         header = new Header("Recipe List");
         //create new recipelist and handler
         list = new RecipeList();
+        System.out.println("refreshing");
+        list.refresh();
         rHandler = new RecipeHandler(list);
         //create ui recipe list to display recipes
         recipeList = new UIRecipeList(list,nHandler);
@@ -294,17 +326,6 @@ class AppFrame extends BorderPane {
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-        //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
-        String title = "Test Recipe 1";
-        String mealtype = "Lunch";
-        String ingredients = "food";
-        String instructions = "cook food";
-        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-        
-        //send to controller
-        this.rHandler.addRecipe(r);
-        this.recipeList.updateList(nHandler);
 
         //send to record page, and also add a recipe for test purposes
         CreateHandler createHandler = new CreateHandler();
@@ -333,6 +354,105 @@ class AppFrame extends BorderPane {
         return this.recipeList;
     }
 
+}
+
+class GPTResultsDisplay extends BorderPane{
+    private Header header;
+    private GPTFooter footer;
+
+    private String instructions;
+    private NavigationHandler nHandler;
+    private RecipeHandler rHandler;
+    private CreateHandler cHandler;
+    private UIRecipe r;
+
+    GPTResultsDisplay(NavigationHandler handler, CreateHandler cHandler) {
+        this.nHandler = handler;
+        this.cHandler = cHandler;
+        // Initialise the header Object
+        header = new Header(cHandler.getRecipe().getTitle());
+        // Initialise the Footer Object
+        footer = new GPTFooter();
+
+        // Create a VBox in the center
+        VBox centerBox = new VBox();
+        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
+
+        // Create two scrollable boxes with text
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients:" +cHandler.getRecipe().getIngredients());
+        ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
+
+        centerBox.getChildren().addAll(scrollPane1, scrollPane2);
+
+        // Set the VBox in the center of the BorderPane
+        this.setCenter(centerBox);
+        // Add header to the top of the BorderPane
+        this.setTop(header);
+        // Add footer to the bottom of the BorderPane
+        this.setBottom(footer);
+        // Initialise Button Variables through the getters in Footer
+
+        // Call Event Listeners for the Buttons
+        addListeners();
+    }
+
+    public void setTitle(String s){
+        //called when displaying from handler, handler has blank one by default
+        //access header settext
+        header.setTitle(s);
+    }
+
+    public void setIngredients(String s){
+        //called when displaying from handler, handler has blank one by default
+        VBox v = (VBox)this.getCenter();
+        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
+        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
+        TextField textField = (TextField) scroll1.getContent();
+        textField.setText(s);
+    }
+
+    public void setInstructions(String s){
+        //called when displaying from handler, handler has blank one by default
+        VBox v = (VBox)this.getCenter();
+        //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
+        ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
+        TextField textField = (TextField) scroll2.getContent();
+        textField.setText(s);
+
+    }
+
+    public void addListeners()
+    {
+        Button saveButton = footer.getSaveButton();
+        saveButton.setOnAction(e ->{
+            //TODO: add save functionality
+            //get recipehandler from navhandler
+            HashMap<String,Scene> pagelist = nHandler.getPageList();
+            AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();
+            RecipeHandler recipeHandler = rlist.getRecipeHandler();
+            recipeHandler.addRecipe(cHandler.getRecipe());
+            //add it and update list and go to menu
+            UIRecipeList uiList = rlist.getRecipeList();
+            uiList.updateList(nHandler);
+            nHandler.menu();
+            
+        });
+        Button cancelButton = footer.getCancelButton();
+        cancelButton.setOnAction(e->{
+            nHandler.menu();
+        });
+    }
+
+    // Helper method to create a scrollable text box
+    private ScrollPane createScrollableBox(String content) {
+        TextArea textArea = new TextArea(content);
+        textArea.setEditable(false);
+        ScrollPane scrollPane = new ScrollPane(textArea);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        return scrollPane;
+    }
 }
 
 //ui page for recording
@@ -422,7 +542,6 @@ class RecordAppFrame extends FlowPane {
                 try {
                     rHandler.record();
                 } catch (IOException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             
@@ -468,7 +587,21 @@ class RecordAppFrame extends FlowPane {
                     System.err.println("URISyntaxException");
                 }
                 continueButton.setOnAction(e1->{
-                    System.out.println("Not implemented for ChatGPT generated page yet");
+                    //on continue, get the transcription and move to new page
+                    Recipe r = createHandler.getRecipe();
+                    String mealtype = r.getMealType();
+                    String ingredients = r.getIngredients();
+                    GPTHandler g = new GPTHandler();
+                    String recipe = g.generate(mealtype, ingredients);
+                    String title = recipe.substring(0,recipe.indexOf("~"));
+                    //take out the newlines and returns for formatting
+                    String strippedString = title.replaceAll("[\\n\\r]+", "");
+                    r.setInstructions(recipe);
+                    r.setTitle(strippedString);
+                    GPTResultsDisplay results = new GPTResultsDisplay(handler, createHandler);
+                    handler.showGPTResults(results);
+                    //System.out.println(title +"TITLE LEFT+RECIPE RIGHT " +recipe  + " ");
+                    //System.out.println(mealtype +"+ " +ingredients  + " " + createHandler.getRecipe().getTitle());
                 });
             }
         });
