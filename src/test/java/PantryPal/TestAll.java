@@ -672,6 +672,7 @@ public class TestAll {
         }
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
+        String transcription = "";
         try {
             transcription = whisperHandler.transcribe();
         }
