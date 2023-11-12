@@ -161,8 +161,8 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
+        Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         //add two and check if you can get title, maybe 2 messes it up
