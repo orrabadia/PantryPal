@@ -392,6 +392,15 @@ class RecordAppFrame extends FlowPane {
             //go back on back button
             backButton.setOnAction(e2->{handler.menu();});
         }
+        else {
+            instructions = new Label("Please list your ingredients");
+            transcriptionLabel = new Label("Please say the ingredients you will use:");
+            //go back to the meal type page
+            backButton.setOnAction(e2->{handler.recordMeal(createHandler);});
+            Button cancelButton = new Button("Cancel");
+            cancelButton.setOnAction(e3->{handler.menu();});
+            this.getChildren().add(cancelButton);
+        }
 
         this.getChildren().addAll(startButton, stopButton, recordingLabel);
 
@@ -409,13 +418,13 @@ class RecordAppFrame extends FlowPane {
         // Start Button
         startButton.setOnAction(e -> {
             rHandler = new RecordHandler();
-            recordingLabel.setVisible(true);
-            try {
-                rHandler.record();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+                recordingLabel.setVisible(true);
+                try {
+                    rHandler.record();
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
             
         });
 
@@ -442,10 +451,29 @@ class RecordAppFrame extends FlowPane {
                     System.err.println("URISyntaxException");
                 }
                 continueButton.setOnAction(e1->{
-                    System.out.println("Not implemented yet");
+                    handler.recordIngredients(createHandler);
+                });
+            }
+            else {
+                try {
+                    wHandler = new WhisperHandler();
+                    transcription = wHandler.transcribe();
+                    createHandler.getRecipe().setIngredients(transcription);
+                    l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
+                }
+                catch (IOException e1){
+                    System.err.println("IOException");
+                }
+                catch (URISyntaxException e2){
+                    System.err.println("URISyntaxException");
+                }
+                continueButton.setOnAction(e1->{
+                    System.out.println("Not implemented for ChatGPT generated page yet");
                 });
             }
         });
+
+       
 
     }
 
