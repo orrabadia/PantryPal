@@ -705,105 +705,73 @@ class RecipeDisplay extends BorderPane {
 
     public void addListeners()
     {
+
         Button backButton = footer.getBackButton();
         backButton.setOnAction(e ->{
-             if (this.footer.getBackButton().getText() == "Back"){
+            if (this.footer.getBackButton().getText() == "Back"){
                 handler.menu();
-             } else {
-                //add revert back to orriginal instructions
-                //get orriginal instructions then set textfields = to the instructions
+            } else {
+                //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
                .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
 
-               //reverts the displayed instructions/ingredients back to orriginal (what is being saved in the rlist (not UIRList))
+               //reverts the displayed instructions back to orriginal (what is being saved in the rlist (not UIRList))
                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
                .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
-
-               //might do something?
-                //((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList()
-                    //.get(r.getTitle().getText()).setIngredients(((TextField)((ScrollPane)((VBox)this.getCenter())
-                    //.getChildren().get(0)).getContent()).getText());
 
                 //sets textfields to non-editable
                 ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
                 ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+
                 //reverts buttons back
                 this.footer.getBackButton().setText("Back");
                 this.footer.getEditButton().setText("Edit");
-             }
+            }
         });
 
         Button editButton = footer.getEditButton();
         editButton.setOnAction(e -> {
 
             if (this.footer.getEditButton().getText() == "Edit") {
-                // TextField previousIngredients = ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent());
-                // TextField previousInstructions = ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent())
-
+                //sets textfields editable
                 ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
                 ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
+                //changes button text
                 this.footer.getEditButton().setText("Save");
                 this.footer.getBackButton().setText("Cancel");
             } else {
                 if (this.footer.getEditButton().getText() == "Save") {
+                    //sets fields uneditable
                     ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
                     ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
-                    // set new fields
-                    //Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Sets this recipe's ingredients to what is within the ingredients text field
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList()
-                    .get(r.getTitle().getText()).setIngredients(((TextField)((ScrollPane)((VBox)this.getCenter())
-                    .getChildren().get(0)).getContent()).getText());
-
-                    //Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Sets this recipe's Instructions to what is within the instructions text field
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList()
-                    .get(r.getTitle().getText()).setInstructions(((TextField)((ScrollPane)((VBox)this.getCenter())
-                    .getChildren().get(1)).getContent()).getText());
-
+                    /*
+                    Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Calls editRecipe()
+                    from RecipeHandler, passing in the recipe which is retrieved from the appframes recipe handlers recipelist, the new
+                    ingredients and the new instructions retrieved from the fields
+                    */
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().editRecipe(
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()),
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
+                    //Updatethe UIList
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler);
-
-                    ((AppFrame)this.handler.getPageList().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().update();
-                    
+                    //Revert button text back
                     this.footer.getEditButton().setText("Edit");
                     this.footer.getBackButton().setText("Back");
                 }
             }
         });
-
-
-
-
-
-
-            // //this.footer.getEditButton().getText() == ""; -> do this ...
-            // this.footer.getBackButton().setText("Cancel");
-            // //create new display with these changes:
-            //     //make instructions field editable
-            //     //change edit button to save
-            //     //change back to cancel -> goes back to regular display (unedited display recipe)
-            // //  deleteButton.setOnAction(e ->{
-            // // AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
-
-            // // mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
-            // // mainAppFrame.getRecipeList().updateList(handler);
-
-
     }
-
-
-
-
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
         TextField textArea = new TextField(content);
-
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
         return scrollPane;
     }
-
 }
 
 /*
@@ -812,7 +780,6 @@ class RecipeDisplay extends BorderPane {
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         //navigation handler to change scenes
         //this contains a map of all pages
         //appframe is initialized without navhandler

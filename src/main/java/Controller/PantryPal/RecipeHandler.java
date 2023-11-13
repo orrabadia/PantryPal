@@ -23,5 +23,11 @@ public class RecipeHandler {
         return this.list;
     }
 
+    public void editRecipe(Recipe r, String ingredients, String instructions){
+        r.setIngredients(ingredients);
+        r.setInstructions(instructions);
+        this.list.update();
+    }
+
     //add methods later for edit
 }

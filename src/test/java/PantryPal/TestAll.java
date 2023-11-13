@@ -70,7 +70,7 @@ public class TestAll {
      }
 
     //story 1, test the gettitle and add and delete
-    @Test 
+    @Test
     //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS1RecipeAdd() {
         String title1 = "Test Recipe 1";
@@ -97,7 +97,7 @@ public class TestAll {
         assertEquals(rList.size(), 0);
     }
 
-    @Test 
+    @Test
     //test that you can get the title(this is used to display in the ui)
     public void unitTestS1RecipeDisplay(){
         String title1 = "Test Recipe 1";
@@ -115,14 +115,14 @@ public class TestAll {
     }
 
 
-    @Test 
+    @Test
     public void storyTestS1NoRecipes() {
         //at start, should be no recipes
         int initialRecipeCount = rList.size();
         assertEquals(initialRecipeCount, 0);
     }
 
-    @Test 
+    @Test
     //having recipes should increase recipe count(these are displayed)
     public void storyTestS1ExistRecipe() {
         //add 2 recipes, 2 should be displayed
@@ -137,7 +137,7 @@ public class TestAll {
         assertEquals(rList.size(), 2);
     }
 
-    @Test 
+    @Test
     //if remove recipes, count should go down(because UI displays this list none should be displayed in UI)
     //actual delete UI functionality with recipe is for later, just want to make sure nothing will be displayed
     public void storyTestS1RemovedRecipes() {
@@ -152,7 +152,7 @@ public class TestAll {
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         assertEquals(rList.size(), 2);
-        //delete 
+        //delete
         rList.remove(title1);
         assertEquals(rList.size(), 1);
         rList.remove(title2);
@@ -180,11 +180,11 @@ public class TestAll {
     }
 
     // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
-    @Test 
+    @Test
     public void unitTestS3Record() {
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -195,10 +195,10 @@ public class TestAll {
 
     // Story 3, test that the "functionality" of getting recording.wav and processing
     // it in Whisper and see whether it's text matches what it should be
-    @Test 
+    @Test
     public void unitTestS3Whisper() {
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -216,7 +216,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -245,18 +245,18 @@ public class TestAll {
     // Story 3, test whether our program saves a user's meal type info
     // Here we separately test for whether our program can save a meal type
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
-    @Test 
+    @Test
     public void unitTestS3SaveMealType() {
         createHandler.getRecipe().setMealType("Dinner");
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-    @Test 
+    @Test
     // tests the combined functionality of record and transcribe and saving meal type
     public void storyTestS3MealType() {
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -264,7 +264,7 @@ public class TestAll {
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -282,7 +282,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -310,14 +310,14 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-    @Test 
-    // tests a rerecord situation, where the user doesn't like the result of the first 
+    @Test
+    // tests a rerecord situation, where the user doesn't like the result of the first
     // record they did and rerecord again
     public void storyTestS3Rerecord() {
         // first record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -328,7 +328,7 @@ public class TestAll {
         // second record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -336,7 +336,7 @@ public class TestAll {
         assertEquals(true, file.exists());
 
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -354,7 +354,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -382,7 +382,7 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-    @Test 
+    @Test
     // integration test of stories 1-3
     // Story 1: No recipes
     // Story 3: Record
@@ -395,7 +395,7 @@ public class TestAll {
         // story 3
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -403,7 +403,7 @@ public class TestAll {
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -421,7 +421,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -449,7 +449,7 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-    @Test 
+    @Test
     // integration test of stories 1-3
     // Story 1: (inserted it before hand but sneakily) Exist recipe
     // Story 2: Expand details of recipe (just make sure that recipe details match)
@@ -480,7 +480,7 @@ public class TestAll {
         // first record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -491,7 +491,7 @@ public class TestAll {
         // second record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -499,7 +499,7 @@ public class TestAll {
         assertEquals(true, file.exists());
 
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -517,7 +517,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -545,7 +545,7 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-     @Test 
+     @Test
     // integration test of stories 1-3
     // Story 1: remove preexisting recipes (2 to 0)
     // Story 3: Record
@@ -563,7 +563,7 @@ public class TestAll {
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         assertEquals(rList.size(), 2);
-        //delete 
+        //delete
         rList.remove(title1);
         assertEquals(rList.size(), 1);
         rList.remove(title2);
@@ -573,7 +573,7 @@ public class TestAll {
         // Story 3
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -581,7 +581,7 @@ public class TestAll {
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -599,7 +599,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -628,11 +628,11 @@ public class TestAll {
     }
 
     // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
-    @Test 
+    @Test
     public void unitTestS4Record() {
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -643,10 +643,10 @@ public class TestAll {
 
     // Story 3, test that the "functionality" of getting recording.wav and processing
     // it in Whisper and see whether it's text matches what it should be
-    @Test 
+    @Test
     public void unitTestS4Whisper() {
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -664,7 +664,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -693,18 +693,18 @@ public class TestAll {
     // Story 4, test whether our program saves a user's ingredient info
     // Here we separately test for whether our program can save ingredients
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
-    @Test 
+    @Test
     public void unitTestS4SaveIngredients() {
         createHandler.getRecipe().setIngredients("Corn, Peas, Carrots, Chicken");
         assertEquals("Corn, Peas, Carrots, Chicken", createHandler.getRecipe().getIngredients());
     }
 
-    @Test 
+    @Test
     // tests the combined functionality of record and transcribe and saving ingredients
     public void storyTestS4Ingredients() {
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -712,7 +712,7 @@ public class TestAll {
         File file = new File("recording.wav");
         assertEquals(true, file.exists());
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -730,7 +730,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -758,14 +758,14 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getIngredients());
     }
 
-    @Test 
-    // tests a rerecord situation, where the user doesn't like the result of the first 
+    @Test
+    // tests a rerecord situation, where the user doesn't like the result of the first
     // record they did and rerecord again
     public void storyTestS4Rerecord() {
         // first record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -776,7 +776,7 @@ public class TestAll {
         // second record
         try {
                 recordHandler.record();
-            } 
+            }
         catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -784,7 +784,7 @@ public class TestAll {
         assertEquals(true, file.exists());
 
         File audioFile = new File("recording.wav");
-        
+
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -802,7 +802,7 @@ public class TestAll {
         boolean bigEndian = false;
 
         AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
-        
+
         // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
 
@@ -834,7 +834,7 @@ public class TestAll {
     // it begins to generate a recipe from the info earlier given
     // here we assume that we created a blank recipe and filled in the mealtype and
     // ingredients as we went, like in the actual app
-    @Test 
+    @Test
     public void unitTestS5Generate() {
         // simulates us setting the recipe's meal type when user says mealtype
         createHandler.getRecipe().setMealType("Lunch");
@@ -845,7 +845,7 @@ public class TestAll {
 
         String mealtype = r.getMealType();
         String ingredients = r.getIngredients();
-        
+
         // generate our instructions and titles
         String recipe = gptHandler.generate(mealtype, ingredients);
         // extract the title from instructions
@@ -865,15 +865,15 @@ public class TestAll {
 
     // Story 5, test that after you press the save button, it not only updates recipeList to include
     // the new recipe, but also adds it to the save.csv
-    @Test 
+    @Test
     public void unitTestS5Save() {
         // precreate our recipe, assuming we generated it correctly earlier after feeding to ChatGPT
         // below info for the recipe is from an actual ChatGPT and whisper response in save.csv
         createHandler.getRecipe().setTitle("BLT Sandwich");
         createHandler.getRecipe().setMealType("Lunch.");
         createHandler.getRecipe().setIngredients("Bacon lettuce tomatoes white bread mayonnaise.");
-        createHandler.getRecipe().setInstructions("BLT Sandwich~  1. Toast the white bread. 2. " + 
-        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+        createHandler.getRecipe().setInstructions("BLT Sandwich~  1. Toast the white bread. 2. " +
+        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
         "the two pieces of toast.  4. Cut the sandwich in half and serve.");
         // add the recipe to both recipeList and save.csv
         rHandler.addRecipe(createHandler.getRecipe());
@@ -899,10 +899,10 @@ public class TestAll {
                     String ingredients = fields[2].trim();
                     assertEquals("Bacon lettuce tomatoes white bread mayonnaise.", ingredients);
                     String instructions = fields[3].trim();
-                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " + 
-                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " +
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
                         "the two pieces of toast.  4. Cut the sandwich in half and serve.", instructions);
-                } 
+                }
             }
         } catch (IOException e) {
             System.out.println("No File found");
@@ -910,7 +910,7 @@ public class TestAll {
         }
     }
 
-    @Test 
+    @Test
     // tests when the user generates the recipe and decides to save
     public void storyTestS5Save() {
         // simulates us setting the recipe's meal type when user says mealtype
@@ -922,7 +922,7 @@ public class TestAll {
 
         String mealtype = r.getMealType();
         String ingredients = r.getIngredients();
-        
+
         // generate our instructions and titles
         String recipe = gptHandler.generate(mealtype, ingredients);
         // extract the title from instructions
@@ -965,7 +965,7 @@ public class TestAll {
                     assertEquals("food", ingredients2);
                     String instructions2 = fields[3].trim();
                     assertEquals("Diet Plan ~ Maybe you should just go on a diet.", instructions2);
-                } 
+                }
             }
         } catch (IOException e) {
             System.out.println("No File found");
@@ -973,7 +973,7 @@ public class TestAll {
         }
     }
 
-    @Test 
+    @Test
     // tests when the user generates the recipe and but doesn't save (cancel)
     public void storyTestS5Cancel() {
         // simulates us setting the recipe's meal type when user says mealtype
@@ -985,7 +985,7 @@ public class TestAll {
 
         String mealtype = r.getMealType();
         String ingredients = r.getIngredients();
-        
+
         // generate our instructions and titles
         String recipe = gptHandler.generate(mealtype, ingredients);
         // extract the title from instructions
@@ -1001,10 +1001,33 @@ public class TestAll {
         assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
         // check whether the display of the instructions is correct
         assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
-        
+
         // don't add it in
 
         // check whether recipeList was not updated
         assertEquals(rList.size(), 0);
+    }
+
+    @Test
+    public void storyTestS6EditRecipe() {
+
+        String title = "Omelet";
+        String mealType = "Breakfast";
+        String oldIngredients = "Eggs, Cheese";
+        String oldInstructions = "1. Heat pan 2. Crack Eggs 3. Flip 4. Wait 5. Eat";
+        String newIngredients = "Eggs, Cheese, Milk";
+        String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
+        Recipe oldRecipe = new Recipe(title, mealType, oldIngredients, oldInstructions);
+        Recipe newRecipe = new Recipe(title, mealType, newIngredients, newInstructions);
+        rHandler.addRecipe(oldRecipe);
+
+        // edit oldRecipe with newInstructions and newIngredients
+        rHandler.editRecipe(oldRecipe, newIngredients, newInstructions);
+
+        assertEquals(1, rList.size());
+
+        // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
+        assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
+        assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
     }
 }
