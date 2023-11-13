@@ -17,6 +17,7 @@ public class RecipeHandler {
 
     public void deleteRecipe(String title){
         this.list.remove(title);
+        this.list.update();
     }
 
     public RecipeList getRecipeList(){

@@ -208,6 +208,7 @@ class ListFooter extends HBox {
 class DisplayFooter extends HBox {
     private Button editButton;
     private Button backButton;
+    private Button deleteButton;
     DisplayFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -218,10 +219,13 @@ class DisplayFooter extends HBox {
 
         editButton = new Button("Edit");
         backButton = new Button("Back");
+        deleteButton = new Button("Delete");
         editButton.setStyle(defaultButtonStyle);
         backButton.setStyle(defaultButtonStyle);
+        deleteButton.setStyle(defaultButtonStyle);
         this.getChildren().add(editButton);
         this.getChildren().add(backButton);
+        this.getChildren().add(deleteButton);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -230,6 +234,10 @@ class DisplayFooter extends HBox {
     }
     public Button getBackButton(){
         return backButton;
+    }
+
+    public Button getDeleteButton(){ 
+        return deleteButton;
     }
 }
 
@@ -621,6 +629,7 @@ class RecipeDisplay extends BorderPane {
     private DisplayFooter footer;
     private Button editButton;
     private Button backButton;
+    private Button deleteButton;
 
     private NavigationHandler handler;
     private UIRecipe r;
@@ -747,6 +756,22 @@ class RecipeDisplay extends BorderPane {
                 }
             }
         });
+
+        Button deleteButton = footer.getDeleteButton();
+        deleteButton.setOnAction(e -> {
+
+            AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
+
+            mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            mainAppFrame.getRecipeList().updateList(handler);
+
+            
+
+            //then call update UI recipe
+            handler.menu();
+            
+        });
+
     }
 
     // Helper method to create a scrollable text box
