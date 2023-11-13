@@ -326,18 +326,7 @@ class AppFrame extends BorderPane {
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-        // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
-        //SAMPLE VALUES FOR TESTING RECIPE DISPLAY
-        String title = "Test Recipe 1";
-        String mealtype = "Lunch";
-        String ingredients = "food";
-        String instructions = "cook food";
-        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-
-        //send to controller
-        this.rHandler.addRecipe(r);
-        this.recipeList.updateList(nHandler);
-
+      
         //send to record page, and also add a recipe for test purposes
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
@@ -484,7 +473,7 @@ class RecordAppFrame extends FlowPane {
     String name;
     CreateHandler createHandler;
 
-    // Set a default style for buttons and fields - background color, font size,
+// Set a default style for buttons and fields - background color, font size,
     // italics
     String defaultButtonStyle = "-fx-border-color: #000000; -fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px;";
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 175px; -fx-pref-height: 50px; -fx-text-fill: red; visibility: hidden";
@@ -673,10 +662,7 @@ class RecipeDisplay extends BorderPane {
     public void setUIR(UIRecipe recipe){
         this.r = recipe;
     }
-
-    public void setR(UIRecipe recipe){
-        this.r = recipe;
-    }
+  
 
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
@@ -790,7 +776,6 @@ public class Main extends Application {
         AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
-
 
         //handler initializes by adding recipe list to pagelist
         handler.initialize(recipeList);
