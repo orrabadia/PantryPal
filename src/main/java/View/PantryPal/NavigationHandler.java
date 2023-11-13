@@ -16,6 +16,7 @@ class NavigationHandler{
     public static final String DISPLAY_RECIPE = "DisplayRecipe";
     public static final String RECORD_MEALTYPE = "RecordMealType";
     public static final String RECORD_INGREDIENTS = "RecordIngredients";
+    public static final String GPT_RESULTS = "GptResults";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
     NavigationHandler(){
@@ -54,9 +55,17 @@ class NavigationHandler{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
+        rd.setUIR(r);
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
+        primaryStage.setScene(s);
+    }
+
+    void showGPTResults(GPTResultsDisplay g){
+        //show gpt results page
+        Scene s = new Scene(g, 500, 600);
+        pageList.put(GPT_RESULTS, s);
         primaryStage.setScene(s);
     }
 
@@ -109,5 +118,10 @@ class NavigationHandler{
         //switches to ingredient page
         r = pageList.get(RECORD_INGREDIENTS);
         primaryStage.setScene(r);
+    }
+
+    //get the actual map
+    HashMap<String, Scene> getPageList(){
+        return this.pageList;
     }
 }

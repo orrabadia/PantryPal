@@ -13,7 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class TestAll {
     private RecordHandler recordHandler;
     private WhisperHandler whisperHandler;
     private CreateHandler createHandler;
+    private GPTHandler gptHandler;
 
      @BeforeEach
      public void initialize(){
@@ -45,6 +48,8 @@ public class TestAll {
         whisperHandler = new WhisperHandler(true);
 
         createHandler = new CreateHandler();
+
+        gptHandler = new GPTHandler(true);
      }
 
     public void deleteRecording() {
@@ -54,6 +59,7 @@ public class TestAll {
         if (file.exists()) {
             file.delete();
         }
+
     }
 
      @AfterEach
@@ -826,5 +832,183 @@ public class TestAll {
         assertEquals( "Dinner", transcription);
         createHandler.getRecipe().setIngredients(transcription);
         assertEquals("Dinner", createHandler.getRecipe().getIngredients());
+    }
+
+    // Story 5, test that after you press the continue button on the ingredients page
+    // it begins to generate a recipe from the info earlier given
+    // here we assume that we created a blank recipe and filled in the mealtype and
+    // ingredients as we went, like in the actual app
+    @Test 
+    public void unitTestS5Generate() {
+        // simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Lunch");
+        // simulates us setting the recipe's ingredients when user says mealtype
+        createHandler.getRecipe().setIngredients("food");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+        
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+    }
+
+    // Story 5, test that after you press the save button, it not only updates recipeList to include
+    // the new recipe, but also adds it to the save.csv
+    @Test 
+    public void unitTestS5Save() {
+        // precreate our recipe, assuming we generated it correctly earlier after feeding to ChatGPT
+        // below info for the recipe is from an actual ChatGPT and whisper response in save.csv
+        createHandler.getRecipe().setTitle("BLT Sandwich");
+        createHandler.getRecipe().setMealType("Lunch.");
+        createHandler.getRecipe().setIngredients("Bacon lettuce tomatoes white bread mayonnaise.");
+        createHandler.getRecipe().setInstructions("BLT Sandwich~  1. Toast the white bread. 2. " + 
+        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+        "the two pieces of toast.  4. Cut the sandwich in half and serve.");
+        // add the recipe to both recipeList and save.csv
+        rHandler.addRecipe(createHandler.getRecipe());
+        // check whether recipeList was updated
+        assertEquals(rList.size(), 1);
+        // check whether the save.csv is there
+        File file = new File("save.csv");
+        assertEquals(true, file.exists());
+        // check the contents of save.csv
+        String csvFile = "./save.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // split for comma
+                String[] fields = line.split(",");
+
+                // get each field
+                if (fields.length >= 4) {
+                    String title = fields[0].trim();
+                    assertEquals("BLT Sandwich", title);
+                    String mealtype = fields[1].trim();
+                    assertEquals("Lunch.", mealtype);
+                    String ingredients = fields[2].trim();
+                    assertEquals("Bacon lettuce tomatoes white bread mayonnaise.", ingredients);
+                    String instructions = fields[3].trim();
+                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " + 
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+                        "the two pieces of toast.  4. Cut the sandwich in half and serve.", instructions);
+                } 
+            }
+        } catch (IOException e) {
+            System.out.println("No File found");
+            e.printStackTrace();
+        }
+    }
+
+    @Test 
+    // tests when the user generates the recipe and decides to save
+    public void storyTestS5Save() {
+        // simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Lunch");
+        // simulates us setting the recipe's ingredients when user says mealtype
+        createHandler.getRecipe().setIngredients("food");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+        
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+
+        // add the recipe to both recipeList and save.csv
+        rHandler.addRecipe(createHandler.getRecipe());
+        // check whether recipeList was updated
+        assertEquals(rList.size(), 1);
+        // check whether the save.csv is there
+        File file = new File("save.csv");
+        assertEquals(true, file.exists());
+        // check the contents of save.csv
+        String csvFile = "./save.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // split for comma
+                String[] fields = line.split(",");
+
+                // get each field
+                if (fields.length >= 4) {
+                    String title2 = fields[0].trim();
+                    assertEquals("Diet Plan", title2);
+                    String mealtype2 = fields[1].trim();
+                    assertEquals("Lunch", mealtype2);
+                    String ingredients2 = fields[2].trim();
+                    assertEquals("food", ingredients2);
+                    String instructions2 = fields[3].trim();
+                    assertEquals("Diet Plan ~ Maybe you should just go on a diet.", instructions2);
+                } 
+            }
+        } catch (IOException e) {
+            System.out.println("No File found");
+            e.printStackTrace();
+        }
+    }
+
+    @Test 
+    // tests when the user generates the recipe and but doesn't save (cancel)
+    public void storyTestS5Cancel() {
+        // simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Lunch");
+        // simulates us setting the recipe's ingredients when user says mealtype
+        createHandler.getRecipe().setIngredients("food");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+        
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+        
+        // don't add it in
+
+        // check whether recipeList was not updated
+        assertEquals(rList.size(), 0);
     }
 }

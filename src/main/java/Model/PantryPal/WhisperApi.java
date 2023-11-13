@@ -64,6 +64,9 @@ public class WhisperApi implements Whisper {
     
     // Disconnect connection
     connection.disconnect();
+    ret = ret.replace(",", "");
+    ret = ret.replace("\n", " ");
+    ret = ret.replace("\r", " ");
     return ret;
     }
 
