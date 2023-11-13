@@ -13,12 +13,8 @@ import java.net.*;
 import org.json.*;
 
 public class AudioRecorder implements Recorder {
-
+//class copied from lab and adapted
     private TargetDataLine targetDataLine;
-
-    // public String transcribe() throws IOException, URISyntaxException {
-    //     return WhisperApi.whisperTranscribe("./recording.wav");
-    // }
 
     public AudioFormat getAudioFormat() {
         // the number of samples of audio per second.

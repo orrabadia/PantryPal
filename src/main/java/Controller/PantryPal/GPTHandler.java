@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class GPTHandler {
+    //handle chatgpt data between frontend and backend
     private ChatGPT c;
     GPTHandler(){
         c = new RecipeGenerator();

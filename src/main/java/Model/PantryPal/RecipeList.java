@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecipeList {
+    //represents recipe list object(list of recipe)
     private ArrayList<Recipe> list;
     RecipeList(){
         list = new ArrayList<>();
@@ -68,6 +69,7 @@ public class RecipeList {
                 recipeWrite.add(i.getIngredients());
                 recipeWrite.add(i.getInstructions());
             }
+            //this is format/order, taken out to simplify
             // f.append("title");
             // f.append(",");
             // f.append("mealtype");

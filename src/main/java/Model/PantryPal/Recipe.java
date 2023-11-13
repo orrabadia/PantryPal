@@ -1,6 +1,7 @@
 package PantryPal;
 
 public class Recipe {
+    //class that represents a recipe object with its fields
     private String title;
     private String mealType;
     private String ingredients;

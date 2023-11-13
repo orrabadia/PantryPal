@@ -4,10 +4,10 @@ import java.net.*;
 import org.json.*;
 
 public class WhisperApi implements Whisper {
+    //class to transcribe whisper from recordings, adapted from lab
     private static final String API_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
     private static final String TOKEN = "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";
     private static final String MODEL = "whisper-1";
-    //private static final String FILE_PATH = "./Guy Yelling Among Us.mp3";
 
     public String whisperTranscribe(String fileName) throws IOException, URISyntaxException {
     // Create file object from file path

@@ -28,8 +28,8 @@ class UIRecipe extends HBox { // extend HBox
     private Label index; // for use in RecipeList
     private Text mealType;
     private Button displayButton;
-    private String ingredients; // change to different data struct?
-    private String recipeInstructions; // change to different data struct?
+    private String ingredients; 
+    private String recipeInstructions; 
     // add UI variables
 
     /*
@@ -62,8 +62,6 @@ class UIRecipe extends HBox { // extend HBox
 
         HBox hbox = new HBox();
         hbox.getChildren().add(title);
-
-        //TODO: fix THE SPACING AND PUT IT AT THE RIGHT IDK HOW TO DO IT
 
         //add display recipe button
         displayButton = new Button("Display Recipe");
@@ -109,22 +107,6 @@ class UIRecipe extends HBox { // extend HBox
         return this.displayButton;
     }
 
-    /*
-     * Set Methods, think its in a different task
-     *
-     * void setTitle(Recipe recipe, String newTitle) { // Not for MS1, Assess
-     * recipe.title = newTitle;
-     * }
-     *
-     * void setMealType(Recipe recipe, String newMealType) {
-     * recipe.mealType = newMealType;
-     * }
-     */
-
-    /*
-     * SetIngredients and RecipeInstructions more complex
-     */
-
     void setRecipeIndex(UIRecipe recipe, Label newIndex) {
         recipe.index = newIndex;
     }
@@ -168,17 +150,6 @@ class UIRecipeList extends VBox { // extends HBox?
             this.updateRecipeIndices();
         }
     }
-
-    //add when delete implementing
-    // public void updateRecipeIndices() {
-    // int index = 1;
-    // for (int i = 0; i < this.getChildren(i); i++) {
-    // if (this.getChildren().get(i) instanceof Recipe) {
-    // ((Recipe) this.getChildren().get(i)).setRecipeIndex(index);
-    // index++;
-    // }
-    // }
-    // }
 }
 
 /*
@@ -342,6 +313,7 @@ class AppFrame extends BorderPane {
 
     }
 
+    //old method used to add recipe directly
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
     //     // just dummy values for now, gotta get the tokens from Chat GPT and parse them and pass them into here
     //     UIRecipe recipe = new UIRecipe(new Text(title), new Text(meal),ingredients, recipeinstructions, this.nHandler);
@@ -433,7 +405,6 @@ class GPTResultsDisplay extends BorderPane{
     {
         Button saveButton = footer.getSaveButton();
         saveButton.setOnAction(e ->{
-            //TODO: add save functionality
             //get recipehandler from navhandler
             HashMap<String,Scene> pagelist = nHandler.getPageList();
             AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();

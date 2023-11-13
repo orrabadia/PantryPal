@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class RecipeGenerator implements ChatGPT{
+    //class to generate a recipe from chatgpt, also has recipe title
+    //gotten from lab and adapted
     
     private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
     private static final String API_KEY = "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";
@@ -55,21 +57,6 @@ public class RecipeGenerator implements ChatGPT{
     
         return generatedText;
     }
-    // public static void main(String[] args) {
-    //     try {
-    //         String returnResponse = generateRecipe("breakfast","eggs, bacon, cheese, bagel, seasoning");
-    //         System.out.println(returnResponse);
-    //     } catch (IOException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
-    //     } catch (InterruptedException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
-    //     } catch (URISyntaxException e) {
-    //         // TODO Auto-generated catch block
-    //         e.printStackTrace();
-    //     }
-    // }
     
 }   
 
