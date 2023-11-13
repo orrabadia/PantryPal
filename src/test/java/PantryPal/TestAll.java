@@ -1066,4 +1066,260 @@ public class TestAll {
         assertEquals(rList.size(), 0);
     }
 
+    @Test
+    // integration test of stories 4-7
+    // Story 4: Ingredients
+    // Story 5: Save
+    // Story 6: Edit
+    // Story 7: Delete
+
+    public void integrationTest4() {
+        // Story 4: Ingredients
+        try {
+                recordHandler.record();
+            }
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+        File audioFile = new File("recording.wav");
+
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setIngredients(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getIngredients());
+
+        // Story 5: Save
+        // simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Lunch");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: Dinner","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+
+        // add the recipe to both recipeList and save.csv
+        rHandler.addRecipe(createHandler.getRecipe());
+        // check whether recipeList was updated
+        assertEquals(rList.size(), 1);
+        // check whether the save.csv is there
+        File file2= new File("save.csv");
+        assertEquals(true, file2.exists());
+        // check the contents of save.csv
+        String csvFile = "./save.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // split for comma
+                String[] fields = line.split(",");
+
+                // get each field
+                if (fields.length >= 4) {
+                    String title2 = fields[0].trim();
+                    assertEquals("Diet Plan", title2);
+                    String mealtype2 = fields[1].trim();
+                    assertEquals("Lunch", mealtype2);
+                    String ingredients2 = fields[2].trim();
+                    assertEquals("Dinner", ingredients2);
+                    String instructions2 = fields[3].trim();
+                    assertEquals("Diet Plan ~ Maybe you should just go on a diet.", instructions2);
+
+                }
+
+            }
+        } catch (IOException e) {
+            System.out.println("No File found");
+            e.printStackTrace();
+        }
+
+        // Story 6: Edit
+        Recipe oldRecipe = createHandler.getRecipe();
+        String newIngredients = "Eggs, Cheese, Milk";
+        String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
+        Recipe newRecipe = new Recipe(strippedString, "Lunch", newIngredients, newInstructions);
+        
+        // edit oldRecipe with newInstructions and newIngredients
+        rHandler.editRecipe(oldRecipe, newIngredients, newInstructions);
+
+        assertEquals(1, rList.size());
+
+        // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
+        assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
+        assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
+
+        //Story 7: Delete
+         //add two and check if you can get title, maybe 2 messes it up
+        assertEquals(rList.size(), 1);
+        rHandler.deleteRecipe(strippedString);
+        assertEquals(rList.size(), 0);
+    }
+
+    // integration test of stories 4-7
+    // Story 4: Rerecord
+    // Story 5: Cancel
+    @Test 
+    public void integrationTest5() {
+        //4-7
+        //Re-record -> Cancel
+        //Re-record test
+        try {
+                recordHandler.record();
+            }
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        File file = new File("recording.wav");
+        assertEquals(true, file.exists());
+
+        // second record
+        try {
+                recordHandler.record();
+            }
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        assertEquals(true, file.exists());
+
+        File audioFile = new File("recording.wav");
+
+         // the number of samples of audio per second.
+        // 44100 represents the typical sample rate for CD-quality audio.
+        float sampleRate = 44100;
+
+        // the number of bits in each sample of a sound that has been digitized.
+        int sampleSizeInBits = 16;
+
+        // the number of audio channels in this format (1 for mono, 2 for stereo).
+        int channels = 1;
+
+        // whether the data is signed or unsigned.
+        boolean signed = true;
+
+        // whether the audio data is stored in big-endian or little-endian order.
+        boolean bigEndian = false;
+
+        AudioFormat audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
+
+        // creates an empty audioInputStream
+        AudioInputStream audioInputStream = new AudioInputStream(null, audioFormat, 0);
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setIngredients(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getIngredients());
+    
+        //end of rerocord test
+        //cancel test
+        //simulates us setting the recipe's meal type when user says mealtype
+        createHandler.getRecipe().setMealType("Dinner");
+        //simulates us setting the recipe's ingredients when user says mealtype
+        //createHandler.getRecipe().setIngredients("Dinner");
+
+        Recipe r = createHandler.getRecipe();
+
+        String mealtype = r.getMealType();
+        String ingredients = r.getIngredients();
+
+        // generate our instructions and titles
+        String recipe = gptHandler.generate(mealtype, ingredients);
+        // extract the title from instructions
+        String title = recipe.substring(0,recipe.indexOf("~"));
+        //take out the newlines and returns for formatting
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        // set the instructions and title
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+        // check whether the display of title is correct
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
+        // check whether the display of ingredients is correct
+        assertEquals("Ingredients: Dinner","Ingredients: " +createHandler.getRecipe().getIngredients());
+        // check whether the display of the instructions is correct
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+        // don't add it in
+
+        // check whether recipeList was not updated
+        assertEquals(rList.size(), 0);
+
+        //end of cancel test
+    }
+
 }
