@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test;
 //import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -58,6 +60,7 @@ public class TestAll {
         if (file.exists()) {
             file.delete();
         }
+
     }
 
      @AfterEach
@@ -608,10 +611,57 @@ public class TestAll {
         r.setInstructions(recipe);
         r.setTitle(strippedString);
         // check whether the display of title is correct
-
+        assertEquals("Diet Plan ", createHandler.getRecipe().getTitle());
         // check whether the display of ingredients is correct
         assertEquals("Ingredients: food","Ingredients: " +createHandler.getRecipe().getIngredients());
         // check whether the display of the instructions is correct
-        
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+    }
+
+    // Story 5, test that after you press the save button, it not only updates recipeList to include
+    // the new recipe, but also adds it to the save.csv
+    @Test 
+    public void unitTestS5Save() {
+        // precreate our recipe, assuming we generated it correctly earlier after feeding to ChatGPT
+        // below info for the recipe is from an actual ChatGPT and whisper response in save.csv
+        createHandler.getRecipe().setTitle("BLT Sandwich");
+        createHandler.getRecipe().setMealType("Lunch.");
+        createHandler.getRecipe().setIngredients("Bacon lettuce tomatoes white bread mayonnaise.");
+        createHandler.getRecipe().setInstructions("BLT Sandwich~  1. Toast the white bread. 2. " + 
+        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+        "the two pieces of toast.  4. Cut the sandwich in half and serve.");
+        // add the recipe to both recipeList and save.csv
+        rHandler.addRecipe(createHandler.getRecipe());
+        // check whether recipeList was updated
+        assertEquals(rList.size(), 1);
+        // check whether the save.csv is there
+        File file = new File("save.csv");
+        assertEquals(true, file.exists());
+        // check the contents of save.csv
+        String csvFile = "./save.csv";
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // split for comma
+                String[] fields = line.split(",");
+
+                // get each field
+                if (fields.length >= 4) {
+                    String title = fields[0].trim();
+                    assertEquals("BLT Sandwich", title);
+                    String mealtype = fields[1].trim();
+                    assertEquals("Lunch.", mealtype);
+                    String ingredients = fields[2].trim();
+                    assertEquals("Bacon lettuce tomatoes white bread mayonnaise.", ingredients);
+                    String instructions = fields[3].trim();
+                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " + 
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
+                        "the two pieces of toast.  4. Cut the sandwich in half and serve.", instructions);
+                } 
+            }
+        } catch (IOException e) {
+            System.out.println("No File found");
+            e.printStackTrace();
+        }
     }
 }
