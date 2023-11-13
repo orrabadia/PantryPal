@@ -326,7 +326,7 @@ class AppFrame extends BorderPane {
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-
+      
         //send to record page, and also add a recipe for test purposes
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
@@ -639,7 +639,9 @@ class RecipeDisplay extends BorderPane {
 
         // Create two scrollable boxes with text
         ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
+        ((TextField) scrollPane1.getContent()).setEditable(false);
         ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
+        ((TextField) scrollPane2.getContent()).setEditable(false);
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
@@ -660,6 +662,7 @@ class RecipeDisplay extends BorderPane {
     public void setUIR(UIRecipe recipe){
         this.r = recipe;
     }
+  
 
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
@@ -669,9 +672,9 @@ class RecipeDisplay extends BorderPane {
 
     public void setIngredients(String s){
         //called when displaying from handler, handler has blank one by default
-        VBox v = (VBox)this.getCenter();
+        VBox v = (VBox) this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
-        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
+        ScrollPane scroll1 = (ScrollPane) v.getChildren().get(0);
         TextField textField = (TextField) scroll1.getContent();
         textField.setText(s);
     }
@@ -688,23 +691,73 @@ class RecipeDisplay extends BorderPane {
 
     public void addListeners()
     {
+
         Button backButton = footer.getBackButton();
         backButton.setOnAction(e ->{
-            handler.menu();
+            if (this.footer.getBackButton().getText() == "Back"){
+                handler.menu();
+            } else {
+                //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
+               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
+               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
+
+               //reverts the displayed instructions back to orriginal (what is being saved in the rlist (not UIRList))
+               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
+               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
+
+                //sets textfields to non-editable
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+
+                //reverts buttons back
+                this.footer.getBackButton().setText("Back");
+                this.footer.getEditButton().setText("Edit");
+            }
+        });
+
+        Button editButton = footer.getEditButton();
+        editButton.setOnAction(e -> {
+
+            if (this.footer.getEditButton().getText() == "Edit") {
+                //sets textfields editable
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
+                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
+                //changes button text
+                this.footer.getEditButton().setText("Save");
+                this.footer.getBackButton().setText("Cancel");
+            } else {
+                if (this.footer.getEditButton().getText() == "Save") {
+                    //sets fields uneditable
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                    /*
+                    Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Calls editRecipe()
+                    from RecipeHandler, passing in the recipe which is retrieved from the appframes recipe handlers recipelist, the new
+                    ingredients and the new instructions retrieved from the fields
+                    */
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().editRecipe(
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()),
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
+                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
+                    //Updatethe UIList
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler);
+                    //Revert button text back
+                    this.footer.getEditButton().setText("Edit");
+                    this.footer.getBackButton().setText("Back");
+                }
+            }
         });
     }
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
         TextField textArea = new TextField(content);
-
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
         return scrollPane;
     }
-
 }
 
 /*
@@ -713,7 +766,6 @@ class RecipeDisplay extends BorderPane {
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         //navigation handler to change scenes
         //this contains a map of all pages
         //appframe is initialized without navhandler

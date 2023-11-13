@@ -33,6 +33,11 @@ class NavigationHandler{
 
         return ret;
     }
+
+    HashMap<String, Scene> getMap(){
+        return this.pageList;
+    }
+
     /**called when initializing, takes a scene(in this case the recipelist) and shows it
      * */
     void initialize(Scene RecipeList){
