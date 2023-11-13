@@ -1050,4 +1050,20 @@ public class TestAll {
         assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
     }
 
+
+    @Test
+    public void storyTestS7DeleteRecipe() {
+        
+        String title1 = "Test Recipe 1";
+        String mealtype = "Lunch";
+        String ingredients = "food";
+        String instructions = "cook food";
+        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
+        rHandler.addRecipe(r1);
+        //add two and check if you can get title, maybe 2 messes it up
+        assertEquals(rList.size(), 1);
+        rHandler.deleteRecipe(title1);
+        assertEquals(rList.size(), 0);
+    }
+
 }
