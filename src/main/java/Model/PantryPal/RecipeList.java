@@ -125,12 +125,49 @@ public class RecipeList {
 
                 } 
             }
-            System.out.println(rlist.toString());
+            //System.out.println(rlist.toString());
             this.list = rlist;
-            System.out.println(this.list.toString());
+            //System.out.println(this.list.toString());
         } catch (IOException e) {
             System.out.println("No File found");
             e.printStackTrace();
         }
+    }
+
+    public void setList(ArrayList<Recipe> set){
+        this.list = set;
+    }
+
+    /**return current csv list as string for http sending
+    */
+    public String stringify(){
+        String csvFile = "./save.csv";
+        this.list.clear();
+        String ret = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // split for comma
+                String[] fields = line.split(",");
+
+                // get each field
+                if (fields.length >= 4) {
+                    String title = fields[0].trim();
+                    String mealtype = fields[1].trim();
+                    String ingredients = fields[2].trim();
+                    String instructions = fields[3].trim();
+                    ret = ret + title + "," + mealtype + "," + ingredients + "," + instructions + "\n";
+                    //add a new line of recipe info
+                } 
+            }
+            //System.out.println(rlist.toString());
+            return ret;
+            //System.out.println(this.list.toString());
+        } catch (IOException e) {
+            System.out.println("No File found");
+            e.printStackTrace();
+        }
+        return ret;
     }
 }
