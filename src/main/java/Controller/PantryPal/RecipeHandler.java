@@ -3,6 +3,9 @@ package PantryPal;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class RecipeHandler {
     private RecipeList list;
     private RequestHandler reqHandler;
@@ -21,10 +24,10 @@ public class RecipeHandler {
         this.list.remove(title);
     }
 
-    public RecipeList getRecipeList(){
-        //this should return the csv maybe? 
-        return this.list;
-    }
+    // public RecipeList getRecipeList(){
+    //     //this should return the csv maybe? 
+    //     return this.list;
+    // }
 
     public void addRecipe(Recipe r){
         //get current list from backend(csv) and replace this objects list with it
@@ -33,18 +36,58 @@ public class RecipeHandler {
         String ingredients = r.getIngredients();
         String instructions = r.getInstructions();
         String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, "recipe");
-        if(newList.equals("")){
-            System.out.println("fuck");
-        }
-        ArrayList<Recipe> replace = this.parseList(newList);
-        this.list.setList(replace);
+        // if(newList.equals("")){
+        //     System.out.println("fuck");
+        // }
+        // ArrayList<Recipe> replace = this.parseList(newList);
+        // this.list.setList(replace);
     }
 
-    public void testgetRecipeList(){
+    public ArrayList<Recipe> getRecipeList(){
         String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", "");
-        //do get, it should return csv list, parse and set current one
-        ArrayList<Recipe> replace = this.parseList(newList);
+        //do get, it should return JSON
+        //parse the json
+        // JSONArray test = new JSONArray(newList.toString());
+        // System.out.println("Printing keys and values:");
+        //     for (int i = 0; i < test.length(); i++) {
+        //     JSONObject jsonObject = test.getJSONObject(i);
+        //     System.out.println("Element " + (i + 1) + ":");
+        //     for (String key : jsonObject.keySet()) {
+        //         Object value = jsonObject.get(key);
+        //         System.out.println("Key: " + key + ", Value: " + value);
+        //     }
+        //     System.out.println(); // Separate each object's output
+        // }
+        //System.out.println("NEWLIST:" + newList);
+        JSONArray test = new JSONArray(newList);
+        ArrayList<Recipe> replace = new ArrayList<>();
+        //System.out.println("RHANDLER : Printing keys and values:");
+            for (int i = 0; i < test.length(); i++) {
+            JSONObject jsonObject = test.getJSONObject(i);
+            Recipe add = new Recipe();
+            //System.out.println("Element " + (i + 1) + ":");
+            for (String key : jsonObject.keySet()) {
+                Object value = jsonObject.get(key);
+                //System.out.println("Key: " + key + ", Value: " + value);
+                if(key.equals("title")){
+                    add.setTitle(value.toString());
+                } else if(key.equals("mealType")){
+                    add.setMealType(value.toString());
+                }else if(key.equals("ingredients")){
+                    add.setIngredients(value.toString());
+                }else if(key.equals("instructions")){
+                    add.setInstructions(value.toString());
+                }
+            }
+            //System.out.println();
+            //add recipe to list as you update
+            replace.add(add);
+        }
+
+
+        //ArrayList<Recipe> replace = this.parseList(newList);
         this.list.setList(replace);
+        return replace;
     }
 
     public ArrayList<Recipe> parseList(String rList){

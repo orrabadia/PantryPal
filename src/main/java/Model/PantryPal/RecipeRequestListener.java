@@ -3,16 +3,19 @@ import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import org.json.*;
 public class RecipeRequestListener implements HttpHandler{
     private final Map<String, String> data;
     private RecipeList rList;
+    private MongoDB m;
 
 
     public RecipeRequestListener(Map<String, String> data) {
-    this.data = data;
-    rList = new RecipeList();
-    //initialze recipelist with data from our backend
-    rList.refresh();
+      this.data = data;
+      rList = new RecipeList();
+      //initialze recipelist with data from our backend
+      rList.refresh();
+      m = new MongoDB();
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -21,6 +24,7 @@ public class RecipeRequestListener implements HttpHandler{
         try {
             if (method.equals("GET")) {
               response = handleGet(httpExchange);
+              httpExchange.getResponseHeaders().set("Content-Type", "application/json");
             } else if (method.equals("POST")) {
               response = handlePost(httpExchange);
             } else if (method.equals("PUT")) {
@@ -36,6 +40,7 @@ public class RecipeRequestListener implements HttpHandler{
             e.printStackTrace();
           }
           //Sending back response to the client
+        //httpExchange.getResponseHeaders().set("Content-Type", "application/json");
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
         outStream.write(response.getBytes());
@@ -44,8 +49,18 @@ public class RecipeRequestListener implements HttpHandler{
     }
     private String handleGet(HttpExchange httpExchange) throws IOException {
       //should return string version of current recipelist in backend
-      rList.refresh();
-      return rList.stringify();
+
+      // Converting the JSON array to a string
+      //note that this has to be a single string with no newlines before you send it back
+      
+      String ret = m.get("MOGUSMAN");
+      ret = ret.replaceAll("[\n\r]", "");
+      System.out.println("REQUESTLISTENER RET: " + ret);
+      return ret;
+
+      //rList.refresh();
+      //return rList.stringify();
+
         // String response = "Invalid GET request";
         // URI uri = httpExchange.getRequestURI();
         // String query = uri.getRawQuery();
@@ -97,15 +112,21 @@ public class RecipeRequestListener implements HttpHandler{
         String ingredients = recipeValues[2];
         String instructions = recipeValues[3];
 
-        Recipe r = new Recipe(title, mealtype, ingredients, instructions);
-        //add adds to rlist and updates csv
-        rList.add(r);
-        rList.refresh();
+        System.out.println("RECIEVED: " + title + mealtype + ingredients + instructions);
 
-        //you might have to refresh again, it seems to clear after adding
+        m.put("MOGUSMAN", title, mealtype, ingredients, instructions);
         scanner.close();
-        //returns csv
-        return rList.stringify();
+        return "Success";
+
+        // Recipe r = new Recipe(title, mealtype, ingredients, instructions);
+        // //add adds to rlist and updates csv
+        // rList.add(r);
+        // rList.refresh();
+
+        // //you might have to refresh again, it seems to clear after adding
+        // scanner.close();
+        // //returns csv
+        // return rList.stringify();
 
         // String language = putData.substring(0, putData.indexOf(","));
         // String year = putData.substring(putData.indexOf(",") + 1);

@@ -131,11 +131,13 @@ class UIRecipe extends HBox { // extend HBox
 }
 
 class UIRecipeList extends VBox { // extends HBox?
-    private RecipeList rList;
+    //private RecipeList rList;
     private NavigationHandler nHandler;
+    private RecipeHandler rHandler;
     // new RecipeList
-    UIRecipeList(RecipeList rList, NavigationHandler nHandler) {
-        this.rList = rList;
+    UIRecipeList(RecipeHandler rHandler, NavigationHandler nHandler) {
+        //this.rList.setList(rHandler.getRecipeList());
+        this.rHandler = rHandler;
         this.nHandler = nHandler;
         this.updateList(nHandler);
         // UI elements
@@ -155,9 +157,15 @@ class UIRecipeList extends VBox { // extends HBox?
         }
     }
 
+    /**
+     * 
+     * Updates list based on what is currently in backend
+     */
     public void updateList(NavigationHandler nHandler){
         this.getChildren().clear();
-        ArrayList<Recipe> list = rList.getList();
+        //replace current list with whats in backend
+        ArrayList<Recipe> list = rHandler.getRecipeList();
+        System.out.println("LIST SIZE:" + list.size());
         for(Recipe r : list){
             String title = r.getTitle();
             String mealType = r.getMealType();
@@ -299,10 +307,14 @@ class AppFrame extends BorderPane {
         //create new recipelist and handler
         list = new RecipeList();
         System.out.println("refreshing");
-        list.refresh();
+        //TODO: get list based on backend not csv
+        //list.refresh();
         rHandler = new RecipeHandler(list);
+        rHandler.getRecipeList();
         //create ui recipe list to display recipes
-        recipeList = new UIRecipeList(list,nHandler);
+        //in its initialization it will get from backend and display
+        //can also call updatelist later to reget from backend
+        recipeList = new UIRecipeList(rHandler,nHandler);
         // Initialise the recipelist footer Object
         footer = new ListFooter();
 
@@ -425,14 +437,16 @@ class GPTResultsDisplay extends BorderPane{
     {
         Button saveButton = footer.getSaveButton();
         saveButton.setOnAction(e ->{
-            //TODO: add save functionality
             //get recipehandler from navhandler
             HashMap<String,Scene> pagelist = nHandler.getPageList();
             AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();
             RecipeHandler recipeHandler = rlist.getRecipeHandler();
+            //add recipe to backend, check new backend, return to menu()
             recipeHandler.addRecipe(cHandler.getRecipe());
-            //add it and update list and go to menu
+            //recipeHandler.getRecipeList();
+            //addrecipe above updates the recipehandler list
             UIRecipeList uiList = rlist.getRecipeList();
+            //note that this calls get, uilist has the rhandler above
             uiList.updateList(nHandler);
             nHandler.menu();
 
@@ -638,8 +652,8 @@ class RecipeDisplay extends BorderPane {
         centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
 
         // Create two scrollable boxes with text
-        ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
-        ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients: ");
+        ScrollPane scrollPane2 = createScrollableBox("Instructions: ");
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 

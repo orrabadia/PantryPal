@@ -19,7 +19,7 @@ public class RequestHandler {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-
+            //if post or put write to outstream
             if (method.equals("POST") || method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(title + "," + mealtype + "," + ingredients + "," + instructions);
@@ -36,8 +36,7 @@ public class RequestHandler {
                     System.out.println("cringe");
                 }
                 responseBuilder.append(line);
-                System.out.println(line);
-                responseBuilder.append('\n');  // Optionally, add newline characters between lines
+                //System.out.println("REQUSTHANDLER RESPONSE:" + line);
             }
 
             in.close();
