@@ -486,6 +486,7 @@ class RecordAppFrame extends FlowPane {
     Label l;
     String name;
     CreateHandler createHandler;
+    RequestHandler reqHandler;
 
     // Set a default style for buttons and fields - background color, font size,
     // italics
@@ -505,6 +506,8 @@ class RecordAppFrame extends FlowPane {
         this.name = name;
 
         this.createHandler = createHandler;
+
+        this.reqHandler = new RequestHandler();
         // Add the buttons and text fields
 
         startButton = new Button("Start");
@@ -570,36 +573,19 @@ class RecordAppFrame extends FlowPane {
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
             if (name == "meal") {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setMealType(transcription);
-                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setMealType(transcription);
+                l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients(createHandler);
                 });
             }
             else {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setIngredients(transcription);
-                    l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setIngredients(transcription);
+                l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
+
                 continueButton.setOnAction(e1->{
                     //on continue, get the transcription and move to new page
                     Recipe r = createHandler.getRecipe();

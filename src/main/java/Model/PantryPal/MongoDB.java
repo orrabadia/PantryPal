@@ -38,7 +38,7 @@ public class MongoDB {
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "";
+        String uri = "mongodb+srv://tqdo:EmgIlBckP64H9rGn@cluster0.8psfiwy.mongodb.net/?retryWrites=true&w=majority";
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 

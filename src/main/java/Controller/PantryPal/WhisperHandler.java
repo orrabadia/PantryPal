@@ -15,6 +15,6 @@ public class WhisperHandler {
     }
 
     public String transcribe() throws IOException, URISyntaxException {
-        return whisper.whisperTranscribe("./recording.wav");
+        return whisper.whisperTranscribe("src/main/java/Model/PantryPal/recording.wav");
     }
 }

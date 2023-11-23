@@ -37,7 +37,7 @@ public class MockRecorder implements Recorder {
 
     // simply creates the audioFile for us
     public void startRecording() throws IOException {
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/View/PantryPal/recording.wav");
        // creates an empty audioInputStream
         AudioInputStream audioInputStream = new AudioInputStream(null, getAudioFormat(), 0);
         // writes recording.wav into the file system
