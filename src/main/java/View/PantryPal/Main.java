@@ -590,9 +590,10 @@ class RecordAppFrame extends FlowPane {
                     //on continue, get the transcription and move to new page
                     Recipe r = createHandler.getRecipe();
                     String mealtype = r.getMealType();
+                    System.out.println("mealType " + mealtype);
                     String ingredients = r.getIngredients();
-                    GPTHandler g = new GPTHandler();
-                    String recipe = g.generate(mealtype, ingredients);
+                    System.out.println("ingredients " + ingredients);
+                    String recipe = reqHandler.performGenerateRequest("PUT", mealtype, ingredients);
                     String title = recipe.substring(0,recipe.indexOf("~"));
                     //take out the newlines and returns for formatting
                     String strippedString = title.replaceAll("[\\n\\r]+", "");

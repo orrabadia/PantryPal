@@ -29,6 +29,7 @@ public class Server {
     //HttpContext context = server.createContext("/", new RequestHandler(data));
     HttpContext recipecontext = server.createContext("/recipe", new RecipeRequestListener(data));
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
+    HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 
     server.start();
