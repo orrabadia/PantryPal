@@ -22,7 +22,7 @@ public class RequestHandler {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-            //if post or put write to outstream
+            //if post or put or get write to outstream
             if (method.equals("POST") || method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(title + "," + mealtype + "," + ingredients + "," + instructions);

@@ -38,7 +38,7 @@ public class MongoDB {
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "mongodb+srv://tqdo:EmgIlBckP64H9rGn@cluster0.8psfiwy.mongodb.net/?retryWrites=true&w=majority";
+        String uri = "";
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 
@@ -48,13 +48,16 @@ public class MongoDB {
         //collection.deleteMany(new Document());
     }
 
+    /** adds to mongodb  */
     public void put(String username, String title, String mealType, String ingredients,
         String instructions) {
         MongoDatabase database = this.mongoClient.getDatabase("PantryPal");
         MongoCollection<Document> collection = database.getCollection(username);
+        String index = Integer.toString((int)collection.countDocuments());
         
-        String[] headers = new String[] { "title", "mealType", "ingredients", "instructions" };
-        String[] values = new String[] { title, mealType, ingredients, instructions };
+        //index is current amount of things in the collection, this is how we will store creation order
+        String[] headers = new String[] { "title", "mealType", "ingredients", "instructions" , "index"};
+        String[] values = new String[] { title, mealType, ingredients, instructions, index };
 
         Document doc = new Document();
         // ADd pairs of headers/values in csv
@@ -65,21 +68,8 @@ public class MongoDB {
 
         System.out.println("Added new recipe");
         System.out.println("After insertion: " + collection.countDocuments());
-
-        // //update and print
-        // Bson filter = eq("Recipe", "Savory Spinach Delight");
-        // Bson updateOperation = set("Hours", "4.5");
-        // UpdateResult updateResult = collection.updateOne(filter, updateOperation);
-        // JsonWriterSettings prettyPrint =
-        // JsonWriterSettings.builder().indent(true).build();
-        // System.out.println(collection.find(filter).first().toJson(prettyPrint));
-
-        // //delete
-        // Bson delFilter = eq("Recipe", "Spicy Shrimp Tacos");
-        // DeleteResult result = collection.deleteOne(delFilter);
-        // System.out.println("After delete: " + collection.countDocuments());
     }
-
+    /** gets from mongodb with username being collection */
     public String get(String username) {
         MongoDatabase database = mongoClient.getDatabase("PantryPal");
 

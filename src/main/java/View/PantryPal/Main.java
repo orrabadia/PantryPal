@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Comparator;
 
 import javax.management.RuntimeErrorException;
 import javax.sound.sampled.AudioFormat;
@@ -139,7 +140,7 @@ class UIRecipeList extends VBox { // extends HBox?
         //this.rList.setList(rHandler.getRecipeList());
         this.rHandler = rHandler;
         this.nHandler = nHandler;
-        this.updateList(nHandler);
+        this.updateList(nHandler,0);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -160,20 +161,41 @@ class UIRecipeList extends VBox { // extends HBox?
     /**
      * 
      * Updates list based on what is currently in backend
+     * takes behavior based on what style of sort you want to use-default is newest first(0)
+     * later add more to have different sorting orders
      */
-    public void updateList(NavigationHandler nHandler){
+    public void updateList(NavigationHandler nHandler, int sortorder){
+
+        //takes behavior based on what style of sort you want to use-default is revchron
         this.getChildren().clear();
         //replace current list with whats in backend
         ArrayList<Recipe> list = rHandler.getRecipeList();
         System.out.println("LIST SIZE:" + list.size());
+        //sort last to first
+        class revchronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r2.getIndex(), r1.getIndex());
+            }
+        }
+        if(sortorder == 0){
+            //sort backwards if order 0
+            revchronComparator comp = new revchronComparator();
+            Collections.sort(list, comp);
+        }
         for(Recipe r : list){
-            String title = r.getTitle();
-            String mealType = r.getMealType();
-            String ingredients = r.getIngredients();
-            String instructions = r.getInstructions();
-            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            this.getChildren().add(uiR);
-            this.updateRecipeIndices();
+            if(sortorder == 0){
+                int index = r.getIndex();
+                String title = r.getTitle();
+                String mealType = r.getMealType();
+                String ingredients = r.getIngredients();
+                String instructions = r.getInstructions();
+                UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+            } else {
+                System.out.println("unimplemented sort method");
+            }
         }
     }
 
@@ -447,7 +469,7 @@ class GPTResultsDisplay extends BorderPane{
             //addrecipe above updates the recipehandler list
             UIRecipeList uiList = rlist.getRecipeList();
             //note that this calls get, uilist has the rhandler above
-            uiList.updateList(nHandler);
+            uiList.updateList(nHandler, 0);
             nHandler.menu();
 
         });
@@ -673,7 +695,7 @@ class RecipeDisplay extends BorderPane {
         VBox v = (VBox)this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
         ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
-        TextField textField = (TextField) scroll1.getContent();
+        TextArea textField = (TextArea) scroll1.getContent();
         textField.setText(s);
     }
 
@@ -682,7 +704,7 @@ class RecipeDisplay extends BorderPane {
         VBox v = (VBox)this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
         ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
-        TextField textField = (TextField) scroll2.getContent();
+        TextArea textField = (TextArea) scroll2.getContent();
         textField.setText(s);
 
     }
@@ -697,7 +719,7 @@ class RecipeDisplay extends BorderPane {
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
-        TextField textArea = new TextField(content);
+        TextArea textArea = new TextArea(content);
 
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);

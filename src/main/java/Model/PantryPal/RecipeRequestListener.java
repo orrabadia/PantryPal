@@ -52,29 +52,18 @@ public class RecipeRequestListener implements HttpHandler{
 
       // Converting the JSON array to a string
       //note that this has to be a single string with no newlines before you send it back
+      String username = "";
+      URI uri = httpExchange.getRequestURI();
+      String query = uri.getRawQuery();
+      if (query != null) {
+        username = query.substring(query.indexOf("=") + 1);
+      }
       
-      String ret = m.get("MOGUSMAN");
+      String ret = m.get(username);
       ret = ret.replaceAll("[\n\r]", "");
       System.out.println("REQUESTLISTENER RET: " + ret);
       return ret;
 
-      //rList.refresh();
-      //return rList.stringify();
-
-        // String response = "Invalid GET request";
-        // URI uri = httpExchange.getRequestURI();
-        // String query = uri.getRawQuery();
-        // if (query != null) {
-        //   String value = query.substring(query.indexOf("=") + 1);
-        //   String year = data.get(value); // Retrieve data from hashmap
-        //   if (year != null) {
-        //     response = year;
-        //     System.out.println("Queried for " + value + " and found " + year);
-        //   } else {
-        //     response = "No data found for " + value;
-        //   }
-        // }
-        // return response;
       }
 
     private String handlePost(HttpExchange httpExchange) throws IOException {
@@ -103,6 +92,13 @@ public class RecipeRequestListener implements HttpHandler{
     }
 
     private String handlePut(HttpExchange httpExchange) throws IOException {
+      //parse username from query
+      String username = "";
+      URI uri = httpExchange.getRequestURI();
+      String query = uri.getRawQuery();
+      if (query != null) {
+        username = query.substring(query.indexOf("=") + 1);
+      }
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String putData = scanner.nextLine();
@@ -114,7 +110,7 @@ public class RecipeRequestListener implements HttpHandler{
 
         System.out.println("RECIEVED: " + title + mealtype + ingredients + instructions);
 
-        m.put("MOGUSMAN", title, mealtype, ingredients, instructions);
+        m.put(username, title, mealtype, ingredients, instructions);
         scanner.close();
         return "Success";
 

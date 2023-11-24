@@ -30,35 +30,22 @@ public class RecipeHandler {
     // }
 
     public void addRecipe(Recipe r){
-        //get current list from backend(csv) and replace this objects list with it
+        //add new list to backend
         String title = r.getTitle();
         String mealType = r.getMealType();
         String ingredients = r.getIngredients();
         String instructions = r.getInstructions();
-        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, "recipe");
-        // if(newList.equals("")){
-        //     System.out.println("fuck");
-        // }
-        // ArrayList<Recipe> replace = this.parseList(newList);
-        // this.list.setList(replace);
+        //TODO: on user account, replace mogusman with something
+        String username = "MOGUSMAN";
+        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, username);
+
     }
 
     public ArrayList<Recipe> getRecipeList(){
-        String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", "");
-        //do get, it should return JSON
-        //parse the json
-        // JSONArray test = new JSONArray(newList.toString());
-        // System.out.println("Printing keys and values:");
-        //     for (int i = 0; i < test.length(); i++) {
-        //     JSONObject jsonObject = test.getJSONObject(i);
-        //     System.out.println("Element " + (i + 1) + ":");
-        //     for (String key : jsonObject.keySet()) {
-        //         Object value = jsonObject.get(key);
-        //         System.out.println("Key: " + key + ", Value: " + value);
-        //     }
-        //     System.out.println(); // Separate each object's output
-        // }
-        //System.out.println("NEWLIST:" + newList);
+        //TODO: on user account, replace mogusman with something
+        String username = "MOGUSMAN";
+        String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", username);
+
         JSONArray test = new JSONArray(newList);
         ArrayList<Recipe> replace = new ArrayList<>();
         //System.out.println("RHANDLER : Printing keys and values:");
@@ -77,6 +64,8 @@ public class RecipeHandler {
                     add.setIngredients(value.toString());
                 }else if(key.equals("instructions")){
                     add.setInstructions(value.toString());
+                }else if(key.equals("index")){
+                    add.setIndex(Integer.parseInt(value.toString()));
                 }
             }
             //System.out.println();
