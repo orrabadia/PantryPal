@@ -22,7 +22,7 @@ public class RequestHandler {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
-            //if post or put or get write to outstream
+            //if post or put write to outstream
             if (method.equals("POST") || method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(title + "," + mealtype + "," + ingredients + "," + instructions);
@@ -54,13 +54,12 @@ public class RequestHandler {
         }
     }
     public String performAudioRequest(String method) {
-        // TODO: the filepath here is localized to the client folder to ensure that we don't read off of the entire
+        // the filepath here is localized to the client folder to ensure that we don't read off of the entire
         final File uploadFile = new File("src/main/java/View/PantryPal/recording.wav");
 
-        // TODO: Below code is to help with multipart/form data, probably something with separating boundaries
+        // Below code is to help with multipart/form data, probably something with separating boundaries
         String boundary = Long.toHexString(System.currentTimeMillis());
         String CRLF = "\r\n";
-        String charset = "UTF-8";
         
         // Implement your HTTP request logic here and return the response
         try {
@@ -70,16 +69,16 @@ public class RequestHandler {
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
 
-            //TODO: Below is to set the request property Content Type to indiicate request body will be in multipart/form data format
+            // Below is to set the request property Content Type to indiicate request body will be in multipart/form data format
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
             if (method.equals("POST") || method.equals("PUT")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 
-                //TODO: use a PrintWriter to write character text to output stream
+                // use a PrintWriter to write character text to output stream
                 PrintWriter writer = new PrintWriter(out, true);
 
-                // TODO: write the multipart/form data headers
+                // write the multipart/form data headers
                 writer.append("--" + boundary).append(CRLF);
                 writer.append("Content-Disposition: form-data; name=\"audio\"; filename=\"" + uploadFile.getName() + "\"").append(CRLF);
                 writer.append("Content-Length: " + uploadFile.length()).append(CRLF);
@@ -89,8 +88,6 @@ public class RequestHandler {
                 // Copy the file content to the output stream
                 Files.copy(uploadFile.toPath(), conn.getOutputStream());
 
-                // TODO: Commented out anything with language or year so we can only focus on the audio file
-                //out.write(language + "," + year);
                 out.flush();
                 out.close();
             }
@@ -134,10 +131,6 @@ public class RequestHandler {
 
             in.close();
             return responseBuilder.toString();
-            //return new list, which should always be returned 
-            // String response = in.readLine();
-            // in.close();
-            // return response;
         } catch (Exception ex) {
             ex.printStackTrace();
             return "Error: " + ex.getMessage();

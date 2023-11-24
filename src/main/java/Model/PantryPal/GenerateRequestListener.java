@@ -2,12 +2,11 @@ package PantryPal;
 
 import com.sun.net.httpserver.*;
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 public class GenerateRequestListener implements HttpHandler {
 
-    // TODO: Here is where we'll store the meal type and ingredients
+    // Here is where we'll store the meal type and ingredients
     private String mealType;
     private String ingredients;
 
@@ -47,62 +46,6 @@ public class GenerateRequestListener implements HttpHandler {
         String recipe = g.generate(mealType, ingredients);
 
         return recipe;
-
-        // TODO: Code below is a former part of the Lab 5 code, but we don't want to deal with year and language
-        // Scanner scanner = new Scanner(inStream);
-        // String putData = scanner.nextLine();
-        // String language = putData.substring(0, putData.indexOf(","));
-        // String year = putData.substring(putData.indexOf(",") + 1);
-    
-        // if (data.containsKey(language)) {
-        //     String previousYear = data.get(language);
-        //     data.put(language, year);
-        //     String response = "Updated entry {" + language + ", " + year + "} (previous year: " + previousYear + ")";
-        //     System.out.println(response);
-        //     scanner.close();
-        //     return response;
-        // } else {
-        //     data.put(language, year);
-        //     String response = "Added entry {" + language + ", " + year + "}";
-        //     System.out.println(response);
-        //     scanner.close();
-        //     return response;
-        // }
-    }
-
-    // TODO: helper method to help read per line
-    private static String readLine(InputStream is, String lineSeparator) 
-    throws IOException {
-
-    int off = 0, i = 0;
-    byte[] separator = lineSeparator.getBytes("UTF-8");
-    byte[] lineBytes = new byte[1024];
-    
-    while (is.available() > 0) {
-        int nextByte = is.read();
-        if (nextByte < -1) {
-            throw new IOException(
-                "Reached end of stream while reading the current line!");
-        }
-        
-        lineBytes[i] = (byte) nextByte;
-        if (lineBytes[i++] == separator[off++]) {
-            if (off == separator.length) {
-                return new String(
-                    lineBytes, 0, i-separator.length, "UTF-8");
-            }
-        }
-        else {
-            off = 0;
-        }
-        
-        if (i == lineBytes.length) {
-            throw new IOException("Maximum line length exceeded: " + i);
-        }
-    }
-    
-    throw new IOException(
-        "Reached end of stream while reading the current line!");       
     }
      
 
