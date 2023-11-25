@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Comparator;
 
 import javax.management.RuntimeErrorException;
 import javax.sound.sampled.AudioFormat;
@@ -131,13 +132,15 @@ class UIRecipe extends HBox { // extend HBox
 }
 
 class UIRecipeList extends VBox { // extends HBox?
-    private RecipeList rList;
+    //private RecipeList rList;
     private NavigationHandler nHandler;
+    private RecipeHandler rHandler;
     // new RecipeList
-    UIRecipeList(RecipeList rList, NavigationHandler nHandler) {
-        this.rList = rList;
+    UIRecipeList(RecipeHandler rHandler, NavigationHandler nHandler) {
+        //this.rList.setList(rHandler.getRecipeList());
+        this.rHandler = rHandler;
         this.nHandler = nHandler;
-        this.updateList(nHandler);
+        this.updateList(nHandler,0);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -155,17 +158,44 @@ class UIRecipeList extends VBox { // extends HBox?
         }
     }
 
-    public void updateList(NavigationHandler nHandler){
+    /**
+     * 
+     * Updates list based on what is currently in backend
+     * takes behavior based on what style of sort you want to use-default is newest first(0)
+     * later add more to have different sorting orders
+     */
+    public void updateList(NavigationHandler nHandler, int sortorder){
+
+        //takes behavior based on what style of sort you want to use-default is revchron
         this.getChildren().clear();
-        ArrayList<Recipe> list = rList.getList();
+        //replace current list with whats in backend
+        ArrayList<Recipe> list = rHandler.getRecipeList();
+        System.out.println("LIST SIZE:" + list.size());
+        //sort last to first
+        class revchronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r2.getIndex(), r1.getIndex());
+            }
+        }
+        if(sortorder == 0){
+            //sort backwards if order 0
+            revchronComparator comp = new revchronComparator();
+            Collections.sort(list, comp);
+        }
         for(Recipe r : list){
-            String title = r.getTitle();
-            String mealType = r.getMealType();
-            String ingredients = r.getIngredients();
-            String instructions = r.getInstructions();
-            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            this.getChildren().add(uiR);
-            this.updateRecipeIndices();
+            if(sortorder == 0){
+                int index = r.getIndex();
+                String title = r.getTitle();
+                String mealType = r.getMealType();
+                String ingredients = r.getIngredients();
+                String instructions = r.getInstructions();
+                UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+            } else {
+                System.out.println("unimplemented sort method");
+            }
         }
     }
 
@@ -307,10 +337,14 @@ class AppFrame extends BorderPane {
         //create new recipelist and handler
         list = new RecipeList();
         System.out.println("refreshing");
-        list.refresh();
+        //TODO: get list based on backend not csv
+        //list.refresh();
         rHandler = new RecipeHandler(list);
+        rHandler.getRecipeList();
         //create ui recipe list to display recipes
-        recipeList = new UIRecipeList(list,nHandler);
+        //in its initialization it will get from backend and display
+        //can also call updatelist later to reget from backend
+        recipeList = new UIRecipeList(rHandler,nHandler);
         // Initialise the recipelist footer Object
         footer = new ListFooter();
 
@@ -433,15 +467,17 @@ class GPTResultsDisplay extends BorderPane{
     {
         Button saveButton = footer.getSaveButton();
         saveButton.setOnAction(e ->{
-            //TODO: add save functionality
             //get recipehandler from navhandler
             HashMap<String,Scene> pagelist = nHandler.getPageList();
             AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();
             RecipeHandler recipeHandler = rlist.getRecipeHandler();
+            //add recipe to backend, check new backend, return to menu()
             recipeHandler.addRecipe(cHandler.getRecipe());
-            //add it and update list and go to menu
+            //recipeHandler.getRecipeList();
+            //addrecipe above updates the recipehandler list
             UIRecipeList uiList = rlist.getRecipeList();
-            uiList.updateList(nHandler);
+            //note that this calls get, uilist has the rhandler above
+            uiList.updateList(nHandler, 0);
             nHandler.menu();
 
         });
@@ -480,6 +516,7 @@ class RecordAppFrame extends FlowPane {
     Label l;
     String name;
     CreateHandler createHandler;
+    RequestHandler reqHandler;
 
 // Set a default style for buttons and fields - background color, font size,
     // italics
@@ -499,6 +536,8 @@ class RecordAppFrame extends FlowPane {
         this.name = name;
 
         this.createHandler = createHandler;
+
+        this.reqHandler = new RequestHandler();
         // Add the buttons and text fields
 
         startButton = new Button("Start");
@@ -564,43 +603,27 @@ class RecordAppFrame extends FlowPane {
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
             if (name == "meal") {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setMealType(transcription);
-                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setMealType(transcription);
+                l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients(createHandler);
                 });
             }
             else {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setIngredients(transcription);
-                    l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setIngredients(transcription);
+                l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
+
                 continueButton.setOnAction(e1->{
                     //on continue, get the transcription and move to new page
                     Recipe r = createHandler.getRecipe();
                     String mealtype = r.getMealType();
+                    System.out.println("mealType " + mealtype);
                     String ingredients = r.getIngredients();
-                    GPTHandler g = new GPTHandler();
-                    String recipe = g.generate(mealtype, ingredients);
+                    System.out.println("ingredients " + ingredients);
+                    String recipe = reqHandler.performGenerateRequest("PUT", mealtype, ingredients);
                     String title = recipe.substring(0,recipe.indexOf("~"));
                     //take out the newlines and returns for formatting
                     String strippedString = title.replaceAll("[\\n\\r]+", "");
@@ -647,10 +670,8 @@ class RecipeDisplay extends BorderPane {
         centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
 
         // Create two scrollable boxes with text
-        ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
-        ((TextField) scrollPane1.getContent()).setEditable(false);
-        ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
-        ((TextField) scrollPane2.getContent()).setEditable(false);
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients: ");
+        ScrollPane scrollPane2 = createScrollableBox("Instructions: ");
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
@@ -683,8 +704,8 @@ class RecipeDisplay extends BorderPane {
         //called when displaying from handler, handler has blank one by default
         VBox v = (VBox) this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
-        ScrollPane scroll1 = (ScrollPane) v.getChildren().get(0);
-        TextField textField = (TextField) scroll1.getContent();
+        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
+        TextArea textField = (TextArea) scroll1.getContent();
         textField.setText(s);
     }
 
@@ -693,7 +714,7 @@ class RecipeDisplay extends BorderPane {
         VBox v = (VBox)this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
         ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
-        TextField textField = (TextField) scroll2.getContent();
+        TextArea textField = (TextArea) scroll2.getContent();
         textField.setText(s);
 
     }
@@ -776,7 +797,8 @@ class RecipeDisplay extends BorderPane {
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
-        TextField textArea = new TextField(content);
+        TextArea textArea = new TextArea(content);
+
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);

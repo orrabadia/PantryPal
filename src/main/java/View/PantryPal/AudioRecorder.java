@@ -65,7 +65,7 @@ public class AudioRecorder implements Recorder {
                                 targetDataLine);
 
                         // the file that will contain the audio data
-                        File audioFile = new File("recording.wav");
+                        File audioFile = new File("src/main/java/View/PantryPal/recording.wav");
                         AudioSystem.write(
                                 audioInputStream,
                                 AudioFileFormat.Type.WAVE,

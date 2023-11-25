@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Server",
+            "request": "launch",
+            "mainClass": "PantryPal.Server",
+            "projectName": "cse-110-project-team-18"
+        },
+        {
+            "type": "java",
             "name": "AudioTranscriber",
             "request": "launch",
             "mainClass": "PantryPal.AudioTranscriber",
