@@ -11,7 +11,8 @@ import java.nio.file.Files;
 import java.net.URI;
 
 public class RequestHandler {
-    public String performRecipeRequest(String method, String title, String mealtype, String ingredients, String instructions, String query) {
+    //Added index field for deleting 
+    public String performRecipeRequest(String method, String title, String mealtype, String ingredients, String instructions, int index, String query) {
         // Implement your HTTP request logic here and return the response
         try {
             String urlString = "http://localhost:8100/recipe/";
@@ -23,10 +24,10 @@ public class RequestHandler {
             conn.setRequestMethod(method);
             conn.setDoOutput(true);
             //if post or put write to outstream
-            if (method.equals("POST") || method.equals("PUT")) {
+            if (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-                out.write(title + "," + mealtype + "," + ingredients + "," + instructions);
-                out.flush();
+                out.write(title + "," + mealtype + "," + ingredients + "," + instructions + "," + index);
+                out.flush(); 
                 out.close();
             }
 

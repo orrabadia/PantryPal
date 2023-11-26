@@ -169,7 +169,9 @@ class UIRecipeList extends VBox { // extends HBox?
         //takes behavior based on what style of sort you want to use-default is revchron
         this.getChildren().clear();
         //replace current list with whats in backend
-        ArrayList<Recipe> list = rHandler.getRecipeList();
+
+        // added .getList()
+        ArrayList<Recipe> list = rHandler.getRecipeList().getList();
         System.out.println("LIST SIZE:" + list.size());
         //sort last to first
         class revchronComparator implements Comparator<Recipe>{
@@ -728,16 +730,19 @@ class RecipeDisplay extends BorderPane {
                 handler.menu();
             } else {
                 //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
-               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
-               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
-
+               //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
+               //.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
+               
+               ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(r.getIngredients());
                //reverts the displayed instructions back to orriginal (what is being saved in the rlist (not UIRList))
-               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
-               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
+               //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
+               //.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
 
+
+               ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(r.getRecipeInstructions());
                 //sets textfields to non-editable
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
 
                 //reverts buttons back
                 this.footer.getBackButton().setText("Back");
@@ -745,7 +750,7 @@ class RecipeDisplay extends BorderPane {
             }
         });
 
-        Button editButton = footer.getEditButton();
+        Button editButton = footer.getEditButton();        
         editButton.setOnAction(e -> {
 
             if (this.footer.getEditButton().getText() == "Edit") {
@@ -765,12 +770,21 @@ class RecipeDisplay extends BorderPane {
                     from RecipeHandler, passing in the recipe which is retrieved from the appframes recipe handlers recipelist, the new
                     ingredients and the new instructions retrieved from the fields
                     */
+
+                   /*ArrayList<Recipe> rList = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList();
+                   
+                   for (Recipe temp : rList){
+                        if(temp.getTitle() == r.getTitle().getText()){
+                            break;
+                        }
+                   }
+                    */
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().editRecipe(
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()),
                     ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
                     ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
                     //Updatethe UIList
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler);
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler, 0);
                     //Revert button text back
                     this.footer.getEditButton().setText("Edit");
                     this.footer.getBackButton().setText("Back");
@@ -782,9 +796,11 @@ class RecipeDisplay extends BorderPane {
         deleteButton.setOnAction(e -> {
 
             AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
-
-            mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
-            mainAppFrame.getRecipeList().updateList(handler);
+            
+            int indexValue = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
+            //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            mainAppFrame.getRecipeHandler().deleteRecipe(indexValue);
+            mainAppFrame.getRecipeList().updateList(handler, 0);
 
             
 

@@ -153,13 +153,18 @@ public class RecipeRequestListener implements HttpHandler{
         String mealtype = recipeValues[1];
         String ingredients = recipeValues[2];
         String instructions = recipeValues[3];
+        String index = recipeValues[4];
 
         // Recipe r = new Recipe(title, mealtype, ingredients, instructions);
         //this removes and updates csv
-        rList.remove(title);
-        scanner.close();
+        //rList.remove(title);
+        //scanner.close();
         //returns csv
-        return rList.stringify();
+        //return rList.stringify();
+        m.delete("MOGUSMAN", index);
+        scanner.close();
+        return "Success";
+
 
         // String response = "Invalid DELETE request";
         // URI uri = httpExchange.getRequestURI();

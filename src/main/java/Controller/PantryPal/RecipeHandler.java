@@ -20,9 +20,13 @@ public class RecipeHandler {
     //     this.list.add(r);
     // }
 
-    public void deleteRecipe(String title){
-        this.list.remove(title);
-        this.list.update();
+    public void deleteRecipe(int index){
+        //this.list.remove(title);
+        //this.list.update();
+
+        String username = "MOGUSMAN";
+        String newList = reqHandler.performRecipeRequest("DELETE", "", "", "","", index, username);
+
     }
 
     // public RecipeList getRecipeList(){
@@ -36,17 +40,19 @@ public class RecipeHandler {
         String mealType = r.getMealType();
         String ingredients = r.getIngredients();
         String instructions = r.getInstructions();
+        int index = r.getIndex();
         //TODO: on user account, replace mogusman with something
         String username = "MOGUSMAN";
-        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, username);
+        //Added index field 
+        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions,index, username);
 
     }
 
-    public ArrayList<Recipe> getRecipeList(){
+    public /*ArrayList<Recipe>*/ RecipeList getRecipeList(){
         //TODO: on user account, replace mogusman with something
         String username = "MOGUSMAN";
-        String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", username);
-
+        //Added index field 
+        String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", -1, username);
         JSONArray test = new JSONArray(newList);
         ArrayList<Recipe> replace = new ArrayList<>();
         //System.out.println("RHANDLER : Printing keys and values:");
@@ -77,7 +83,7 @@ public class RecipeHandler {
 
         //ArrayList<Recipe> replace = this.parseList(newList);
         this.list.setList(replace);
-        return replace;
+        return this.list; // changed from replace to this.list
     }
 
     public ArrayList<Recipe> parseList(String rList){

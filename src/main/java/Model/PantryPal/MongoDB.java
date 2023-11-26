@@ -3,6 +3,7 @@ package PantryPal;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.unset;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -28,8 +29,8 @@ public class MongoDB {
     public static void main(String[] args) {
         //for testing
         MongoDB m = new MongoDB();
-        m.put("MOGUSMAN", "hot dog soup", "breakfast", "hot dogs", "cook hot dog");
-        m.put("MOGUSMAN", null, null, null, null);
+        //m.put("MOGUSMAN", "hot dog soup", "breakfast", "hot dogs", "cook hot dog");
+        //m.put("MOGUSMAN", null, null, null, null);
         //System.out.println(m.get("MOGUSMAN"));
         m.get("MOGUSMAN");
     }
@@ -38,7 +39,7 @@ public class MongoDB {
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "mongodb+srv://tqdo:EmgIlBckP64H9rGn@cluster0.8psfiwy.mongodb.net/?retryWrites=true&w=majority";
+        String uri = "mongodb://m5zuniga:0161ugetme@ac-a1jneth-shard-00-00.q516qrr.mongodb.net:27017,ac-a1jneth-shard-00-01.q516qrr.mongodb.net:27017,ac-a1jneth-shard-00-02.q516qrr.mongodb.net:27017/?ssl=true&replicaSet=atlas-rrv032-shard-0&authSource=admin&retryWrites=true&w=majority";
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 
@@ -109,10 +110,28 @@ public class MongoDB {
         return ret;
     }
 
-    public static void delete(MongoClient mongoClient) {
-
+    public void delete(String username, String index) {
+        MongoDatabase database = mongoClient.getDatabase("PantryPal");
+        MongoCollection<Document> collection = database.getCollection(username);
+        System.out.println(collection.countDocuments() + "Deleted a Recipe");
+        Bson filter = eq("index", index);
+        System.out.println(collection.countDocuments());
+        collection.deleteOne(filter);
     }
 
+    public void post(String username, String title, String mealtype, String ingredients, String instructions) {
+        MongoDatabase database = mongoClient.getDatabase("PantryPal");
+        MongoCollection<Document> collection = database.getCollection(username);
+        Bson filterTitle = eq("title", title);
+        Bson updateMealType = set("mealType", mealtype);
+        Bson updateIngredients = set("ingredients", ingredients);
+        Bson updateInstructions = set("instructions", instructions);
+        collection.updateOne(filterTitle, updateMealType);
+        collection.updateOne(filterTitle, updateIngredients);
+        collection.updateOne(filterTitle, updateInstructions);
+
+
+    }
 
     public void test(MongoClient mongoClient, String title, String mealType, String ingredients, String instructions) {
         MongoDatabase database = mongoClient.getDatabase("PantryPal");
