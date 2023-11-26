@@ -119,16 +119,16 @@ public class MongoDB {
         collection.deleteOne(filter);
     }
 
-    public void post(String username, String title, String mealtype, String ingredients, String instructions) {
+    public void post(String username, String title, String mealtype, String ingredients, String instructions, String index) {
         MongoDatabase database = mongoClient.getDatabase("PantryPal");
         MongoCollection<Document> collection = database.getCollection(username);
-        Bson filterTitle = eq("title", title);
+        Bson filterIndex = eq("index", index);
         Bson updateMealType = set("mealType", mealtype);
         Bson updateIngredients = set("ingredients", ingredients);
         Bson updateInstructions = set("instructions", instructions);
-        collection.updateOne(filterTitle, updateMealType);
-        collection.updateOne(filterTitle, updateIngredients);
-        collection.updateOne(filterTitle, updateInstructions);
+        collection.updateOne(filterIndex, updateMealType);
+        collection.updateOne(filterIndex, updateIngredients);
+        collection.updateOne(filterIndex, updateInstructions);
 
 
     }

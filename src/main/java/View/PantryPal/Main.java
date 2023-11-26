@@ -755,16 +755,16 @@ class RecipeDisplay extends BorderPane {
 
             if (this.footer.getEditButton().getText() == "Edit") {
                 //sets textfields editable
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
                 //changes button text
                 this.footer.getEditButton().setText("Save");
                 this.footer.getBackButton().setText("Cancel");
             } else {
                 if (this.footer.getEditButton().getText() == "Save") {
                     //sets fields uneditable
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
                     /*
                     Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Calls editRecipe()
                     from RecipeHandler, passing in the recipe which is retrieved from the appframes recipe handlers recipelist, the new
@@ -781,8 +781,8 @@ class RecipeDisplay extends BorderPane {
                     */
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().editRecipe(
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()),
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
                     //Updatethe UIList
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler, 0);
                     //Revert button text back

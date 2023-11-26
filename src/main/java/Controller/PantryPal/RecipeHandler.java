@@ -106,9 +106,17 @@ public class RecipeHandler {
     }
 
     public void editRecipe(Recipe r, String ingredients, String instructions){
-        r.setIngredients(ingredients);
-        r.setInstructions(instructions);
-        this.list.update();
+        String title = r.getTitle();
+        String mealType = r.getMealType();
+        int index = r.getIndex();
+        String username = "MOGUSMAN";
+        //r.setIngredients(ingredients);
+        //r.setInstructions(instructions);
+
+        String newList = reqHandler.performRecipeRequest("POST", title, mealType, ingredients, instructions, index, username);
+        //this.list.update();
+
+
     }
 
     //add methods later for edit

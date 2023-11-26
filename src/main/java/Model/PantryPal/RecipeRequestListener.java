@@ -68,8 +68,20 @@ public class RecipeRequestListener implements HttpHandler{
 
     private String handlePost(HttpExchange httpExchange) throws IOException {
         //this is for editing, do this later
-
-        return "unimplemented";
+        InputStream inStream = httpExchange.getRequestBody();
+        Scanner scanner = new Scanner(inStream);
+        String putData = scanner.nextLine();
+        String[] recipeValues = putData.split(",");
+        String title = recipeValues[0];
+        String mealtype = recipeValues[1];
+        String ingredients = recipeValues[2];
+        String instructions = recipeValues[3];
+        String index = recipeValues[4];
+        
+        m.post("MOGUSMAN", title, mealtype, ingredients, instructions, index);
+        scanner.close();
+        return "Success";
+        
         // InputStream inStream = httpExchange.getRequestBody();
         // Scanner scanner = new Scanner(inStream);
         // String postData = scanner.nextLine();
