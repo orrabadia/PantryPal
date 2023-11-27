@@ -218,6 +218,7 @@ class UIRecipeList extends VBox { // extends HBox?
  */
 class ListFooter extends HBox {
     private Button newRecipeButton;
+    private Button logOutButton;
     ListFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -227,13 +228,20 @@ class ListFooter extends HBox {
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
 
         newRecipeButton = new Button("New Recipe");
+        logOutButton = new Button("Log Out");
         newRecipeButton.setStyle(defaultButtonStyle);
-        this.getChildren().add(newRecipeButton);
+        logOutButton.setStyle(defaultButtonStyle);
+
+        this.getChildren().addAll(logOutButton, newRecipeButton);
         this.setAlignment(Pos.CENTER);
     }
 
     public Button getNewRecipeButton(){
         return newRecipeButton;
+    }
+
+    public Button getLogOutButton() {
+        return logOutButton;
     }
 }
 
@@ -301,6 +309,36 @@ class GPTFooter extends HBox {
     }
 }
 
+class UserAccFooter extends HBox {
+    private Button logInButton;
+    private Button signUpButton;
+   
+    UserAccFooter() {
+        this.setPrefSize(500, 60);
+        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setSpacing(15);
+        // set a default style for buttons - background color, font size, italics
+        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+        this.setAlignment(Pos.CENTER); // aligning the buttons to center
+
+        logInButton = new Button("Log In");
+        signUpButton = new Button("Sign Up");
+        logInButton.setStyle(defaultButtonStyle);
+        signUpButton.setStyle(defaultButtonStyle);
+        this.getChildren().add(logInButton);
+        this.getChildren().add(signUpButton);
+        this.setAlignment(Pos.CENTER);
+    }
+
+    public Button getLogInButton(){
+        return logInButton;
+    }
+    public Button getSignUpButton(){
+        return signUpButton;
+    }
+    
+}
+
 /*
  * Class Copied from Lab 1 for Header
  */
@@ -328,6 +366,7 @@ class AppFrame extends BorderPane {
     private ListFooter footer;
     private UIRecipeList recipeList;
     private Button newRecipeButton;
+    private Button logOutButton;
     private NavigationHandler nHandler;
     private RecipeList list;
     private RecipeHandler rHandler;
@@ -362,6 +401,7 @@ class AppFrame extends BorderPane {
         this.setBottom(footer);
         // Initialise Button Variables through the getters in Footer
         newRecipeButton = footer.getNewRecipeButton();
+        logOutButton = footer.getLogOutButton();
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -375,6 +415,12 @@ class AppFrame extends BorderPane {
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
     });
+
+    logOutButton.setOnAction(e1 ->{
+        nHandler.userSL();
+    });
+
+    
 
     }
 
@@ -646,6 +692,80 @@ class RecordAppFrame extends FlowPane {
 
 }
 
+class UserAccDisplay extends BorderPane {
+    private Header header;
+    private UserAccFooter footer;
+    private Button logInButton;
+    private Button signUpButton;
+    
+    private NavigationHandler handler;
+
+    UserAccDisplay(NavigationHandler handler) {
+        this.handler = handler;
+        header = new Header("Welcome to PantryPal");
+
+        // Initialise the Footer Object
+        footer = new UserAccFooter();
+
+        // Create a VBox in the center
+        VBox centerBox = new VBox();
+        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
+
+        // Create two scrollable boxes with text
+        TextField user = new TextField();
+        TextField pass = new TextField();
+
+        user.setPromptText("Username");
+        pass.setPromptText("Password");
+        // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
+        // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
+
+        centerBox.getChildren().addAll(user, pass);
+
+        // Set the VBox in the center of the BorderPane
+        this.setCenter(centerBox);
+        // Add header to the top of the BorderPane
+        this.setTop(header);
+        // Add footer to the bottom of the BorderPane
+        this.setBottom(footer);
+        // Initialise Button Variables through the getters in Footer
+
+        // Call Event Listeners for the Buttons
+        addListeners();
+    }
+
+    public void addListeners(){
+
+    Button logButton = footer.getLogInButton();
+    logButton.setOnAction(e1->{
+         /*will have to check whether or not the username is a collection within the database. 
+            If it is -> Check that password is correct (will probably have to create a new collection within the database that only has username and passwords)
+            if both correct-> set username as the inputted username and use the collection associated with it, and lead to the recipe list
+            if password incorrect -> say password is incorrect
+            If it is not -> say username not found
+        */
+        ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+        ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+        handler.menu();
+    });
+    
+    Button signUpButton = footer.getSignUpButton();
+    signUpButton.setOnAction(e1->{
+         //will have to check whether or not the username is already a collection within the database (maybe create a function for this)
+        /*
+        if it is -> say that username is already taken and try again
+        if it is not -> insert username and password into the user collection (within the database), create a new collection named the username, go to recipe list*/
+        ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+        ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+        handler.menu();
+    });
+        
+    }
+
+    
+    
+}
+
 /**
  * Page for detailed recipe display
  */
@@ -809,6 +929,8 @@ class RecipeDisplay extends BorderPane {
             
         });
 
+        
+
     }
 
     // Helper method to create a scrollable text box
@@ -840,8 +962,16 @@ public class Main extends Application {
         // Create scene of mentioned size with the border pane
         Scene recipeList = new Scene(root, 500,600);
 
+
         //handler initializes by adding recipe list to pagelist
+        //moved to sign in/login on action
         handler.initialize(recipeList);
+
+        UserAccDisplay userslDisplay = new UserAccDisplay(handler);
+        handler.showUserLogin(userslDisplay);
+
+
+
 
         // Make window non-resizable
         primaryStage.setResizable(false);
