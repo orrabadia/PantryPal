@@ -1,6 +1,8 @@
 package PantryPal;
 import org.junit.jupiter.api.Test;
 
+import com.mongodb.client.MongoDatabase;
+
 import PantryPal.AppFrame;
 import PantryPal.Main;
 import PantryPal.NavigationHandler;
@@ -25,6 +27,27 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.unset;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collection;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+
 
 public class TestAll {
     private RecipeList rList;
@@ -33,6 +56,10 @@ public class TestAll {
     private WhisperHandler whisperHandler;
     private CreateHandler createHandler;
     private GPTHandler gptHandler;
+    private MongoDatabase database;
+    private MongoClient clientMongoDB;
+    private MongoCollection<Document> collection;
+
 
      @BeforeEach
      public void initialize(){
@@ -50,6 +77,14 @@ public class TestAll {
         createHandler = new CreateHandler();
 
         gptHandler = new GPTHandler(true);
+
+        //insert your uri
+        clientMongoDB = MongoClients.create( "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority");
+        
+        database = clientMongoDB.getDatabase("PantryPal");
+
+        collection = database.getCollection("MOGUSMAN");
+
      }
 
     public void deleteRecording() {
@@ -66,12 +101,15 @@ public class TestAll {
      public void clearrecipes(){
         //clear recipe list each time
         rList.clear();
+        //deletes test_username collection
+        database.getCollection("MOGUSMAN").drop();
      }
 
     //story 1, test the gettitle and add and delete
     @Test
     //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS1RecipeAdd() {
+        
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
@@ -79,10 +117,13 @@ public class TestAll {
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
+
+        //maybe have username input and make test collection?
+        assertEquals(/*rList.size()*/ rHandler.getRecipeList().getList().size(), 1);
     }
 
     //test that you can delete recipes
+    @Test
     public void unitTestS1RecipeDelete() {
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
@@ -91,9 +132,9 @@ public class TestAll {
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
-        rList.remove(title1);
-        assertEquals(rList.size(), 0);
+        assertEquals(rHandler.getRecipeList().getList().size(), 1);
+        rHandler.deleteRecipe(r1.getIndex());
+        assertEquals(rHandler.getRecipeList().getList().size(), 0);
     }
 
     @Test
@@ -109,7 +150,7 @@ public class TestAll {
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
         //add two and check if you can get title, maybe 2 messes it up
-        Recipe r = rList.get(title1);
+        Recipe r = rHandler.getRecipeList().get(title1);
         assertEquals(r.getTitle(), "Test Recipe 1");
     }
 
@@ -118,7 +159,7 @@ public class TestAll {
     public void storyTestS1NoRecipes() {
         //at start, should be no recipes
         int initialRecipeCount = rList.size();
-        assertEquals(initialRecipeCount, 0);
+        assertEquals(rHandler.getRecipeList().getList().size(), initialRecipeCount);
     }
 
     @Test
@@ -133,7 +174,7 @@ public class TestAll {
         Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        assertEquals(rHandler.getRecipeList().getList().size(), 2);
     }
 
     @Test
@@ -150,12 +191,12 @@ public class TestAll {
         Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
         rHandler.addRecipe(r1);
         rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        assertEquals(rHandler.getRecipeList().getList().size(), 2);
         //delete
-        rList.remove(title1);
-        assertEquals(rList.size(), 1);
-        rList.remove(title2);
-        assertEquals(rList.size(), 0);
+        rHandler.deleteRecipe(r1.getIndex());
+        assertEquals(rHandler.getRecipeList().getList().size(), 1);
+        rHandler.deleteRecipe(r2.getIndex());
+        assertEquals(rHandler.getRecipeList().getList().size(), 0);
 
     }
     
@@ -1131,7 +1172,7 @@ public class TestAll {
         rHandler.addRecipe(r1);
         //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(title1);
+        rHandler.deleteRecipe(r1.getIndex());
         assertEquals(rList.size(), 0);
     }
 
@@ -1277,7 +1318,7 @@ public class TestAll {
         //Story 7: Delete
          //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(strippedString);
+        rHandler.deleteRecipe(newRecipe.getIndex());
         assertEquals(rList.size(), 0);
     }
 
@@ -1599,7 +1640,7 @@ public class TestAll {
         //Story 7: Delete
          //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 3);
-        rHandler.deleteRecipe(strippedString);
+        rHandler.deleteRecipe(r1.getIndex());
         assertEquals(rList.size(), 2);
     }
 
@@ -1894,7 +1935,7 @@ public class TestAll {
         //beggining of story 7 - Delete
         //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(createHandler.getRecipe().getTitle());
+        rHandler.deleteRecipe(createHandler.getRecipe().getIndex());
         assertEquals(rList.size(), 0);
         //end of 7 - Delete
     }

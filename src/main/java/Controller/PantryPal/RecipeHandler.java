@@ -44,7 +44,7 @@ public class RecipeHandler {
         //TODO: on user account, replace mogusman with something
         String username = "MOGUSMAN";
         //Added index field 
-        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions,index, username);
+        String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, index, username);
 
     }
 
@@ -104,7 +104,7 @@ public class RecipeHandler {
         return ret;
 
     }
-
+    //username parameter?
     public void editRecipe(Recipe r, String ingredients, String instructions){
         String title = r.getTitle();
         String mealType = r.getMealType();
@@ -118,6 +118,5 @@ public class RecipeHandler {
 
 
     }
-
-    //add methods later for edit
+    
 }

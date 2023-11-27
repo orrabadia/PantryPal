@@ -25,7 +25,7 @@ import org.bson.json.JsonWriterSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class MongoDB {
+public class MongoDB implements MongoDBInterface{
     public static void main(String[] args) {
         //for testing
         MongoDB m = new MongoDB();
@@ -39,7 +39,7 @@ public class MongoDB {
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "mongodb://m5zuniga:0161ugetme@ac-a1jneth-shard-00-00.q516qrr.mongodb.net:27017,ac-a1jneth-shard-00-01.q516qrr.mongodb.net:27017,ac-a1jneth-shard-00-02.q516qrr.mongodb.net:27017/?ssl=true&replicaSet=atlas-rrv032-shard-0&authSource=admin&retryWrites=true&w=majority";
+        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority";
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 
