@@ -12,7 +12,7 @@ public class GPTHandler {
     GPTHandler(boolean mock){
         //if constructed with mock true, then mock it for testing purposes
         if(mock){
-            c= new MockRecipeGenerator();
+            c = new MockRecipeGenerator();
         }
     }
 

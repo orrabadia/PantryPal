@@ -1,6 +1,7 @@
 package PantryPal;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.unset;
@@ -33,6 +34,7 @@ public class MongoDB implements MongoDBInterface{
         //m.put("MOGUSMAN", null, null, null, null);
         //System.out.println(m.get("MOGUSMAN"));
         m.get("MOGUSMAN");
+        // for username/ passwords
     }
 
     private MongoClient mongoClient;
@@ -49,6 +51,34 @@ public class MongoDB implements MongoDBInterface{
         //collection.deleteMany(new Document());
     }
 
+    public boolean find(String username) {
+        MongoDatabase dataBase = this.mongoClient.getDatabase("PantryPal");
+        //dataBase.getCollection("users").find( { username : {$exists: true});
+
+
+        //dataBase.getCollection("Users").find(/*{"_id": username}, {"_id": 1}*/{[username]:{$exists:true}});
+        //dataBase.getCollection("Users").find({"username");
+        //dataBase.getCollection("Users").find( { username : {exists(username)}} } );
+
+        Document doc = (Document) dataBase.getCollection("Users").find(exists(username)).first();
+        System.out.println(doc);
+        if (doc == null){
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
+
+    public void putUsername(String username, String password) {
+        MongoDatabase dataBase = this.mongoClient.getDatabase("PantryPal");
+        //database.users.insertOne(username :: password);
+        Document doc = new Document();
+        doc.append(username, password);
+        dataBase.getCollection("Users").insertOne(doc);
+
+    }
     /** adds to mongodb  */
     public void put(String username, String title, String mealType, String ingredients,
         String instructions) {

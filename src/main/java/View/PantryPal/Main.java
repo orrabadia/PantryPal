@@ -3,8 +3,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -370,6 +372,7 @@ class AppFrame extends BorderPane {
     private NavigationHandler nHandler;
     private RecipeList list;
     private RecipeHandler rHandler;
+    //private String defaultTextFieldStyle;
 
     AppFrame(NavigationHandler handler) {
         this.nHandler = handler;
@@ -388,6 +391,8 @@ class AppFrame extends BorderPane {
         recipeList = new UIRecipeList(rHandler,nHandler);
         // Initialise the recipelist footer Object
         footer = new ListFooter();
+        
+        //defaultTextFieldStyle = "-fx-border-color: #F0F8FF ; -fx-border-width: 2px ;";
 
         ScrollPane Scroller = new ScrollPane(recipeList);
         Scroller.setFitToHeight(true);
@@ -418,10 +423,9 @@ class AppFrame extends BorderPane {
 
     logOutButton.setOnAction(e1 ->{
         nHandler.userSL();
+
     });
-
     
-
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -697,11 +701,19 @@ class UserAccDisplay extends BorderPane {
     private UserAccFooter footer;
     private Button logInButton;
     private Button signUpButton;
+    private Label inputAlert;
     
-    private NavigationHandler handler;
+    
+    String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 300px; -fx-pref-height: 100px; -fx-text-fill: red;";
+    String badFieldStyle = "-fx-border-color: red ; -fx-border-width: 2px ;";
+    String defaultTextFieldStyle = "-fx-border-color: #F0F8FF ; -fx-border-width: 2px ;";
+    private UserHandler uHandler;
+    private NavigationHandler nhandler;
 
-    UserAccDisplay(NavigationHandler handler) {
-        this.handler = handler;
+    UserAccDisplay(NavigationHandler nhandler) {
+        this.nhandler = nhandler;
+
+        uHandler = new UserHandler();
         header = new Header("Welcome to PantryPal");
 
         // Initialise the Footer Object
@@ -714,6 +726,9 @@ class UserAccDisplay extends BorderPane {
         // Create two scrollable boxes with text
         TextField user = new TextField();
         TextField pass = new TextField();
+
+        user.setStyle(defaultTextFieldStyle);
+        pass.setStyle(defaultTextFieldStyle);
 
         user.setPromptText("Username");
         pass.setPromptText("Password");
@@ -730,6 +745,11 @@ class UserAccDisplay extends BorderPane {
         this.setBottom(footer);
         // Initialise Button Variables through the getters in Footer
 
+        inputAlert = new Label();
+        inputAlert.setStyle(defaultLabelStyle);
+        inputAlert.setVisible(false);
+        ((VBox)this.getCenter()).getChildren().add(inputAlert);        
+
         // Call Event Listeners for the Buttons
         addListeners();
     }
@@ -744,20 +764,50 @@ class UserAccDisplay extends BorderPane {
             if password incorrect -> say password is incorrect
             If it is not -> say username not found
         */
+        String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
+        String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
+        
         ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
         ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
-        handler.menu();
+        nhandler.menu();
     });
     
     Button signUpButton = footer.getSignUpButton();
-    signUpButton.setOnAction(e1->{
+    signUpButton.setOnAction( e1-> {
+
+        inputAlert.setVisible(false);
          //will have to check whether or not the username is already a collection within the database (maybe create a function for this)
         /*
         if it is -> say that username is already taken and try again
-        if it is not -> insert username and password into the user collection (within the database), create a new collection named the username, go to recipe list*/
-        ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
-        ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
-        handler.menu();
+        done - if it is not -> insert username and password into the user collection (within the database), create a new collection named the username, go to recipe list*/
+        String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
+        String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
+        
+        
+        if (username.length() < 1 || password.length() < 1){
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
+            inputAlert.setText("Username or Password too short");
+            inputAlert.setVisible(true);
+            return;
+            
+        }
+        //need to check if it is not a username already
+        String ret = uHandler.getUser(username, password /* may not need this*/ ); // what should this return?
+        if (! Boolean.parseBoolean(ret)){
+            uHandler.putUser(username, password);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(defaultTextFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(defaultTextFieldStyle);
+            nhandler.menu();
+            
+        }else{
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            inputAlert.setText("Username: \""+username+"\" taken. Please try again.");
+            inputAlert.setVisible(true);
+            
+        }
     });
         
     }
