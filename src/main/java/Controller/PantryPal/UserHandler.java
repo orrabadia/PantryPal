@@ -5,12 +5,31 @@ import java.net.URISyntaxException;
 
 public class UserHandler {
     private RequestHandler reqHandler;
+    private String user;
+
+    private AppFrame appFrame;
     //private MongoDB db;
     
     UserHandler(/*String user, String pass*/) {
         reqHandler = new RequestHandler();
         //db = new MongoDB()
         
+    }
+
+    public void setAppFrame(AppFrame appFrame){
+        this.appFrame = appFrame;
+    }
+
+    public void setUser(String user){
+        this.user = user;
+    }
+
+    public String getUserName(){
+        return this.user;
+    }
+
+    public AppFrame getAppFrame() {
+        return this.appFrame;
     }
 
     public void putUser(String user, String pass) {
@@ -20,4 +39,6 @@ public class UserHandler {
         String ret = reqHandler.performUserRequest("GET", user, pass);
         return ret;
     }
+
+    
 }

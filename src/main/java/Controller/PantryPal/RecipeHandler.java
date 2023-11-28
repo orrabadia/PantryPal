@@ -20,7 +20,7 @@ public class RecipeHandler {
     //     this.list.add(r);
     // }
 
-    public void deleteRecipe(int index){
+    public void deleteRecipe(int index/*String username*/){
         //this.list.remove(title);
         //this.list.update();
 
@@ -29,12 +29,9 @@ public class RecipeHandler {
 
     }
 
-    // public RecipeList getRecipeList(){
-    //     //this should return the csv maybe? 
-    //     return this.list;
-    // }
 
-    public void addRecipe(Recipe r){
+    //added user parameter
+    public void addRecipe(Recipe r, String username){
         //add new list to backend
         String title = r.getTitle();
         String mealType = r.getMealType();
@@ -42,15 +39,15 @@ public class RecipeHandler {
         String instructions = r.getInstructions();
         int index = r.getIndex();
         //TODO: on user account, replace mogusman with something
-        String username = "MOGUSMAN";
+        //String username = "MOGUSMAN"; // fix this to be current user
         //Added index field 
         String newList = reqHandler.performRecipeRequest("PUT", title, mealType, ingredients, instructions, index, username);
 
     }
-
-    public /*ArrayList<Recipe>*/ RecipeList getRecipeList(){
+    //added username parameter
+    public RecipeList getRecipeList(String username){
         //TODO: on user account, replace mogusman with something
-        String username = "MOGUSMAN";
+        //String username = "MOGUSMAN";
         //Added index field 
         String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", -1, username);
         JSONArray test = new JSONArray(newList);
@@ -105,15 +102,15 @@ public class RecipeHandler {
 
     }
     //username parameter?
-    public void editRecipe(Recipe r, String ingredients, String instructions){
+    public void editRecipe(Recipe r, String ingredients, String instructions /*String username*/){
         String title = r.getTitle();
         String mealType = r.getMealType();
         int index = r.getIndex();
-        String username = "MOGUSMAN";
+        
         //r.setIngredients(ingredients);
         //r.setInstructions(instructions);
 
-        String newList = reqHandler.performRecipeRequest("POST", title, mealType, ingredients, instructions, index, username);
+        String newList = reqHandler.performRecipeRequest("POST", title, mealType, ingredients, instructions, index, /*username*/ "MOGUSMAN");
         //this.list.update();
 
 

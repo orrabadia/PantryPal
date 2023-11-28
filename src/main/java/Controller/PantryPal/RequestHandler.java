@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.net.URI;
 
 public class RequestHandler {
+
     public String performUserRequest(String method, String user, String password){
         try{
             String urlString = "http://localhost:8100/user";

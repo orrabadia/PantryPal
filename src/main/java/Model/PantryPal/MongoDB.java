@@ -41,7 +41,7 @@ public class MongoDB implements MongoDBInterface{
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority";
+        String uri = "<placeholder>";
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 

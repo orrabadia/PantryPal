@@ -67,6 +67,9 @@ public class RecipeRequestListener implements HttpHandler{
       }
 
     private String handlePost(HttpExchange httpExchange) throws IOException {
+        // if (query != null) {
+        //username = query.substring(query.indexOf("=") + 1);
+      //}
         //this is for editing, do this later
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
@@ -157,6 +160,10 @@ public class RecipeRequestListener implements HttpHandler{
 
     private String handleDelete(HttpExchange httpExchange) throws IOException {
       //delete recipe by title and return new list
+        //if (query != null) {
+        //username = query.substring(query.indexOf("=") + 1);
+      //}
+        
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
         String putData = scanner.nextLine();
