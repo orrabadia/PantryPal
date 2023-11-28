@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Comparator;
+import org.json.JSONObject;
 
 import javax.management.RuntimeErrorException;
 import javax.sound.sampled.AudioFormat;
@@ -841,7 +842,7 @@ class UserAccDisplay extends BorderPane {
         String ret = uHandler.getUser(username, password ); 
         System.out.println(ret + "RETTTTTTTTTTTTTTTTTTTTT");
         
-        if (ret == null){
+        if (ret.contains("JSONException")){
             uHandler.putUser(username, password);
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();

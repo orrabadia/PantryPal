@@ -43,8 +43,8 @@ public class MongoDB {
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority"
-        ;
+        String uri = "";
+        
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 
@@ -53,35 +53,28 @@ public class MongoDB {
         // MongoCollection<Document> collection = database.getCollection("MOGUSMAN");
         //collection.deleteMany(new Document());
     }
-
+    /** find and return json for a user, if not return notfound  */
     public String find(String username) {
-        MongoDatabase dataBase = this.mongoClient.getDatabase("PantryPal");
 
-        MongoCollection<Document> collection = dataBase.getCollection("Users");
-        Bson filter = Filters.exists(username); // Om Added After Tyler
-        FindIterable<Document> firstDoc = collection.find().projection(Projections.include(username));
-        JsonWriterSettings prettyPrint = JsonWriterSettings.builder().indent(true).build();
-        StringBuilder combinedJson = new StringBuilder();
-        int x = 0;
-        for (Document i : firstDoc){
-                combinedJson.append(i.toJson(prettyPrint));
-        }
-        String value = combinedJson.toString();
-        //dataBase.getCollection("users").find( { username : {$exists: true});
-        //dataBase.geCollection("Users").find(/*{"_id": username}, {"_id": 1}*/{[username]:{$exists:true}});
-        //dataBase.getCollection("Users").find({"username");
-        //dataBase.getCollection("Users").find( { username : {exists(username)}} } );
-        //Document doc = (Document) dataBase.getCollection("Users").find(exists(username)).first();
-        //String value  = dataBase.getCollection("Users").find().projection(Projections.include(username)).first().getString(username);
-        System.out.println(value + "This is the value that is returned from mongoDB.find 64");
-
-        return value;
+        MongoDatabase database = this.mongoClient.getDatabase("PantryPal");
+        MongoCollection<Document> collection = database.getCollection("Users");
         
+        // filter for specific username
+        Bson filter = Filters.exists(username);
+        
+        //find the specific username
+        FindIterable<Document> result = collection.find(filter).projection(Projections.include(username));
 
-    //if(doc != null){
-      //  return ;
-    //}
+        // should only be one
+        Document document = result.first();
 
+        // return if found, blank if not
+        if (document != null) {
+            return document.toJson();
+        } else {
+            return "{}";
+        }
+        
     }
 
     public void putUsername(String username, String password) {

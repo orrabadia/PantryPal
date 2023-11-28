@@ -60,15 +60,14 @@ public class UserRequestListener implements HttpHandler {
       }
       
       String check = mongoDB.find(username);
-      check = check.replaceAll("[\n\r]", "");
+      JSONObject details = new JSONObject(check);
+      //check = check.replaceAll("[\n\r]", "");
+
       System.out.println("REQUESTLISTENER RET: " + check);
-      System.out.println(check + " This is what mongo.find is returning: 63");
-           /* try {
-        Boolean.parseBoolean(check);
-      } catch (Exception e) {
-          System.out.println(e);
-      }*/
-      return check;
+      String pass = details.getString(username);
+      System.out.println(username + " password is: " + pass +  " :END");
+
+      return pass;
 
     }
 
