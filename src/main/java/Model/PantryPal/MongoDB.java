@@ -19,6 +19,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
@@ -26,7 +28,7 @@ import org.bson.json.JsonWriterSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class MongoDB implements MongoDBInterface{
+public class MongoDB {
     public static void main(String[] args) {
         //for testing
         MongoDB m = new MongoDB();
@@ -41,7 +43,8 @@ public class MongoDB implements MongoDBInterface{
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "<placeholder>";
+        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority"
+        ;
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
 
@@ -51,23 +54,33 @@ public class MongoDB implements MongoDBInterface{
         //collection.deleteMany(new Document());
     }
 
-    public boolean find(String username) {
+    public String find(String username) {
         MongoDatabase dataBase = this.mongoClient.getDatabase("PantryPal");
+
+        MongoCollection<Document> collection = dataBase.getCollection("Users");
+        Bson filter = Filters.exists(username); // Om Added After Tyler
+        FindIterable<Document> firstDoc = collection.find().projection(Projections.include(username));
+        JsonWriterSettings prettyPrint = JsonWriterSettings.builder().indent(true).build();
+        StringBuilder combinedJson = new StringBuilder();
+        int x = 0;
+        for (Document i : firstDoc){
+                combinedJson.append(i.toJson(prettyPrint));
+        }
+        String value = combinedJson.toString();
         //dataBase.getCollection("users").find( { username : {$exists: true});
-
-
-        //dataBase.getCollection("Users").find(/*{"_id": username}, {"_id": 1}*/{[username]:{$exists:true}});
+        //dataBase.geCollection("Users").find(/*{"_id": username}, {"_id": 1}*/{[username]:{$exists:true}});
         //dataBase.getCollection("Users").find({"username");
         //dataBase.getCollection("Users").find( { username : {exists(username)}} } );
+        //Document doc = (Document) dataBase.getCollection("Users").find(exists(username)).first();
+        //String value  = dataBase.getCollection("Users").find().projection(Projections.include(username)).first().getString(username);
+        System.out.println(value + "This is the value that is returned from mongoDB.find 64");
 
-        Document doc = (Document) dataBase.getCollection("Users").find(exists(username)).first();
-        System.out.println(doc);
-        if (doc == null){
-            return false;
-        }
-        else {
-            return true;
-        }
+        return value;
+        
+
+    //if(doc != null){
+      //  return ;
+    //}
 
     }
 
@@ -77,6 +90,9 @@ public class MongoDB implements MongoDBInterface{
         Document doc = new Document();
         doc.append(username, password);
         dataBase.getCollection("Users").insertOne(doc);
+        System.out.println("COLLECTION CREATED");
+        dataBase.createCollection(username); // should we do this
+        
 
     }
     /** adds to mongodb  */

@@ -67,9 +67,13 @@ public class RecipeRequestListener implements HttpHandler{
       }
 
     private String handlePost(HttpExchange httpExchange) throws IOException {
-        // if (query != null) {
-        //username = query.substring(query.indexOf("=") + 1);
-      //}
+      String username = "";
+      URI uri = httpExchange.getRequestURI();
+      String query = uri.getRawQuery();
+      
+      if (query != null) {
+          username = query.substring(query.indexOf("=") + 1);
+        }
         //this is for editing, do this later
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
@@ -81,7 +85,7 @@ public class RecipeRequestListener implements HttpHandler{
         String instructions = recipeValues[3];
         String index = recipeValues[4];
         
-        m.post("MOGUSMAN", title, mealtype, ingredients, instructions, index);
+        m.post(username, title, mealtype, ingredients, instructions, index);
         scanner.close();
         return "Success";
         
@@ -160,9 +164,13 @@ public class RecipeRequestListener implements HttpHandler{
 
     private String handleDelete(HttpExchange httpExchange) throws IOException {
       //delete recipe by title and return new list
-        //if (query != null) {
-        //username = query.substring(query.indexOf("=") + 1);
-      //}
+      String username = "";
+      URI uri = httpExchange.getRequestURI();
+      String query = uri.getRawQuery();
+      
+      if (query != null) {
+        username = query.substring(query.indexOf("=") + 1);
+      }
         
         InputStream inStream = httpExchange.getRequestBody();
         Scanner scanner = new Scanner(inStream);
@@ -180,7 +188,7 @@ public class RecipeRequestListener implements HttpHandler{
         //scanner.close();
         //returns csv
         //return rList.stringify();
-        m.delete("MOGUSMAN", index);
+        m.delete(username, index);
         scanner.close();
         return "Success";
 

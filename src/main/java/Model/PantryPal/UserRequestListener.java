@@ -18,13 +18,12 @@ public class UserRequestListener implements HttpHandler {
     }
 
     public void handle(HttpExchange httpExchange /*username parameter? */) throws IOException {
-        boolean responseBool = false;
+        //boolean responseBool = false;
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
             if (method.equals("GET")) {
-              responseBool = handleGet(httpExchange);
-              response = String.valueOf(responseBool);
+              response = handleGet(httpExchange);
               //response = handleGet(httpExchange);
               httpExchange.getResponseHeaders().set("Content-Type", "application/json");
             } else if (method.equals("PUT")) {
@@ -46,8 +45,10 @@ public class UserRequestListener implements HttpHandler {
        
     }
 
+    
 
-    private boolean handleGet(HttpExchange httpExchange) throws IOException {
+
+    private String handleGet(HttpExchange httpExchange) throws IOException {
       // Converting the JSON array to a string
       //note that this has to be a single string with no newlines before you send it back
       String username = "";
@@ -58,9 +59,15 @@ public class UserRequestListener implements HttpHandler {
         System.out.println(username);
       }
       
-      boolean check = mongoDB.find(username);
-      String password = mongoDB.get(username);
-      System.out.println("REQUESTLISTENER RET: " + password);
+      String check = mongoDB.find(username);
+      check = check.replaceAll("[\n\r]", "");
+      System.out.println("REQUESTLISTENER RET: " + check);
+      System.out.println(check + " This is what mongo.find is returning: 63");
+           /* try {
+        Boolean.parseBoolean(check);
+      } catch (Exception e) {
+          System.out.println(e);
+      }*/
       return check;
 
     }

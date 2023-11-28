@@ -779,20 +779,30 @@ class UserAccDisplay extends BorderPane {
             if password incorrect -> say password is incorrect
             If it is not -> say username not found
         */
+        inputAlert.setVisible(false);
         String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
         String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
+
+        System.out.println(uHandler.getUser(username,password) + "THIS IS WHAT IS BEING RETURNED IN LOG BUTTON");
         
-        ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
-        ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
-
-        uHandler.setUser(username);
-
-        AppFrame root = new AppFrame(this.nhandler, uHandler);
-        root.setUHandler(uHandler);
-        uHandler.setAppFrame(root);
-        Scene recipeList = new Scene(root, 500,600);
-        //recipeList.setRoot(root);
-        this.nhandler.initialize(recipeList);
+        //correct password, log in to their recipe list
+        if (password.equals(uHandler.getUser(username, password))) {
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+            uHandler.setUser(username);
+            AppFrame root = new AppFrame(this.nhandler, uHandler);
+            root.setUHandler(uHandler);
+            uHandler.setAppFrame(root);
+            Scene recipeList = new Scene(root, 500,600);
+            //recipeList.setRoot(root);
+            this.nhandler.initialize(recipeList);
+        } else { //if password is incorrect alert them
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
+            inputAlert.setText("Incorrect Pass");
+            inputAlert.setVisible(true);
+        }
+        
 
 
     });
@@ -809,7 +819,7 @@ class UserAccDisplay extends BorderPane {
         String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
         
         
-        
+        // password length control for signup
         if (username.length() < 1 || password.length() < 1){
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
@@ -819,16 +829,32 @@ class UserAccDisplay extends BorderPane {
             
         }
         //need to check if it is not a username already
-        String ret = uHandler.getUser(username, password /* may not need this*/ ); // what should this return?
-        if (! Boolean.parseBoolean(ret)){
+        /*String ret;
+        try{
+            ret = uHandler.getUser(username, password );
+        }catch(Exception e){
+           // The above code is printing the value of the variable "e" to the console.
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+            ret = null;
+        }*/
+        String ret = uHandler.getUser(username, password ); 
+        System.out.println(ret + "RETTTTTTTTTTTTTTTTTTTTT");
+        
+        if (ret == null){
             uHandler.putUser(username, password);
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(defaultTextFieldStyle);
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(defaultTextFieldStyle);
-            this.nhandler.menu();
-            
-        }else{
+
+            uHandler.setUser(username);
+            AppFrame root = new AppFrame(this.nhandler, uHandler);
+            root.setUHandler(uHandler);
+            uHandler.setAppFrame(root);
+            Scene recipeList = new Scene(root, 500,600);
+            this.nhandler.initialize(recipeList);
+        } else {
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
             inputAlert.setText("Username: \""+username+"\" taken. Please try again.");
             inputAlert.setVisible(true);
@@ -838,8 +864,6 @@ class UserAccDisplay extends BorderPane {
         
     }
 
-    
-    
 }
 
 /**
@@ -981,7 +1005,7 @@ class RecipeDisplay extends BorderPane {
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler()
                     .getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).get(r.getTitle().getText()),
                     ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
-                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText(), ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getUserHandler().getUserName());
                     //Updatethe UIList
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler, 0);
                     //Revert button text back
@@ -999,10 +1023,8 @@ class RecipeDisplay extends BorderPane {
             int indexValue = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler()
             .getUserName()).get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
             //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
-            mainAppFrame.getRecipeHandler().deleteRecipe(indexValue);
+            mainAppFrame.getRecipeHandler().deleteRecipe(indexValue, mainAppFrame.getUserHandler().getUserName());
             mainAppFrame.getRecipeList().updateList(handler, 0);
-
-            
 
             //then call update UI recipe
             handler.menu();

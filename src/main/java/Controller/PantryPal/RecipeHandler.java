@@ -20,11 +20,11 @@ public class RecipeHandler {
     //     this.list.add(r);
     // }
 
-    public void deleteRecipe(int index/*String username*/){
+    public void deleteRecipe(int index, String username){
         //this.list.remove(title);
         //this.list.update();
 
-        String username = "MOGUSMAN";
+        // String username = "MOGUSMAN";
         String newList = reqHandler.performRecipeRequest("DELETE", "", "", "","", index, username);
 
     }
@@ -46,8 +46,7 @@ public class RecipeHandler {
     }
     //added username parameter
     public RecipeList getRecipeList(String username){
-        //TODO: on user account, replace mogusman with something
-        //String username = "MOGUSMAN";
+
         //Added index field 
         String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", -1, username);
         JSONArray test = new JSONArray(newList);
@@ -102,17 +101,13 @@ public class RecipeHandler {
 
     }
     //username parameter?
-    public void editRecipe(Recipe r, String ingredients, String instructions /*String username*/){
+    public void editRecipe(Recipe r, String ingredients, String instructions, String username){
         String title = r.getTitle();
         String mealType = r.getMealType();
         int index = r.getIndex();
         
-        //r.setIngredients(ingredients);
-        //r.setInstructions(instructions);
 
-        String newList = reqHandler.performRecipeRequest("POST", title, mealType, ingredients, instructions, index, /*username*/ "MOGUSMAN");
-        //this.list.update();
-
+        String newList = reqHandler.performRecipeRequest("POST", title, mealType, ingredients, instructions, index, username);
 
     }
     
