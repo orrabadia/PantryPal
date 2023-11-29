@@ -33,7 +33,6 @@ public class TestM2 {
         rList = new RecipeList();
 
         //insert your uri
-        //clientMongoDB = MongoClients.create( "mongodb+srv://mogusman:amogus69@110.wfvva6a.mongodb.net/?retryWrites=true&w=majority");
         clientMongoDB = MongoClients.create( "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority");
         
         database = clientMongoDB.getDatabase("PantryPal");
