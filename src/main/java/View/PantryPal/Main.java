@@ -1,15 +1,17 @@
 package PantryPal;
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.text.TextAlignment;
 import javafx.geometry.Insets;
 import javafx.scene.text.*;
 import java.io.*;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Comparator;
+import org.json.JSONObject;
 
 import javax.management.RuntimeErrorException;
 import javax.sound.sampled.AudioFormat;
@@ -131,13 +135,18 @@ class UIRecipe extends HBox { // extend HBox
 }
 
 class UIRecipeList extends VBox { // extends HBox?
-    private RecipeList rList;
+    //private RecipeList rList;
     private NavigationHandler nHandler;
+    private RecipeHandler rHandler;
+
+
+    //u handler parameter?
     // new RecipeList
-    UIRecipeList(RecipeList rList, NavigationHandler nHandler) {
-        this.rList = rList;
+    UIRecipeList(RecipeHandler rHandler, NavigationHandler nHandler) {
+        //this.rList.setList(rHandler.getRecipeList());
+        this.rHandler = rHandler;
         this.nHandler = nHandler;
-        this.updateList(nHandler);
+        this.updateList(nHandler,0);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -155,17 +164,46 @@ class UIRecipeList extends VBox { // extends HBox?
         }
     }
 
-    public void updateList(NavigationHandler nHandler){
+    /**
+     * 
+     * Updates list based on what is currently in backend
+     * takes behavior based on what style of sort you want to use-default is newest first(0)
+     * later add more to have different sorting orders
+     */
+    public void updateList(NavigationHandler nHandler, int sortorder){
+
+        //takes behavior based on what style of sort you want to use-default is revchron
         this.getChildren().clear();
-        ArrayList<Recipe> list = rList.getList();
+        //replace current list with whats in backend
+
+        // added .getList()
+        ArrayList<Recipe> list = rHandler.getRecipeList(((UserAccDisplay)this.nHandler.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).getList();
+        System.out.println("LIST SIZE:" + list.size());
+        //sort last to first
+        class revchronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r2.getIndex(), r1.getIndex());
+            }
+        }
+        if(sortorder == 0){
+            //sort backwards if order 0
+            revchronComparator comp = new revchronComparator();
+            Collections.sort(list, comp);
+        }
         for(Recipe r : list){
-            String title = r.getTitle();
-            String mealType = r.getMealType();
-            String ingredients = r.getIngredients();
-            String instructions = r.getInstructions();
-            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            this.getChildren().add(uiR);
-            this.updateRecipeIndices();
+            if(sortorder == 0){
+                int index = r.getIndex();
+                String title = r.getTitle();
+                String mealType = r.getMealType();
+                String ingredients = r.getIngredients();
+                String instructions = r.getInstructions();
+                UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+            } else {
+                System.out.println("unimplemented sort method");
+            }
         }
     }
 
@@ -186,6 +224,7 @@ class UIRecipeList extends VBox { // extends HBox?
  */
 class ListFooter extends HBox {
     private Button newRecipeButton;
+    private Button logOutButton;
     ListFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -195,13 +234,20 @@ class ListFooter extends HBox {
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
 
         newRecipeButton = new Button("New Recipe");
+        logOutButton = new Button("Log Out");
         newRecipeButton.setStyle(defaultButtonStyle);
-        this.getChildren().add(newRecipeButton);
+        logOutButton.setStyle(defaultButtonStyle);
+
+        this.getChildren().addAll(logOutButton, newRecipeButton);
         this.setAlignment(Pos.CENTER);
     }
 
     public Button getNewRecipeButton(){
         return newRecipeButton;
+    }
+
+    public Button getLogOutButton() {
+        return logOutButton;
     }
 }
 
@@ -269,6 +315,36 @@ class GPTFooter extends HBox {
     }
 }
 
+class UserAccFooter extends HBox {
+    private Button logInButton;
+    private Button signUpButton;
+   
+    UserAccFooter() {
+        this.setPrefSize(500, 60);
+        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setSpacing(15);
+        // set a default style for buttons - background color, font size, italics
+        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+        this.setAlignment(Pos.CENTER); // aligning the buttons to center
+
+        logInButton = new Button("Log In");
+        signUpButton = new Button("Sign Up");
+        logInButton.setStyle(defaultButtonStyle);
+        signUpButton.setStyle(defaultButtonStyle);
+        this.getChildren().add(logInButton);
+        this.getChildren().add(signUpButton);
+        this.setAlignment(Pos.CENTER);
+    }
+
+    public Button getLogInButton(){
+        return logInButton;
+    }
+    public Button getSignUpButton(){
+        return signUpButton;
+    }
+    
+}
+
 /*
  * Class Copied from Lab 1 for Header
  */
@@ -296,24 +372,31 @@ class AppFrame extends BorderPane {
     private ListFooter footer;
     private UIRecipeList recipeList;
     private Button newRecipeButton;
+    private Button logOutButton;
     private NavigationHandler nHandler;
+    private UserHandler uHandler;
     private RecipeList list;
     private RecipeHandler rHandler;
+    //private String defaultTextFieldStyle;
 
-    AppFrame(NavigationHandler handler) {
+    AppFrame(NavigationHandler handler, UserHandler uHandler) {
         this.nHandler = handler;
         // Initialise the header Object
         header = new Header("Recipe List");
         //create new recipelist and handler
         list = new RecipeList();
         System.out.println("refreshing");
-        list.refresh();
+        //TODO: get list based on backend not csv
+        //list.refresh();
         rHandler = new RecipeHandler(list);
+        rHandler.getRecipeList(uHandler.getUserName());
         //create ui recipe list to display recipes
-        recipeList = new UIRecipeList(list,nHandler);
+        //in its initialization it will get from backend and display
+        //can also call updatelist later to reget from backend
+        recipeList = new UIRecipeList(rHandler,nHandler);
         // Initialise the recipelist footer Object
         footer = new ListFooter();
-
+        
         ScrollPane Scroller = new ScrollPane(recipeList);
         Scroller.setFitToHeight(true);
         Scroller.setFitToWidth(true);
@@ -326,6 +409,7 @@ class AppFrame extends BorderPane {
         this.setBottom(footer);
         // Initialise Button Variables through the getters in Footer
         newRecipeButton = footer.getNewRecipeButton();
+        logOutButton = footer.getLogOutButton();
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -340,6 +424,10 @@ class AppFrame extends BorderPane {
         nHandler.recordMeal(createHandler);
     });
 
+    logOutButton.setOnAction(e1 ->{
+        nHandler.userSL();
+    });
+    
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -360,6 +448,14 @@ class AppFrame extends BorderPane {
 
     public UIRecipeList getRecipeList(){
         return this.recipeList;
+    }
+    
+    public UserHandler getUserHandler() {
+        return this.uHandler;
+    }
+
+    public void setUHandler(UserHandler uHandler) {
+        this.uHandler = uHandler;
     }
 
 }
@@ -433,15 +529,19 @@ class GPTResultsDisplay extends BorderPane{
     {
         Button saveButton = footer.getSaveButton();
         saveButton.setOnAction(e ->{
-            //TODO: add save functionality
             //get recipehandler from navhandler
+            System.out.println("1");
             HashMap<String,Scene> pagelist = nHandler.getPageList();
-            AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();
+            //System.out.println(pagelist.get("RecipeList").getRoot().getClass().toString());
+            AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot(); 
             RecipeHandler recipeHandler = rlist.getRecipeHandler();
-            recipeHandler.addRecipe(cHandler.getRecipe());
-            //add it and update list and go to menu
+            //add recipe to backend, check new backend, return to menu()
+            recipeHandler.addRecipe(cHandler.getRecipe(), rlist.getUserHandler().getUserName());
+            //recipeHandler.getRecipeList();
+            //addrecipe above updates the recipehandler list
             UIRecipeList uiList = rlist.getRecipeList();
-            uiList.updateList(nHandler);
+            //note that this calls get, uilist has the rhandler above
+            uiList.updateList(nHandler, 0);
             nHandler.menu();
 
         });
@@ -480,6 +580,7 @@ class RecordAppFrame extends FlowPane {
     Label l;
     String name;
     CreateHandler createHandler;
+    RequestHandler reqHandler;
 
 // Set a default style for buttons and fields - background color, font size,
     // italics
@@ -499,6 +600,8 @@ class RecordAppFrame extends FlowPane {
         this.name = name;
 
         this.createHandler = createHandler;
+
+        this.reqHandler = new RequestHandler();
         // Add the buttons and text fields
 
         startButton = new Button("Start");
@@ -564,43 +667,27 @@ class RecordAppFrame extends FlowPane {
             continueButton = new Button("Continue");
             this.getChildren().add(continueButton);
             if (name == "meal") {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setMealType(transcription);
-                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setMealType(transcription);
+                l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
                 continueButton.setOnAction(e1->{
                     handler.recordIngredients(createHandler);
                 });
             }
             else {
-                try {
-                    wHandler = new WhisperHandler();
-                    transcription = wHandler.transcribe();
-                    createHandler.getRecipe().setIngredients(transcription);
-                    l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
-                }
-                catch (IOException e1){
-                    System.err.println("IOException");
-                }
-                catch (URISyntaxException e2){
-                    System.err.println("URISyntaxException");
-                }
+                transcription = reqHandler.performAudioRequest("PUT");
+                createHandler.getRecipe().setIngredients(transcription);
+                l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
+
                 continueButton.setOnAction(e1->{
                     //on continue, get the transcription and move to new page
                     Recipe r = createHandler.getRecipe();
                     String mealtype = r.getMealType();
+                    System.out.println("mealType " + mealtype);
                     String ingredients = r.getIngredients();
-                    GPTHandler g = new GPTHandler();
-                    String recipe = g.generate(mealtype, ingredients);
+                    System.out.println("ingredients " + ingredients);
+                    String recipe = reqHandler.performGenerateRequest("PUT", mealtype, ingredients);
                     String title = recipe.substring(0,recipe.indexOf("~"));
                     //take out the newlines and returns for formatting
                     String strippedString = title.replaceAll("[\\n\\r]+", "");
@@ -621,6 +708,165 @@ class RecordAppFrame extends FlowPane {
 
 }
 
+class UserAccDisplay extends BorderPane {
+    private Header header;
+    private UserAccFooter footer;
+    private Button logInButton;
+    private Button signUpButton;
+    private Label inputAlert;
+    
+    
+    String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 300px; -fx-pref-height: 100px; -fx-text-fill: red;";
+    String badFieldStyle = "-fx-border-color: red ; -fx-border-width: 2px ;";
+    String defaultTextFieldStyle = "-fx-border-color: #F0F8FF ; -fx-border-width: 2px ;";
+    private UserHandler uHandler;
+    private NavigationHandler nhandler;
+
+    UserAccDisplay(NavigationHandler nhandler) {
+        this.nhandler = nhandler;
+
+        uHandler = new UserHandler();
+        header = new Header("Welcome to PantryPal");
+
+        // Initialise the Footer Object
+        footer = new UserAccFooter();
+
+        // Create a VBox in the center
+        VBox centerBox = new VBox();
+        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
+
+        // Create two scrollable boxes with text
+        TextField user = new TextField();
+        TextField pass = new TextField();
+
+        user.setStyle(defaultTextFieldStyle);
+        pass.setStyle(defaultTextFieldStyle);
+
+        user.setPromptText("Username");
+        pass.setPromptText("Password");
+        // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
+        // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
+
+        centerBox.getChildren().addAll(user, pass);
+
+        // Set the VBox in the center of the BorderPane
+        this.setCenter(centerBox);
+        // Add header to the top of the BorderPane
+        this.setTop(header);
+        // Add footer to the bottom of the BorderPane
+        this.setBottom(footer);
+        // Initialise Button Variables through the getters in Footer
+
+        inputAlert = new Label();
+        inputAlert.setStyle(defaultLabelStyle);
+        inputAlert.setVisible(false);
+        ((VBox)this.getCenter()).getChildren().add(inputAlert);        
+
+        // Call Event Listeners for the Buttons
+        addListeners();
+    }
+
+    public UserHandler getUHandler(){
+        return this.uHandler;
+    }
+
+    public void addListeners(){
+
+    Button logButton = footer.getLogInButton();
+    logButton.setOnAction(e1->{
+         /*will have to check whether or not the username is a collection within the database. 
+            If it is -> Check that password is correct (will probably have to create a new collection within the database that only has username and passwords)
+            if both correct-> set username as the inputted username and use the collection associated with it, and lead to the recipe list
+            if password incorrect -> say password is incorrect
+            If it is not -> say username not found
+        */
+        inputAlert.setVisible(false);
+        String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
+        String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
+
+        System.out.println(uHandler.getUser(username,password) + "THIS IS WHAT IS BEING RETURNED IN LOG BUTTON");
+        
+        //correct password, log in to their recipe list
+        if (password.equals(uHandler.getUser(username, password))) {
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+            uHandler.setUser(username);
+            AppFrame root = new AppFrame(this.nhandler, uHandler);
+            root.setUHandler(uHandler);
+            uHandler.setAppFrame(root);
+            Scene recipeList = new Scene(root, 500,600);
+            //recipeList.setRoot(root);
+            this.nhandler.initialize(recipeList);
+        } else { //if password is incorrect alert them
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
+            inputAlert.setText("Incorrect Pass");
+            inputAlert.setVisible(true);
+        }
+        
+
+
+    });
+    
+    Button signUpButton = footer.getSignUpButton();
+    signUpButton.setOnAction( e1-> {
+
+        inputAlert.setVisible(false);
+         //will have to check whether or not the username is already a collection within the database (maybe create a function for this)
+        /*
+        if it is -> say that username is already taken and try again
+        done - if it is not -> insert username and password into the user collection (within the database), create a new collection named the username, go to recipe list*/
+        String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
+        String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
+        
+        
+        // password length control for signup
+        if (username.length() < 1 || password.length() < 1){
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
+            inputAlert.setText("Username or Password too short");
+            inputAlert.setVisible(true);
+            return;
+            
+        }
+        //need to check if it is not a username already
+        /*String ret;
+        try{
+            ret = uHandler.getUser(username, password );
+        }catch(Exception e){
+           // The above code is printing the value of the variable "e" to the console.
+            e.printStackTrace();
+            return "Error: " + e.getMessage();
+            ret = null;
+        }*/
+        String ret = uHandler.getUser(username, password ); 
+        System.out.println(ret + "RETTTTTTTTTTTTTTTTTTTTT");
+        
+        if (ret.contains("JSONException")){
+            uHandler.putUser(username, password);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(defaultTextFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(defaultTextFieldStyle);
+
+            uHandler.setUser(username);
+            AppFrame root = new AppFrame(this.nhandler, uHandler);
+            root.setUHandler(uHandler);
+            uHandler.setAppFrame(root);
+            Scene recipeList = new Scene(root, 500,600);
+            this.nhandler.initialize(recipeList);
+        } else {
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            inputAlert.setText("Username: \""+username+"\" taken. Please try again.");
+            inputAlert.setVisible(true);
+            
+        }
+    });
+        
+    }
+
+}
+
 /**
  * Page for detailed recipe display
  */
@@ -633,6 +879,7 @@ class RecipeDisplay extends BorderPane {
 
     private NavigationHandler handler;
     private UIRecipe r;
+
 
     RecipeDisplay(NavigationHandler handler) {
         this.handler = handler;
@@ -647,10 +894,8 @@ class RecipeDisplay extends BorderPane {
         centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
 
         // Create two scrollable boxes with text
-        ScrollPane scrollPane1 = createScrollableBox("Ingredients: YOU");
-        ((TextField) scrollPane1.getContent()).setEditable(false);
-        ScrollPane scrollPane2 = createScrollableBox("Instructions: RUN");
-        ((TextField) scrollPane2.getContent()).setEditable(false);
+        ScrollPane scrollPane1 = createScrollableBox("Ingredients: ");
+        ScrollPane scrollPane2 = createScrollableBox("Instructions: ");
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
@@ -683,8 +928,8 @@ class RecipeDisplay extends BorderPane {
         //called when displaying from handler, handler has blank one by default
         VBox v = (VBox) this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
-        ScrollPane scroll1 = (ScrollPane) v.getChildren().get(0);
-        TextField textField = (TextField) scroll1.getContent();
+        ScrollPane scroll1 = (ScrollPane)v.getChildren().get(0);
+        TextArea textField = (TextArea) scroll1.getContent();
         textField.setText(s);
     }
 
@@ -693,7 +938,7 @@ class RecipeDisplay extends BorderPane {
         VBox v = (VBox)this.getCenter();
         //THIS SHOULD BE THE FIRST ELEMENT IF IT CHANGES THINGS WILL NOT BE GOOD
         ScrollPane scroll2 = (ScrollPane)v.getChildren().get(1);
-        TextField textField = (TextField) scroll2.getContent();
+        TextArea textField = (TextArea) scroll2.getContent();
         textField.setText(s);
 
     }
@@ -707,16 +952,19 @@ class RecipeDisplay extends BorderPane {
                 handler.menu();
             } else {
                 //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
-               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
-               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
-
+               //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
+               //.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
+               
+               ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(r.getIngredients());
                //reverts the displayed instructions back to orriginal (what is being saved in the rlist (not UIRList))
-               ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
-               .getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
+               //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
+               //.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getInstructions());
 
+
+               ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(r.getRecipeInstructions());
                 //sets textfields to non-editable
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
 
                 //reverts buttons back
                 this.footer.getBackButton().setText("Back");
@@ -724,32 +972,43 @@ class RecipeDisplay extends BorderPane {
             }
         });
 
-        Button editButton = footer.getEditButton();
+        Button editButton = footer.getEditButton();        
         editButton.setOnAction(e -> {
 
             if (this.footer.getEditButton().getText() == "Edit") {
                 //sets textfields editable
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
-                ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(true);
+                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(true);
                 //changes button text
                 this.footer.getEditButton().setText("Save");
                 this.footer.getBackButton().setText("Cancel");
             } else {
                 if (this.footer.getEditButton().getText() == "Save") {
                     //sets fields uneditable
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
                     /*
                     Gets the recipe from the recipelist which is gotten from the handler gotten from the appframe. Calls editRecipe()
                     from RecipeHandler, passing in the recipe which is retrieved from the appframes recipe handlers recipelist, the new
                     ingredients and the new instructions retrieved from the fields
                     */
+
+                   /*ArrayList<Recipe> rList = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList();
+                   
+                   for (Recipe temp : rList){
+                        if(temp.getTitle() == r.getTitle().getText()){
+                            break;
+                        }
+                   }
+                    */
+                   // not gonna work
                     ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().editRecipe(
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()),
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
-                    ((TextField)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText());
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler()
+                    .getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).get(r.getTitle().getText()),
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
+                    ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText(), ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getUserHandler().getUserName());
                     //Updatethe UIList
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler);
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler, 0);
                     //Revert button text back
                     this.footer.getEditButton().setText("Edit");
                     this.footer.getBackButton().setText("Back");
@@ -760,23 +1019,27 @@ class RecipeDisplay extends BorderPane {
         Button deleteButton = footer.getDeleteButton();
         deleteButton.setOnAction(e -> {
 
-            AppFrame mainAppFrame = (AppFrame)this.handler.getMap().get("RecipeList").getRoot();
-
-            mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
-            mainAppFrame.getRecipeList().updateList(handler);
-
+            AppFrame mainAppFrame = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot());
             
+            int indexValue = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler()
+            .getUserName()).get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
+            //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            mainAppFrame.getRecipeHandler().deleteRecipe(indexValue, mainAppFrame.getUserHandler().getUserName());
+            mainAppFrame.getRecipeList().updateList(handler, 0);
 
             //then call update UI recipe
             handler.menu();
             
         });
 
+        
+
     }
 
     // Helper method to create a scrollable text box
     private ScrollPane createScrollableBox(String content) {
-        TextField textArea = new TextField(content);
+        TextArea textArea = new TextArea(content);
+
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
@@ -796,19 +1059,43 @@ public class Main extends Application {
         //appframe is initialized without navhandler
         //set its thing to primarystage
         NavigationHandler handler = new NavigationHandler();
+     
         handler.setStage(primaryStage);
         //each UI element must have access to handler if it wants to do navigation
-        AppFrame root = new AppFrame(handler);
         // Create scene of mentioned size with the border pane
-        Scene recipeList = new Scene(root, 500,600);
+        //Scene recipeList = new Scene(root, 500,600);
 
         //handler initializes by adding recipe list to pagelist
-        handler.initialize(recipeList);
+        //moved to sign in/login on action
+        //handler.initialize(recipeList);
 
-        // Make window non-resizable
-        primaryStage.setResizable(false);
-        // Show the app
-        primaryStage.show();
+        //if reachable, do regular app, if not show error
+        boolean server = ServerPing.ping();
+        if(server){
+            UserAccDisplay userslDisplay = new UserAccDisplay(handler);
+            //AppFrame root = new AppFrame(handler, userslDisplay.getUHandler());
+            //root.setUHandler(userslDisplay.getUHandler());
+            handler.showUserLogin(userslDisplay);
+
+            // Make window non-resizable
+            primaryStage.setResizable(false);
+            // Show the app
+            primaryStage.show();
+        } else {
+            Label statusLabel = new Label();
+            //show red bold text where servers unreachable
+            statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            statusLabel.setText("Server is unreachable, please try again later :(");
+    
+            VBox root = new VBox(20);
+            root.getChildren().add(statusLabel);
+    
+            Scene scene = new Scene(root, 300, 50);
+            primaryStage.setTitle("Server Status");
+            primaryStage.setScene(scene);
+    
+            primaryStage.show();
+        }  
     }
 
     public static void main(String[] args) {

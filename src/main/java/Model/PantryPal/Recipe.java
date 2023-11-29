@@ -5,6 +5,7 @@ public class Recipe {
     private String mealType;
     private String ingredients;
     private String instructions;
+    private int index;
     Recipe() {
         title="";
         mealType="";
@@ -44,5 +45,11 @@ public class Recipe {
     }
     public void setInstructions(String instructions) {
         this.instructions = instructions;
+    }
+    public void setIndex(int i){
+        this.index = i;
+    }
+    public int getIndex(){
+        return this.index;
     }
 }

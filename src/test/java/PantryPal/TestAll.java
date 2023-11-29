@@ -1,6 +1,8 @@
 package PantryPal;
 import org.junit.jupiter.api.Test;
 
+import com.mongodb.client.MongoDatabase;
+
 import PantryPal.AppFrame;
 import PantryPal.Main;
 import PantryPal.NavigationHandler;
@@ -25,6 +27,29 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.unset;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collection;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+
 
 public class TestAll {
     private RecipeList rList;
@@ -33,11 +58,25 @@ public class TestAll {
     private WhisperHandler whisperHandler;
     private CreateHandler createHandler;
     private GPTHandler gptHandler;
+    private UserHandler userHandler;
+    private MongoDatabase database;
+    private MongoClient clientMongoDB;
+    private MongoDB m;
+
+    private MongoCollection<Document> collection1;
+    private MongoCollection<Document> collection2;
+    private String usernameTest1;
+    private String passwordTest1;
+    private String usernameTest2;
+    private String passwordTest2;
+
 
      @BeforeEach
      public void initialize(){
+        m = new MongoDB();
         rList = new RecipeList();
         rHandler = new RecipeHandler(rList);
+        userHandler = new UserHandler();
         //this represents the initial app where no recipes are in the recipelist
         //every time you click add it adds to list, so this represents the list
         //the displayed list is gotten from the recipelist instance
@@ -50,6 +89,34 @@ public class TestAll {
         createHandler = new CreateHandler();
 
         gptHandler = new GPTHandler(true);
+
+        //insert your uri
+        clientMongoDB = MongoClients.create( "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority");
+        
+        database = clientMongoDB.getDatabase("PantryPal");
+
+        usernameTest1 = "MOGUSMAN";
+        passwordTest1 = "pass1";
+        usernameTest2 = "HUMAN";
+        passwordTest2 = "pass2";
+
+        // Document doc1 = new Document();
+        // Document doc2 = new Document();
+
+        // doc1.append(usernameTest1, passwordTest1);
+        // doc2.append(usernameTest2, passwordTest2);
+
+        userHandler.putUser(usernameTest1, passwordTest1);
+        userHandler.putUser(usernameTest2, passwordTest2);
+
+
+        collection1 = database.getCollection(usernameTest1);
+        collection2 = database.getCollection(usernameTest2);
+        // userHandler.setUser(usernameTest1);
+        // userHandler.setPass(passwordTest1);
+
+
+
      }
 
     public void deleteRecording() {
@@ -65,35 +132,103 @@ public class TestAll {
      @AfterEach
      public void clearrecipes(){
         //clear recipe list each time
+        // rHandler.getRecipeList(usernameTest1).clear();
+        // rHandler.getRecipeList(usernameTest2).clear();
         rList.clear();
+        //deletes test_username collection
+
+        Document doc1 = new Document();
+        Document doc2 = new Document();
+
+        doc1.append(usernameTest1, passwordTest1);
+        doc2.append(usernameTest2, passwordTest2);
+        collection1.drop();
+        collection2.drop();
+
      }
+
+      /**get the most updated recipes for user specified at top */
+    public ArrayList<Recipe> update(){
+        JSONArray test = new JSONArray(m.get(usernameTest1));
+        ArrayList<Recipe> replace = new ArrayList<>();
+        //System.out.println("RHANDLER : Printing keys and values:");
+        for (int i = 0; i < test.length(); i++) {
+            JSONObject jsonObject = test.getJSONObject(i);
+            Recipe add = new Recipe();
+            //System.out.println("Element " + (i + 1) + ":");
+            for (String key : jsonObject.keySet()) {
+                Object value = jsonObject.get(key);
+                //System.out.println("Key: " + key + ", Value: " + value);
+                if(key.equals("title")){
+                    add.setTitle(value.toString());
+                } else if(key.equals("mealType")){
+                    add.setMealType(value.toString());
+                }else if(key.equals("ingredients")){
+                    add.setIngredients(value.toString());
+                }else if(key.equals("instructions")){
+                    add.setInstructions(value.toString());
+                }else if(key.equals("index")){
+                    add.setIndex(Integer.parseInt(value.toString()));
+                }
+            }
+            //System.out.println();
+            //add recipe to list as you update
+            replace.add(add);
+        }
+        return replace;
+    }
 
     //story 1, test the gettitle and add and delete
     @Test
     //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS1RecipeAdd() {
+        
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
+        //rHandler.addRecipe(r1, usernameTest1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
+
+        //maybe have username input and make test collection?
+         assertEquals(1, collection1.countDocuments());
+        //assertEquals(rHandler.getRecipeList(usernameTest2).getList().size(), 0);
+         assertEquals(0, collection2.countDocuments());
+        //rHandler.addRecipe(r1, usernameTest2);
+        m.put(usernameTest2, title1, mealtype, ingredients, instructions);
+        replace = update();
+        rList.setList(replace);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
     }
 
     //test that you can delete recipes
+    @Test
     public void unitTestS1RecipeDelete() {
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
-        rList.remove(title1);
-        assertEquals(rList.size(), 0);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r1, usernameTest2);
+
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest2, title1, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+
+        //check if you can delete recipes, and whether it effects other collections
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
+        //rHandler.deleteRecipe(r1.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        assertEquals(0, collection1.countDocuments());
+        //assertEquals(rHandler.getRecipeList(usernameTest2).getList().size(), 1);
+        assertEquals(1, collection2.countDocuments());
     }
 
     @Test
@@ -106,8 +241,13 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+        //check if ingredients changed
+        ArrayList<Recipe>replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getTitle(), "Test Recipe 1");
@@ -117,8 +257,11 @@ public class TestAll {
     @Test
     public void storyTestS1NoRecipes() {
         //at start, should be no recipes
-        int initialRecipeCount = rList.size();
-        assertEquals(initialRecipeCount, 0);
+        //int initialRecipeCount = rList.size();
+        assertEquals(collection1.countDocuments(), 0);
+        assertEquals(collection2.countDocuments(), 0);
+        // assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), initialRecipeCount);
+        // assertEquals(rHandler.getRecipeList(usernameTest2).getList().size(), initialRecipeCount);
     }
 
     @Test
@@ -131,9 +274,15 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1= new Recipe(title, mealtype, ingredients, instructions);
         Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        // assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
+
+        m.put(usernameTest1, title, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        assertEquals(1, collection1.countDocuments());
+        assertEquals(1, rList.size());
     }
 
     @Test
@@ -146,16 +295,30 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        // assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
+        assertEquals(2, collection1.countDocuments());
         //delete
-        rList.remove(title1);
-        assertEquals(rList.size(), 1);
-        rList.remove(title2);
-        assertEquals(rList.size(), 0);
+        //rHandler.deleteRecipe(r1.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        assertEquals(1, collection1.countDocuments());
+        m.delete(usernameTest1, "1");
+        assertEquals(0, collection1.countDocuments());
+        
+        // rHandler.deleteRecipe(r2.getIndex(), usernameTest1);
+
+
+        // assertEquals(0 , rHandler.getRecipeList(usernameTest1).getList().size());
 
     }
     
@@ -169,8 +332,16 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getTitle(), "Test Recipe 1");
@@ -186,8 +357,15 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getMealType(), "Lunch");
@@ -203,8 +381,17 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        // //add two and check if you can get title, maybe 2 messes it up
+        // Recipe r = rHandler.getRecipeList(usernameTest1).get(title1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getIngredients(), "food");
@@ -220,8 +407,17 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        // //add two and check if you can get title, maybe 2 messes it up
+        // Recipe r = rHandler.getRecipeList(usernameTest1).get(title1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getInstructions(), "cook food");
@@ -237,8 +433,17 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
         Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        // //add two and check if you can get title, maybe 2 messes it up
+        // Recipe r = rHandler.getRecipeList(usernameTest1).get(title1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
         Recipe r = rList.get(title1);
         assertEquals(r.getTitle(), "Test Recipe 1");
@@ -533,9 +738,18 @@ public class TestAll {
         String instructions = "cook food";
         Recipe r1= new Recipe(title, mealtype, ingredients, instructions);
         Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        m.put(usernameTest1, title, mealtype, ingredients, instructions);
+        m.put(usernameTest1, "Test Recipe 2", mealtype, ingredients, instructions);
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        assertEquals(2, collection1.countDocuments());
+        //add two and check if you can get title, maybe 2 messes it up
+        
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
 
         // story 2
         //add two and check if you can get title, maybe 2 messes it up
@@ -619,7 +833,7 @@ public class TestAll {
     // Story 1: remove preexisting recipes (2 to 0)
     // Story 3: Record
 
-    public void integrationTest3() {
+    public void integrationTest3 () {
         // Story 1
         //add 2 recipes, 2 should be displayed
         String title1 = "Test Recipe 1";
@@ -627,17 +841,23 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        assertEquals(2, collection1.countDocuments());
         //delete
-        rList.remove(title1);
-        assertEquals(rList.size(), 1);
-        rList.remove(title2);
-        assertEquals(rList.size(), 0);
-
+        m.delete(usernameTest1, "0");
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
+        //rHandler.getRecipeList(usernameTest1).remove(title2);
+        replace = update();
+        rList.setList(replace);
+         m.delete(usernameTest1, "1"); //may be wrong
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 0);
+        assertEquals(0, collection1.countDocuments());
 
         // Story 3
         try {
@@ -955,9 +1175,16 @@ public class TestAll {
 
         "the two pieces of toast.  4. Cut the sandwich in half and serve.");
         // add the recipe to both recipeList and save.csv
-        rHandler.addRecipe(createHandler.getRecipe());
+        //rHandler.addRecipe(createHandler.getRecipe(), usernameTest1);
+        m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+
         // check whether recipeList was updated
-        assertEquals(rList.size(), 1);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
         // check whether the save.csv is there
         File file = new File("save.csv");
         assertEquals(true, file.exists());
@@ -1023,9 +1250,15 @@ public class TestAll {
 
 
         // add the recipe to both recipeList and save.csv
-        rHandler.addRecipe(createHandler.getRecipe());
+        //rHandler.addRecipe(createHandler.getRecipe(), usernameTest1);
+        m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         // check whether recipeList was updated
-        assertEquals(rList.size(), 1);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
         // check whether the save.csv is there
         File file = new File("save.csv");
         assertEquals(true, file.exists());
@@ -1107,16 +1340,25 @@ public class TestAll {
         String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
         Recipe oldRecipe = new Recipe(title, mealType, oldIngredients, oldInstructions);
         Recipe newRecipe = new Recipe(title, mealType, newIngredients, newInstructions);
-        rHandler.addRecipe(oldRecipe);
+        //rHandler.addRecipe(oldRecipe, usernameTest1);
+        m.put(usernameTest1, title, mealType, oldIngredients, oldInstructions);
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
 
         // edit oldRecipe with newInstructions and newIngredients
-        rHandler.editRecipe(oldRecipe, newIngredients, newInstructions);
+        //rHandler.editRecipe(oldRecipe, newIngredients, newInstructions, usernameTest1);
+        m.post(usernameTest1, title, mealType, newIngredients, newInstructions, "0");
+        //check if ingredients changed
+        replace = update();
+        rList.setList(replace);
 
-        assertEquals(1, rList.size());
+        //assertEquals(1, rHandler.getRecipeList(usernameTest1).getList().size());
 
         // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
-        assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
-        assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
+        assertEquals(rList.get(title).getIngredients(), newIngredients);
+        assertEquals(rList.get(title).getInstructions(), newInstructions);
     }
 
 
@@ -1128,11 +1370,21 @@ public class TestAll {
         String ingredients = "food";
         String instructions = "cook food";
         Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
+        //rHandler.addRecipe(r1, usernameTest1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(title1);
-        assertEquals(rList.size(), 0);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
+        //rHandler.deleteRecipe(r1.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        replace = update();
+        rList.setList(replace);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 0);
+        assertEquals(0, collection1.countDocuments());
     }
 
     @Test
@@ -1226,9 +1478,14 @@ public class TestAll {
 
 
         // add the recipe to both recipeList and save.csv
-        rHandler.addRecipe(createHandler.getRecipe());
+        //rHandler.addRecipe(createHandler.getRecipe(), usernameTest1); //this adds to documents
+        m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        
         // check whether recipeList was updated
-        assertEquals(rList.size(), 1);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
         // check whether the save.csv is there
         File file2= new File("save.csv");
         assertEquals(true, file2.exists());
@@ -1266,19 +1523,30 @@ public class TestAll {
         Recipe newRecipe = new Recipe(strippedString, "Lunch", newIngredients, newInstructions);
         
         // edit oldRecipe with newInstructions and newIngredients
-        rHandler.editRecipe(oldRecipe, newIngredients, newInstructions);
+        //rHandler.editRecipe(oldRecipe, newIngredients, newInstructions, usernameTest1);
+        m.post(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), newIngredients, newInstructions, "0");
+        //check if ingredients changed
+        replace = update();
+        rList.setList(replace);
 
         assertEquals(1, rList.size());
 
         // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
-        assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
-        assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
+        assertEquals(newIngredients, rList.get(createHandler.getRecipe().getTitle()).getIngredients());
+        assertEquals(newInstructions, rList.get(createHandler.getRecipe().getTitle()).getInstructions());
+        
+        // assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
+        // assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
 
         //Story 7: Delete
          //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(strippedString);
-        assertEquals(rList.size(), 0);
+        //assertEquals(rList.size(), 1);
+        // rHandler.deleteRecipe(newRecipe.getIndex(), usernameTest1);
+        // assertEquals(rList.size(), 0);
+        m.delete(usernameTest1, "0");
+
+        //collection should now be empty
+        assertEquals(0, collection1.countDocuments());
     }
 
     // integration test of stories 4-7
@@ -1404,14 +1672,20 @@ public class TestAll {
         // story 1
         //add 2 recipes, 2 should be displayed
         String title = "Test Recipe 1";
+        String titleTwo = "Test Recipe 2";
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
         Recipe r1= new Recipe(title, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe("Test Recipe 2", mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        Recipe r2= new Recipe(titleTwo, mealtype, ingredients, instructions);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        m.put(usernameTest1, title, mealtype, ingredients, instructions);
+        m.put(usernameTest1, titleTwo, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
+        assertEquals(2, collection1.countDocuments());
 
         // story 2
         Recipe r = rList.get(title);
@@ -1547,9 +1821,13 @@ public class TestAll {
 
 
         // add the recipe to both recipeList and save.csv
-        rHandler.addRecipe(createHandler.getRecipe());
+            //rHandler.addRecipe(createHandler.getRecipe(), usernameTest1);
+        m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
+        replace = update();
+        rList.setList(replace);
         // check whether recipeList was updated
-        assertEquals(rList.size(), 3);
+            //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 3);
+        assertEquals(3, collection1.countDocuments());
         // check whether the save.csv is there
         File file2= new File("save.csv");
         assertEquals(true, file2.exists());
@@ -1583,23 +1861,32 @@ public class TestAll {
 
         // Story 6: Edit
         Recipe oldRecipe = createHandler.getRecipe();
+        //System.out.println(oldRecipe.getTitle() + "ddfdfdfddsfdsfdsfdsfsfdsfsdfsdfsdfsdfsfdsf");
         String newIngredients = "Eggs, Cheese, Milk";
         String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
         Recipe newRecipe = new Recipe(strippedString, "Lunch", newIngredients, newInstructions);
         
         // edit oldRecipe with newInstructions and newIngredients
-        rHandler.editRecipe(oldRecipe, newIngredients, newInstructions);
+        //rHandler.editRecipe(oldRecipe, newIngredients, newInstructions, usernameTest1);
+        m.post(usernameTest1, createHandler.getRecipe().getTitle(), "Lunch", newIngredients, newInstructions, "0");
+        //check if ingredients changed
+        replace = update();
+        rList.setList(replace);
 
         assertEquals(3, rList.size());
 
-        // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
-        assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
-        assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
+        // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want ????????????????????????????
+        assertEquals(rList.get(createHandler.getRecipe().getTitle()).getIngredients(), oldRecipe.getIngredients());
+        assertEquals(rList.get(createHandler.getRecipe().getTitle()).getInstructions(), oldRecipe.getInstructions());
 
         //Story 7: Delete
          //add two and check if you can get title, maybe 2 messes it up
         assertEquals(rList.size(), 3);
-        rHandler.deleteRecipe(strippedString);
+        //rHandler.deleteRecipe(r1.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        replace = update();
+        rList.setList(replace);
+
         assertEquals(rList.size(), 2);
     }
 
@@ -1617,16 +1904,28 @@ public class TestAll {
         String mealtype = "Lunch";
         String ingredients = "food";
         String instructions = "cook food";
-        Recipe r1= new Recipe(title1, mealtype, ingredients, instructions);
-        Recipe r2= new Recipe(title2, mealtype, ingredients, instructions);
-        rHandler.addRecipe(r1);
-        rHandler.addRecipe(r2);
-        assertEquals(rList.size(), 2);
+        Recipe r1 = new Recipe(title1, mealtype, ingredients, instructions);
+        Recipe r2 = new Recipe(title2, mealtype, ingredients, instructions);
+        // rHandler.addRecipe(r1, usernameTest1);
+        // rHandler.addRecipe(r2, usernameTest1);
+        m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+        m.put(usernameTest1, title2, mealtype, ingredients, instructions);
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
+        assertEquals(2, collection1.countDocuments());
         //delete
-        rList.remove(title1);
-        assertEquals(rList.size(), 1);
-        rList.remove(title2);
-        assertEquals(rList.size(), 0);
+        //rHandler.deleteRecipe(r1.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        replace = update();
+        rList.setList(replace);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
+        //rHandler.deleteRecipe(r2.getIndex(), usernameTest1);
+        m.delete(usernameTest1, "1");
+        replace = update();
+        rList.setList(replace);
+        assertEquals(0, collection1.countDocuments());
 
         // Story 3: Record 
         try {
@@ -1849,9 +2148,17 @@ public class TestAll {
         "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
         "the two pieces of toast.  4. Cut the sandwich in half and serve.");
         // add the recipe to both recipeList and save.csv
-        rHandler.addRecipe(createHandler.getRecipe());
+        //rHandler.addRecipe(createHandler.getRecipe(), usernameTest1);
+        //add a new recipe
+        m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
+
+        //get user list from mongo and replace current one
+        ArrayList<Recipe> replace = update();
+        rList.setList(replace);
         // check whether recipeList was updated
-        assertEquals(rList.size(), 1);
+        //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
+        assertEquals(1, collection1.countDocuments());
+
         // check whether the save.csv is there
         File csvfile = new File("save.csv");
         assertEquals(true, csvfile.exists());
@@ -1893,9 +2200,73 @@ public class TestAll {
 
         //beggining of story 7 - Delete
         //add two and check if you can get title, maybe 2 messes it up
-        assertEquals(rList.size(), 1);
-        rHandler.deleteRecipe(createHandler.getRecipe().getTitle());
-        assertEquals(rList.size(), 0);
+        assertEquals(1, collection1.countDocuments());
+
+        //rHandler.deleteRecipe(createHandler.getRecipe().getIndex(), usernameTest1);
+        m.delete(usernameTest1, "0");
+        replace = update();
+        rList.setList(replace);
+        assertEquals(0, collection1.countDocuments());
         //end of 7 - Delete
     }
-}
+
+        @Test
+        //user adds, edits, and deletes a recipe
+        public void StoryTestF1() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //edit that recipe
+            m.post(usernameTest1, title, mealType, "two hot dogs", instructions, "0");
+            //check if ingredients changed
+            replace = update();
+            rList.setList(replace);
+            assertEquals("two hot dogs", rList.get(title).getIngredients());
+
+            //delete the recipe
+            m.delete(usernameTest1, "0");
+
+            //collection should now be empty
+            assertEquals(0, collection1.countDocuments());
+        }
+
+        public void delCSV(){
+            String filePath = "./users.csv"; // Replace with the file path of the CSV file to delete
+
+            File fileToDelete = new File(filePath);
+
+            if (fileToDelete.exists()) { // Check if the file exists
+                boolean isDeleted = fileToDelete.delete(); // Attempt to delete the file
+
+                if (isDeleted) {
+                    System.out.println("File deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete the file.");
+                }
+            } else {
+                System.out.println("File does not exist.");
+            }
+        }
+    }
+

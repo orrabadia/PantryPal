@@ -17,6 +17,8 @@ class NavigationHandler{
     public static final String RECORD_MEALTYPE = "RecordMealType";
     public static final String RECORD_INGREDIENTS = "RecordIngredients";
     public static final String GPT_RESULTS = "GptResults";
+    //scene for user sign in and login
+    public static final String USER_S_L = "UserSL";
     private Stage primaryStage;
     private HashMap<String, Scene> pageList;
     NavigationHandler(){
@@ -44,6 +46,7 @@ class NavigationHandler{
 
         try {
             pageList.put("RecipeList", RecipeList);
+        
             // Set the title of the Recipe Page
             primaryStage.setTitle("PantryPal");
             primaryStage.setScene(RecipeList);
@@ -51,6 +54,7 @@ class NavigationHandler{
             throw e;
         }
     }
+
 
     /**
      * takes a recipe, link this with new recipe button
@@ -74,8 +78,24 @@ class NavigationHandler{
         primaryStage.setScene(s);
     }
 
+     void showUserLogin(UserAccDisplay u){
+        //show gpt results page
+        Scene s = new Scene(u, 500, 600);
+        pageList.put(USER_S_L, s);
+        primaryStage.setScene(s);
+    }
+
     void menu(){
         Scene f = pageList.get(RECIPE_LIST);
+        if(f != null){
+            primaryStage.setScene(f);
+        } else {
+            throw new RuntimeErrorException(null);
+        }
+    }
+
+    void userSL(){
+        Scene f = pageList.get(USER_S_L);
         if(f != null){
             primaryStage.setScene(f);
         } else {
