@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
@@ -713,6 +714,7 @@ class UserAccDisplay extends BorderPane {
     private UserAccFooter footer;
     private Button logInButton;
     private Button signUpButton;
+    private CheckBox rememberMe;
     private Label inputAlert;
     
     
@@ -747,7 +749,19 @@ class UserAccDisplay extends BorderPane {
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
+        ArrayList<String> details = AutoLogin.load();
+        //if csv exists, fill it in with last info when remember me was checked
+        if(!details.isEmpty()){
+            String u = details.get(0);
+            String p = details.get(1);
+            user.setText(u);
+            pass.setText(p);
+        }
+
         centerBox.getChildren().addAll(user, pass);
+
+        rememberMe = new CheckBox("Remember Me");
+        centerBox.getChildren().add(rememberMe);
 
         // Set the VBox in the center of the BorderPane
         this.setCenter(centerBox);
@@ -769,6 +783,7 @@ class UserAccDisplay extends BorderPane {
     public UserHandler getUHandler(){
         return this.uHandler;
     }
+
 
     public void addListeners(){
 
@@ -803,6 +818,14 @@ class UserAccDisplay extends BorderPane {
             inputAlert.setText("Incorrect Pass");
             inputAlert.setVisible(true);
         }
+
+        boolean remembered = rememberMe.isSelected();
+        if(remembered){
+            System.out.println("REMEMBER ME");
+            AutoLogin.save(username,password);
+        } else {
+            System.out.println("DONT REMEMBER");
+        }
         
 
 
@@ -828,6 +851,12 @@ class UserAccDisplay extends BorderPane {
             inputAlert.setVisible(true);
             return;
             
+        } else if(username.contains(",") || password.contains(",")){
+            ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
+            ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
+            inputAlert.setText("Commas are invalid characters");
+            inputAlert.setVisible(true);
+            return;
         }
         //need to check if it is not a username already
         /*String ret;

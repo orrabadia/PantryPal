@@ -2268,5 +2268,23 @@ public class TestAll {
                 System.out.println("File does not exist.");
             }
         }
+
+        //Feature 1, automatic login
+        @Test
+        //user remembers password, loads in again later
+        public void StoryTestF2() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the actual csv methods that are being called
+
+            ArrayList<String> details = AutoLogin.load();
+            //this should be empty as there is no csv
+            AutoLogin.save(usernameTest1, passwordTest1);
+            //load checks if there is a csv, and also reads from it, so load should work
+            details = AutoLogin.load();
+            assertEquals(usernameTest1, details.get(0));
+            assertEquals(passwordTest1, details.get(1));
+            //clear csv
+            delCSV();
+        }
     }
 
