@@ -47,7 +47,7 @@ public class UserRequestListener implements HttpHandler {
 
     
 
-
+    //** return password */
     private String handleGet(HttpExchange httpExchange) throws IOException {
       // Converting the JSON array to a string
       //note that this has to be a single string with no newlines before you send it back

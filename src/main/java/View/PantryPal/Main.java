@@ -1069,15 +1069,33 @@ public class Main extends Application {
         //moved to sign in/login on action
         //handler.initialize(recipeList);
 
-        UserAccDisplay userslDisplay = new UserAccDisplay(handler);
-        //AppFrame root = new AppFrame(handler, userslDisplay.getUHandler());
-        //root.setUHandler(userslDisplay.getUHandler());
-        handler.showUserLogin(userslDisplay);
+        //if reachable, do regular app, if not show error
+        boolean server = ServerPing.ping();
+        if(server){
+            UserAccDisplay userslDisplay = new UserAccDisplay(handler);
+            //AppFrame root = new AppFrame(handler, userslDisplay.getUHandler());
+            //root.setUHandler(userslDisplay.getUHandler());
+            handler.showUserLogin(userslDisplay);
 
-        // Make window non-resizable
-        primaryStage.setResizable(false);
-        // Show the app
-        primaryStage.show();
+            // Make window non-resizable
+            primaryStage.setResizable(false);
+            // Show the app
+            primaryStage.show();
+        } else {
+            Label statusLabel = new Label();
+            //show red bold text where servers unreachable
+            statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            statusLabel.setText("Server is unreachable, please try again later :(");
+    
+            VBox root = new VBox(20);
+            root.getChildren().add(statusLabel);
+    
+            Scene scene = new Scene(root, 300, 50);
+            primaryStage.setTitle("Server Status");
+            primaryStage.setScene(scene);
+    
+            primaryStage.show();
+        }  
     }
 
     public static void main(String[] args) {
