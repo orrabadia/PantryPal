@@ -90,8 +90,10 @@ public class TestAll {
 
         gptHandler = new GPTHandler(true);
 
+        String uri = System.getenv("MONGODB_CONNECTION_STRING");
+
         //insert your uri
-        clientMongoDB = MongoClients.create( "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority");
+        clientMongoDB = MongoClients.create(uri);
         
         database = clientMongoDB.getDatabase("PantryPal");
 
@@ -120,8 +122,15 @@ public class TestAll {
      }
 
     public void deleteRecording() {
-        String fileName = "recording.wav";
+        String fileName = "src/main/java/Model/PantryPal/recording.wav";
         File file = new File(fileName);
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        fileName = "src/main/java/View/PantryPal/recording.wav";
+        file = new File(fileName);
 
         if (file.exists()) {
             file.delete();
@@ -452,7 +461,7 @@ public class TestAll {
         assertEquals(r.getInstructions(), "cook food");
     }
 
-    // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
+    // Story 3, test that when you press the Record button (and press stop record), src/main/java/Model/PantryPal/recording.wav is made
     @Test
     public void unitTestS3Record() {
         try {
@@ -462,16 +471,16 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
     }
 
-    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // Story 3, test that the "functionality" of getting src/main/java/Model/PantryPal/recording.wav and processing
 
     // it in Whisper and see whether it's text matches what it should be
     @Test
     public void unitTestS3Whisper() {
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/View/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -503,7 +512,7 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
         try {
             assertEquals( "Dinner", whisperHandler.transcribe());
@@ -535,9 +544,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -596,7 +608,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -609,7 +621,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -674,9 +688,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -768,7 +785,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -781,7 +798,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -867,9 +886,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -917,7 +939,7 @@ public class TestAll {
     }
 
 
-    // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
+    // Story 4, test that when you press the Record button (and press stop record), src/main/java/Model/PantryPal/recording.wav is made
     @Test
     public void unitTestS4Record() {
         try {
@@ -927,15 +949,15 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
     }
 
-    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // Story 3, test that the "functionality" of getting src/main/java/Model/PantryPal/recording.wav and processing
     // it in Whisper and see whether it's text matches what it should be
     @Test
     public void unitTestS4Whisper() {
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -967,7 +989,7 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/Model/PantryPal/recording.wav");
         assertEquals(true, file.exists());
         String transcription = "";
         try {
@@ -1004,9 +1026,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1065,7 +1090,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1078,7 +1103,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1403,9 +1430,9 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/Model/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1564,7 +1591,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1577,7 +1604,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1703,7 +1732,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1716,7 +1745,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1935,9 +1966,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1992,7 +2026,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        file = new File("recording.wav");
+        file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -2005,7 +2039,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
         try {
             AudioSystem.write(
@@ -2079,20 +2115,12 @@ public class TestAll {
         catch (IOException e1) {
             e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        //end of 3
 
-        //begin of test 4 - Ingredients
-        try {
-                recordHandler.record();
-            }
-        catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-        }
-        assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -2124,6 +2152,44 @@ public class TestAll {
             System.err.println("IOException");
         }
         String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
+
+        //end of 3
+
+        //begin of test 4 - Ingredients
+        try {
+                recordHandler.record();
+            }
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        assertEquals(true, file.exists());
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        transcription = "";
         try {
             transcription = whisperHandler.transcribe();
         }
