@@ -67,8 +67,8 @@ class UIRecipe extends HBox { // extend HBox
         //this.getChildren().add(title);
 
         HBox hbox = new HBox();
+        hbox.getChildren().add(mealType);
         hbox.getChildren().add(title);
-
         //TODO: fix THE SPACING AND PUT IT AT THE RIGHT IDK HOW TO DO IT
 
         //add display recipe button
@@ -176,12 +176,17 @@ class UIRecipeList extends VBox { // extends HBox?
 
         //get sortorder from appframe
         int sortorder;
+        //get filterType from appframe 
+        String filterType;
          try {
             AppFrame a = (AppFrame)nHandler.getMap().get("RecipeList").getRoot();
             sortorder = a.getSortOrder();
+            filterType = a.getFilterType();
+
         } catch (NullPointerException e) {
             // if you get nullpointer, this means it hasn't been initialized yet(first call), set to 0
             sortorder = 0;
+            filterType = "All";
         }
 
         //takes behavior based on what style of sort you want to use-default is revchron
@@ -238,11 +243,34 @@ class UIRecipeList extends VBox { // extends HBox?
             int index = r.getIndex();
             String title = r.getTitle();
             String mealType = r.getMealType();
+            //temp fix for comparing mealtypes 
+            //String mealTypeLowerCase = mealType.toLowerCase();  //temp fix for comparing mealtypes 
             String ingredients = r.getIngredients();
             String instructions = r.getInstructions();
             UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-            this.getChildren().add(uiR);
-            this.updateRecipeIndices();
+
+            if(filterType.equals( "All")) {
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+                System.out.println(mealType);
+            }
+            else if(filterType.equals("Breakfast") && mealType.contains("Breakfast")) {
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+                System.out.println("Breakfast only");
+            }
+            else if(filterType.equals("Lunch") && mealType.contains("Lunch")) {
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+                System.out.println("Lunch only");
+            }
+            else if(filterType.equals("Dinner") && mealType.contains("Dinner")) {
+                this.getChildren().add(uiR);
+                this.updateRecipeIndices();
+                System.out.println("Dinner only");
+            }
+            //this.getChildren().add(uiR);
+            //this.updateRecipeIndices();
         }
     }
 
@@ -265,6 +293,7 @@ class ListFooter extends HBox {
     private Button newRecipeButton;
     private Button logOutButton;
     private ComboBox<String> sortBox;
+    private ComboBox<String> filterBox;
     ListFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -284,7 +313,12 @@ class ListFooter extends HBox {
         //default value
         sortBox.setValue("Newest to Oldest");
 
-        this.getChildren().addAll(logOutButton, newRecipeButton, sortBox);
+        //dropdown for filter
+        filterBox = new ComboBox<>();
+        filterBox.getItems().addAll("All", "Breakfast", "Lunch", "Dinner");
+        filterBox.setValue("All");
+
+        this.getChildren().addAll(logOutButton, newRecipeButton, sortBox, filterBox);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -298,6 +332,10 @@ class ListFooter extends HBox {
 
     public ComboBox<String> getSortBox(){
         return this.sortBox;
+    }
+
+    public ComboBox<String> getFilterBox() {
+        return this.filterBox;
     }
 }
 
@@ -430,8 +468,12 @@ class AppFrame extends BorderPane {
     //private String defaultTextFieldStyle;
     private int sortOrder;
     private ComboBox<String> sortBox;
+    
+    private String filterType;
+    private ComboBox<String> filterBox;
 
     AppFrame(NavigationHandler handler, UserHandler uHandler) {
+        this.filterType = "All";
         this.sortOrder = 0;
         this.nHandler = handler;
         // Initialise the header Object
@@ -464,6 +506,7 @@ class AppFrame extends BorderPane {
         newRecipeButton = footer.getNewRecipeButton();
         logOutButton = footer.getLogOutButton();
         sortBox = footer.getSortBox();
+        filterBox = footer.getFilterBox();
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -479,6 +522,9 @@ class AppFrame extends BorderPane {
     });
 
     logOutButton.setOnAction(e1 ->{
+        //reset filter to default 
+        this.filterType = "All";
+
         //reset sort order and button
         this.sortOrder = 0;
         sortBox.setValue("Newest to Oldest");
@@ -501,6 +547,28 @@ class AppFrame extends BorderPane {
             System.out.println("SORTORDER IS " +sortOrder);
         } else {
             System.out.println("Unimplemented sorting method");
+        }
+        recipeList.updateList(nHandler);
+    });
+
+    filterBox.setOnAction(e3-> {
+        String filter = filterBox.getValue();
+        if(filter.equals("All")) {
+            this.filterType = "All";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Breakfast")) {
+            this.filterType = "Breakfast";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Lunch")) {
+            this.filterType = "Lunch";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Dinner")) {
+            this.filterType = "Dinner";
+            System.out.println("FILTER TYPE IS " + filterType);
+
         }
         recipeList.updateList(nHandler);
     });
@@ -541,6 +609,14 @@ class AppFrame extends BorderPane {
 
     public int getSortOrder(){
         return this.sortOrder;
+    }
+
+    public void setFilterType(String fil) {
+        this.filterType = fil;
+    }
+
+    public String getFilterType() {
+        return this.filterType;
     }
 
 }
@@ -766,9 +842,15 @@ class RecordAppFrame extends FlowPane {
                 String trans2 = transcription.toLowerCase();
                 System.out.println(trans2);
                 //sometimes it adds periods and its weird delete those
-                trans2 = trans2.replace(".", "");
+                trans2 = trans2.replaceAll("\\.", "");
+                System.out.println(trans2);
 
                 if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
+                    //createHandler.getRecipe().setMealType(transcription);
+                    //deletes all periods from transcriptions
+                    transcription = transcription.replaceAll("\\.", ""); 
+                    //Transcriptions first letter capatilized and rest lowercase to remain consistent in UI
+                    transcription = transcription.substring(0,1).toUpperCase() + transcription.substring(1).toLowerCase();
                     createHandler.getRecipe().setMealType(transcription);
                     l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
@@ -788,7 +870,7 @@ class RecordAppFrame extends FlowPane {
             else {
                 transcription = reqHandler.performAudioRequest("PUT");
                 //sometimes it adds periods and its weird delete those
-                transcription = transcription.replace(".", "");
+                transcription = transcription.replaceAll("\\.", "");
                 createHandler.getRecipe().setIngredients(transcription);
                 l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
 
