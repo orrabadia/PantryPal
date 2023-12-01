@@ -765,6 +765,8 @@ class RecordAppFrame extends FlowPane {
                 //new line
                 String trans2 = transcription.toLowerCase();
                 System.out.println(trans2);
+                //sometimes it adds periods and its weird delete those
+                trans2 = trans2.replace(".", "");
 
                 if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
                     createHandler.getRecipe().setMealType(transcription);
@@ -785,6 +787,8 @@ class RecordAppFrame extends FlowPane {
             }
             else {
                 transcription = reqHandler.performAudioRequest("PUT");
+                //sometimes it adds periods and its weird delete those
+                transcription = transcription.replace(".", "");
                 createHandler.getRecipe().setIngredients(transcription);
                 l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
 
