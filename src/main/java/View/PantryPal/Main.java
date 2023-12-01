@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
@@ -147,7 +148,7 @@ class UIRecipeList extends VBox { // extends HBox?
         //this.rList.setList(rHandler.getRecipeList());
         this.rHandler = rHandler;
         this.nHandler = nHandler;
-        this.updateList(nHandler,0);
+        this.updateList(nHandler);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
         this.setPrefSize(500, 560);
@@ -171,7 +172,17 @@ class UIRecipeList extends VBox { // extends HBox?
      * takes behavior based on what style of sort you want to use-default is newest first(0)
      * later add more to have different sorting orders
      */
-    public void updateList(NavigationHandler nHandler, int sortorder){
+    public void updateList(NavigationHandler nHandler){
+
+        //get sortorder from appframe
+        int sortorder;
+         try {
+            AppFrame a = (AppFrame)nHandler.getMap().get("RecipeList").getRoot();
+            sortorder = a.getSortOrder();
+        } catch (NullPointerException e) {
+            // if you get nullpointer, this means it hasn't been initialized yet(first call), set to 0
+            sortorder = 0;
+        }
 
         //takes behavior based on what style of sort you want to use-default is revchron
         this.getChildren().clear();
@@ -187,24 +198,51 @@ class UIRecipeList extends VBox { // extends HBox?
                 return Integer.compare(r2.getIndex(), r1.getIndex());
             }
         }
+        class chronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r1.getIndex(), r2.getIndex());
+            }
+        }
+        class alphaComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return r1.getTitle().compareTo(r2.getTitle());
+            }
+        }
+        class revAlphaComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return r2.getTitle().compareTo(r1.getTitle());
+            }
+        }
+
         if(sortorder == 0){
             //sort backwards if order 0
             revchronComparator comp = new revchronComparator();
             Collections.sort(list, comp);
+        } else if (sortorder == 1){
+            //1 is oldest to newest
+            chronComparator comp = new chronComparator();
+            Collections.sort(list, comp);
+        } else if (sortorder == 2){
+            //2 is alphabetical
+            alphaComparator comp = new alphaComparator();
+            Collections.sort(list,comp);
+        } else if (sortorder == 3){
+            //3 is reverse alphabetical
+            revAlphaComparator comp = new revAlphaComparator();
+            Collections.sort(list,comp);
         }
         for(Recipe r : list){
-            if(sortorder == 0){
-                int index = r.getIndex();
-                String title = r.getTitle();
-                String mealType = r.getMealType();
-                String ingredients = r.getIngredients();
-                String instructions = r.getInstructions();
-                UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-                this.getChildren().add(uiR);
-                this.updateRecipeIndices();
-            } else {
-                System.out.println("unimplemented sort method");
-            }
+            int index = r.getIndex();
+            String title = r.getTitle();
+            String mealType = r.getMealType();
+            String ingredients = r.getIngredients();
+            String instructions = r.getInstructions();
+            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+            this.getChildren().add(uiR);
+            this.updateRecipeIndices();
         }
     }
 
@@ -226,6 +264,7 @@ class UIRecipeList extends VBox { // extends HBox?
 class ListFooter extends HBox {
     private Button newRecipeButton;
     private Button logOutButton;
+    private ComboBox<String> sortBox;
     ListFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -239,7 +278,13 @@ class ListFooter extends HBox {
         newRecipeButton.setStyle(defaultButtonStyle);
         logOutButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(logOutButton, newRecipeButton);
+        //dropdown for sort
+        sortBox = new ComboBox<>();
+        sortBox.getItems().addAll("Newest to Oldest", "Oldest to Newest", "Alphabetical", "Reverse Alphabetical");
+        //default value
+        sortBox.setValue("Newest to Oldest");
+
+        this.getChildren().addAll(logOutButton, newRecipeButton, sortBox);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -249,6 +294,10 @@ class ListFooter extends HBox {
 
     public Button getLogOutButton() {
         return logOutButton;
+    }
+
+    public ComboBox<String> getSortBox(){
+        return this.sortBox;
     }
 }
 
@@ -379,8 +428,11 @@ class AppFrame extends BorderPane {
     private RecipeList list;
     private RecipeHandler rHandler;
     //private String defaultTextFieldStyle;
+    private int sortOrder;
+    private ComboBox<String> sortBox;
 
     AppFrame(NavigationHandler handler, UserHandler uHandler) {
+        this.sortOrder = 0;
         this.nHandler = handler;
         // Initialise the header Object
         header = new Header("Recipe List");
@@ -411,6 +463,7 @@ class AppFrame extends BorderPane {
         // Initialise Button Variables through the getters in Footer
         newRecipeButton = footer.getNewRecipeButton();
         logOutButton = footer.getLogOutButton();
+        sortBox = footer.getSortBox();
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -426,7 +479,30 @@ class AppFrame extends BorderPane {
     });
 
     logOutButton.setOnAction(e1 ->{
+        //reset sort order and button
+        this.sortOrder = 0;
+        sortBox.setValue("Newest to Oldest");
         nHandler.userSL();
+    });
+
+    sortBox.setOnAction(e2->{
+        String check = sortBox.getValue();
+        if(check.equals("Newest to Oldest")){
+            this.sortOrder = 0;
+            System.out.println("SORTORDER IS " +sortOrder);
+        } else if (check.equals("Oldest to Newest")){
+            this.sortOrder = 1;
+            System.out.println("SORTORDER IS " +sortOrder);
+        } else if (check.equals("Alphabetical")){
+            this.sortOrder = 2;
+            System.out.println("SORTORDER IS " +sortOrder);
+        } else if (check.equals("Reverse Alphabetical")){
+            this.sortOrder = 3;
+            System.out.println("SORTORDER IS " +sortOrder);
+        } else {
+            System.out.println("Unimplemented sorting method");
+        }
+        recipeList.updateList(nHandler);
     });
     
     }
@@ -457,6 +533,14 @@ class AppFrame extends BorderPane {
 
     public void setUHandler(UserHandler uHandler) {
         this.uHandler = uHandler;
+    }
+
+    public void setSortOrder(int set){
+        this.sortOrder = set;
+    }
+
+    public int getSortOrder(){
+        return this.sortOrder;
     }
 
 }
@@ -542,7 +626,7 @@ class GPTResultsDisplay extends BorderPane{
             //addrecipe above updates the recipehandler list
             UIRecipeList uiList = rlist.getRecipeList();
             //note that this calls get, uilist has the rhandler above
-            uiList.updateList(nHandler, 0);
+            uiList.updateList(nHandler);
             nHandler.menu();
 
         });
@@ -682,7 +766,7 @@ class RecordAppFrame extends FlowPane {
                 String trans2 = transcription.toLowerCase();
                 System.out.println(trans2);
 
-                if(trans2.equals("Breakfast.")|| trans2.equals("Lunch.") || trans2.equals("Dinner.")){
+                if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
                     createHandler.getRecipe().setMealType(transcription);
                     l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
@@ -1060,7 +1144,7 @@ class RecipeDisplay extends BorderPane {
                     ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).getText(),
                     ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).getText(), ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getUserHandler().getUserName());
                     //Updatethe UIList
-                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler, 0);
+                    ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeList().updateList(this.handler);
                     //Revert button text back
                     this.footer.getEditButton().setText("Edit");
                     this.footer.getBackButton().setText("Back");
@@ -1077,7 +1161,7 @@ class RecipeDisplay extends BorderPane {
             .getUserName()).get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
             //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
             mainAppFrame.getRecipeHandler().deleteRecipe(indexValue, mainAppFrame.getUserHandler().getUserName());
-            mainAppFrame.getRecipeList().updateList(handler, 0);
+            mainAppFrame.getRecipeList().updateList(handler);
 
             //then call update UI recipe
             handler.menu();
