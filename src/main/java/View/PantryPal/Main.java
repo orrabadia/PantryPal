@@ -305,6 +305,7 @@ class DisplayFooter extends HBox {
     private Button editButton;
     private Button backButton;
     private Button deleteButton;
+    private Button shareButton;
     DisplayFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -316,6 +317,7 @@ class DisplayFooter extends HBox {
         editButton = new Button("Edit");
         backButton = new Button("Back");
         deleteButton = new Button("Delete");
+        shareButton = new Button("Share");
         editButton.setStyle(defaultButtonStyle);
         backButton.setStyle(defaultButtonStyle);
         deleteButton.setStyle(defaultButtonStyle);
