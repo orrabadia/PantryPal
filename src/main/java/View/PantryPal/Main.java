@@ -321,9 +321,11 @@ class DisplayFooter extends HBox {
         editButton.setStyle(defaultButtonStyle);
         backButton.setStyle(defaultButtonStyle);
         deleteButton.setStyle(defaultButtonStyle);
+        shareButton.setStyle(defaultButtonStyle);
         this.getChildren().add(editButton);
         this.getChildren().add(backButton);
         this.getChildren().add(deleteButton);
+        this.getChildren().add(shareButton);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -337,6 +339,11 @@ class DisplayFooter extends HBox {
     public Button getDeleteButton(){ 
         return deleteButton;
     }
+
+    public Button getShareButton(){
+        return shareButton;
+    }
+
 }
 
 class GPTFooter extends HBox {
@@ -802,6 +809,7 @@ class RecordAppFrame extends FlowPane {
                     String ingredients = r.getIngredients();
                     System.out.println("ingredients " + ingredients);
                     String recipe = reqHandler.performGenerateRequest("PUT", mealtype, ingredients);
+                    System.out.println("recipe = " + recipe);
                     String title = recipe.substring(0,recipe.indexOf("~"));
                     //take out the newlines and returns for formatting
                     String strippedString = title.replaceAll("[\\n\\r]+", "");
@@ -1038,10 +1046,19 @@ class RecipeDisplay extends BorderPane {
         // Create two scrollable boxes with text
         ScrollPane scrollPane1 = createScrollableBox("Ingredients: ");
         ScrollPane scrollPane2 = createScrollableBox("Instructions: ");
+        // AppFrame mainAppFrame = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot());
+        // String username = mainAppFrame.getUserHandler().getUserName();
+        // int index = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).get(r.getTitle().getText()).getIndex();;
+        // String shareUrl = "http://localhost:8100/share/" + username + "/" + index;
+        TextField shareLink = new TextField();
+        // shareLink.setText(shareUrl);
+        shareLink.setVisible(false);
+        shareLink.setEditable(false);
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
-        centerBox.getChildren().addAll(scrollPane1, scrollPane2);
+        //centerBox.getChildren().addAll(scrollPane1, scrollPane2);
+        centerBox.getChildren().addAll(scrollPane1, scrollPane2, shareLink);
 
         // Set the VBox in the center of the BorderPane
         this.setCenter(centerBox);
@@ -1066,6 +1083,7 @@ class RecipeDisplay extends BorderPane {
         header.setTitle(s);
     }
 
+
     public void setIngredients(String s){
         //called when displaying from handler, handler has blank one by default
         VBox v = (VBox) this.getCenter();
@@ -1085,12 +1103,24 @@ class RecipeDisplay extends BorderPane {
 
     }
 
+    public void setShare(String s){
+        VBox v = (VBox)this.getCenter();
+        TextField share = ((TextField)((VBox)this.getCenter()).getChildren().get(2));
+        share.setText(s);
+    }
+
+    
+
     public void addListeners()
     {
 
         Button backButton = footer.getBackButton();
         backButton.setOnAction(e ->{
             if (this.footer.getBackButton().getText() == "Back"){
+                // here we'll make our shareButton visible and our shareLink invisible
+                this.footer.getShareButton().setVisible(true);
+                ((TextField)((VBox)this.getCenter()).getChildren().get(2)).setVisible(false);
+                // return back to main menu
                 handler.menu();
             } else {
                 //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
@@ -1104,6 +1134,7 @@ class RecipeDisplay extends BorderPane {
 
 
                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(r.getRecipeInstructions());
+
                 //sets textfields to non-editable
                 ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setEditable(false);
                 ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setEditable(false);
@@ -1174,7 +1205,22 @@ class RecipeDisplay extends BorderPane {
             
         });
 
-        
+        Button shareButton = footer.getShareButton();
+        shareButton.setOnAction(e -> {
+            shareButton.setVisible(false);
+            TextField share = ((TextField)((VBox)this.getCenter()).getChildren().get(2));
+            share.setVisible(true);
+
+            //(((TextField)((VBox)this.getCenter()).getChildren().get(2)).getContent()).setText(shareUrl);
+
+            //((TextArea)((TextField)((VBox)this.getCenter()).getChildren().get(2)).getContent()).setVisible(true);
+
+            
+            // TextField shareLink = new TextField();
+            // shareLink.setText(shareUrl);
+            // shareLink.setEditable(false);
+            // ((VBox)this.getCenter()).getChildren().add(shareLink);
+        });
 
     }
 

@@ -74,6 +74,8 @@ public class ShareRequestListener implements HttpHandler {
               .append("Instructions: ")
               .append(instructions)
               .append("<br>")
+              .append("<img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\">")  // does not work
+              .append("<br>")
               .append("</h1>")
               .append("</body>")
               .append("</html>");
