@@ -2353,6 +2353,20 @@ public class TestAll {
             delCSV();
         }
 
+        // Feature 7, unit test to make sure buildHTML method works
+        @Test
+        public void unitTestF7build() {
+            String title1 = "Test Recipe 1";
+            String mealtype = "Lunch";
+            String ingredients = "food";
+            String instructions = "cook food";
+
+            // the HTML content you see below should match the info from above
+            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            
+            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+        }
+
         // Feature 7, demonstrating that you can see a recipe from a shared link
         @Test
         public void StoryTestF7Share() {
@@ -2367,15 +2381,27 @@ public class TestAll {
             // the user has shared a link to their friend and the friend uses that link to search up the recipe
             // in their browser
             // we'll assume the query is correct and the username and index is extracted out
-            // String username = usernameTest1;
-            // // is 0 because it's the first recipe ever made, also is string because we extract it out
-            // String index = "0";
+            String username = usernameTest1;
+            // is 0 because it's the first recipe ever made, also is string because we extract it out
+            String index = "0";
             
+            // we'll simulate getting the recipe info from the database
             
+            String recipeString = m.getRecipe(username, index);
+            
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
+
             // the HTML content you see below should match the info from above
             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
             
-            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
             
             // String recipeString = m.getRecipe(username, index);
             
@@ -2409,10 +2435,23 @@ public class TestAll {
              // the HTML content you see below should match the info from above
              String username = usernameTest1;
              String index = "0";
+
+             // we'll simulate getting the recipe info from the database
+            
+            String recipeString = m.getRecipe(username, index);
+            
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
             
              HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
             
-            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
             
 
             // now we'll delete the recipe
@@ -2421,7 +2460,7 @@ public class TestAll {
 
             // now we'll see if we can see the recipe if we try the link again (we shouldn't)
             // because we can't get it, that means our code can't create the HTML page and display an error
-            String recipeString = m.getRecipe(username, index);
+            recipeString = m.getRecipe(username, index);
             assertEquals("{}", recipeString);
         }
 
@@ -2442,12 +2481,22 @@ public class TestAll {
             String username = usernameTest1;
             // is 0 because it's the first recipe ever made, also is string because we extract it out
             String index = "0";
+             // we'll simulate getting the recipe info from the database
+            
             String recipeString = m.getRecipe(username, index);
             
-             // the HTML content you see below should match the info from above
-             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
             
-            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+            
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
 
             // now we'll edit the recipe
             // except the title since the user can't edit that
@@ -2456,10 +2505,21 @@ public class TestAll {
             String newInstructions = "smear honey, eat";
             m.post(usernameTest1, title1, newMeal, newIngredients, newInstructions, "0");
             assertEquals(1, collection1.countDocuments());
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+
+            recipeString = m.getRecipe(username, index);
+            recipeJSON = new JSONObject(recipeString);
+            testtitle = recipeJSON.getString("title");
+            testmealType = recipeJSON.getString("mealType");
+            testingredients = recipeJSON.getString("ingredients");
+            testinstructions = recipeJSON.getString("instructions");
             
             // our HTML page should match the correct one
-             HTMLBuilder htmlB2 = new HTMLBuilder(title1, newMeal,newIngredients, newInstructions);
-             assertEquals(htmlB2.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Dinner<br>Ingredients: Honey, Bread<br>Instructions: smear honey, eat<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+             htmlB = new HTMLBuilder(title1, newMeal,newIngredients, newInstructions);
+             htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
         }
 
     }
