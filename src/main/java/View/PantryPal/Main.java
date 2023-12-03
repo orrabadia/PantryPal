@@ -140,6 +140,7 @@ class UIRecipeList extends VBox { // extends HBox?
     //private RecipeList rList;
     private NavigationHandler nHandler;
     private RecipeHandler rHandler;
+    private FilterHandler fHandler;
 
 
     //u handler parameter?
@@ -148,6 +149,7 @@ class UIRecipeList extends VBox { // extends HBox?
         //this.rList.setList(rHandler.getRecipeList());
         this.rHandler = rHandler;
         this.nHandler = nHandler;
+        this.fHandler = fHandler;
         this.updateList(nHandler);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
@@ -239,38 +241,17 @@ class UIRecipeList extends VBox { // extends HBox?
             revAlphaComparator comp = new revAlphaComparator();
             Collections.sort(list,comp);
         }
+
+        list = FilterHandler.filterMealType(list, filterType);
         for(Recipe r : list){
             int index = r.getIndex();
             String title = r.getTitle();
             String mealType = r.getMealType();
-            //temp fix for comparing mealtypes 
-            //String mealTypeLowerCase = mealType.toLowerCase();  //temp fix for comparing mealtypes 
             String ingredients = r.getIngredients();
             String instructions = r.getInstructions();
             UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
-
-            if(filterType.equals( "All")) {
-                this.getChildren().add(uiR);
-                this.updateRecipeIndices();
-                System.out.println(mealType);
-            }
-            else if(filterType.equals("Breakfast") && mealType.contains("Breakfast")) {
-                this.getChildren().add(uiR);
-                this.updateRecipeIndices();
-                System.out.println("Breakfast only");
-            }
-            else if(filterType.equals("Lunch") && mealType.contains("Lunch")) {
-                this.getChildren().add(uiR);
-                this.updateRecipeIndices();
-                System.out.println("Lunch only");
-            }
-            else if(filterType.equals("Dinner") && mealType.contains("Dinner")) {
-                this.getChildren().add(uiR);
-                this.updateRecipeIndices();
-                System.out.println("Dinner only");
-            }
-            //this.getChildren().add(uiR);
-            //this.updateRecipeIndices();
+            this.getChildren().add(uiR);
+            this.updateRecipeIndices();
         }
     }
 
