@@ -31,7 +31,7 @@
             "request": "launch",
             "mainClass": "PantryPal.AudioRecorder",
             "projectName": "cse-110-project-team-18_b5750f85",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -39,7 +39,7 @@
             "request": "launch",
             "mainClass": "main.java.PantryPal.Main",
             "projectName": "cse-110-project-team-18_b5750f85",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -47,7 +47,7 @@
             "request": "launch",
             "mainClass": "main.java.PantryPal.AudioRecorder",
             "projectName": "cse-110-project-team-18_b5750f85",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -55,7 +55,7 @@
             "request": "launch",
             "mainClass": "PantryPal.AudioRecorder",
             "projectName": "cse-110-project-team-18",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -63,7 +63,7 @@
             "request": "launch",
             "mainClass": "AudioRecorder",
             "projectName": "cse-110-project-team-18",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -71,7 +71,7 @@
             "request": "launch",
             "mainClass": "PantryPal.AudioTranscriber",
             "projectName": "cse-110-project-team-18_ea9e9cda",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -79,7 +79,7 @@
             "request": "launch",
             "mainClass": "PantryPal.AudioRecorder",
             "projectName": "cse-110-project-team-18_ea9e9cda",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
@@ -87,14 +87,14 @@
             "request": "launch",
             "mainClass": "PantryPal.Whisper",
             "projectName": "cse-110-project-team-18_ea9e9cda",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules json-20230227"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules json-20230227"
         },
         {
             "type": "java",
             "name": "PantryPal",
             "request": "launch",
             "mainClass": "PantryPal.Main",
-            "vmArgs": "--module-path 'C:\\Users\\Public\\Documents\\CSE110\\javafx-sdk-21.0.1\\lib' --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path '${workspaceFolder}/lib/' --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
