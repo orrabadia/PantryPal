@@ -6,27 +6,20 @@ import java.net.*;
 import java.util.*;
 import org.json.*;
 public class ImageRequestListener implements HttpHandler {
-    private MongoDB mongoDB;
-    private final Map<String, String> data;
+    private DallE d;
   
-    //may need to add more?
+    //TODO: all this has to do is call dalle method and return the url string
 
-    public ImageRequestListener(Map<String, String> data){
-        this.data = data;
-        mongoDB = new MongoDB();
-        
+    public ImageRequestListener(){
+        d = new ImageGenerator();
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
-            if (method.equals("GET")) {
-              response = handleGet(httpExchange);
-              //response = handleGet(httpExchange);
-              httpExchange.getResponseHeaders().set("Content-Type", "application/json");
-            } else if (method.equals("PUT")) {
-                response = handlePut(httpExchange);
+            if (method.equals("POST")) {
+              response = handlePost(httpExchange);
             } else {
               throw new Exception("Not Valid Request Method");
             }
@@ -46,48 +39,29 @@ public class ImageRequestListener implements HttpHandler {
 
     
 
-    //** return password */
-    private String handleGet(HttpExchange httpExchange) throws IOException {
-      // Converting the JSON array to a string
-      //note that this has to be a single string with no newlines before you send it back
-      String username = "";
-      URI uri = httpExchange.getRequestURI();
-      String query = uri.getRawQuery();
-      if (query != null) {
-        username = query.substring(query.indexOf("=") + 1);
-        System.out.println(username);
+    //** return url of generated image */
+    private String handlePost(HttpExchange httpExchange) throws IOException {
+      InputStream inStream = httpExchange.getRequestBody();
+      Scanner scanner = new Scanner(inStream);
+      String imageData = scanner.nextLine();
+      String[] recipeValues = imageData.split(",");
+      String title = recipeValues[0];
+      String ingredients = recipeValues[1];
+
+      scanner.close();
+
+      String ret = "ERROR";
+      try {
+          ret = d.generateRecipeImage(title, ingredients);
+      } catch (IOException e1) {
+          System.out.println("IOEXCEPTION" + e1.toString());
+      } catch (InterruptedException e2) {
+          System.out.println("INTERRUPTEDEXCEPTION" + e2.toString());
+      } catch (URISyntaxException e3){
+          System.out.println("URISYNTAXEXCEPTION" + e3.toString());
       }
-      
-      String check = mongoDB.find(username);
-      JSONObject details = new JSONObject(check);
-      //check = check.replaceAll("[\n\r]", "");
+      return ret;
 
-      System.out.println("REQUESTLISTENER RET: " + check);
-      String pass = details.getString(username);
-      System.out.println(username + " password is: " + pass +  " :END");
-
-      return pass;
-
-    }
-
-    private String handlePut(HttpExchange httpExchange) throws IOException {
-      //parse username from query
-      String username = "";
-      URI uri = httpExchange.getRequestURI();
-      String query = uri.getRawQuery();
-      if (query != null) {
-        username = query.substring(query.indexOf("=") + 1);
-      }
-        InputStream inStream = httpExchange.getRequestBody();
-        Scanner scanner = new Scanner(inStream);
-        String putData = scanner.nextLine();
-        String[] userCredentials = putData.split(",");
-        String user = userCredentials[0];
-        String pass = userCredentials[1];
-      // need to change
-        mongoDB.putUsername(user, pass);
-        scanner.close();
-        return "Success";
     }
 
 

@@ -184,4 +184,40 @@ public class RequestHandler {
             return "Error: " + ex.getMessage();
         }
     }
+
+    public String performImageRequest(String method, String title, String ingredients){
+        // Implement your HTTP request logic here and return the response
+        try {
+            String urlString = "http://localhost:8100/image/";
+            URL url = new URI(urlString).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            //if post or put write to outstream
+            if (method.equals("POST")) {
+                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+                out.write(title + "," + ingredients );
+                out.flush(); 
+                out.close();
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder responseBuilder = new StringBuilder();
+            String line;
+
+            while ((line = in.readLine()) != null) {
+                if(line.equals("")){
+                    System.out.println("cringe");
+                }
+                responseBuilder.append(line);
+                //System.out.println("REQUSTHANDLER RESPONSE:" + line);
+            }
+
+            in.close();
+            return responseBuilder.toString();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "Error: " + ex.getMessage();
+        }
+    }
 }
