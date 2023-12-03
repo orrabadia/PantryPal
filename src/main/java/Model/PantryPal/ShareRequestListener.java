@@ -44,7 +44,7 @@ public class ShareRequestListener implements HttpHandler {
       // Parse path segments from the URI
       String[] pathSegments = uri.getPath().split("/");
       
-      if (pathSegments.length == 4 && pathSegments[1].equals("share")) {
+      if (validLink(pathSegments)) {
           String username = pathSegments[2];
           String index = pathSegments[3];
 
@@ -56,41 +56,28 @@ public class ShareRequestListener implements HttpHandler {
           String mealType = recipeJSON.getString("mealType");
           String ingredients = recipeJSON.getString("ingredients");
           String instructions = recipeJSON.getString("instructions");
-  
-          StringBuilder htmlBuilder = new StringBuilder();
-          htmlBuilder
-              .append("<html>")
-              .append("<body>")
-              .append("<h1>")
-              .append("Title: ")
-              .append(title)
-              .append("<br>")
-              .append("Meal Type: ")
-              .append(mealType)
-              .append("<br>")
-              .append("Ingredients: ")
-              .append(ingredients)
-              .append("<br>")
-              .append("Instructions: ")
-              .append(instructions)
-              .append("<br>")
-              .append("<img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\">")  // does not work
-              .append("<br>")
-              .append("</h1>")
-              .append("</body>")
-              .append("</html>");
+
+          HTMLBuilder htmlB = new HTMLBuilder(title, mealType,ingredients, instructions);
   
           // encode HTML content
           httpExchange.getResponseHeaders().set("Content-Type", "text/html");
-          response = htmlBuilder.toString();
+          response = htmlB.buildHTML().toString();
   
           System.out.println("Username: " + username);
           System.out.println("Index: " + index);
+          System.out.println("response: " + response);
       } else {
           System.out.println("Invalid path structure");
       }
   
       return response;
+      }
+
+      public boolean validLink(String[] pathSegments) {
+        if (pathSegments.length == 4 && pathSegments[1].equals("share")) {
+          return true;
+        }
+        return false;
       }
 
     

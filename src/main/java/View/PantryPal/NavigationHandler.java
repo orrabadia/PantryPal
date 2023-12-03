@@ -71,7 +71,8 @@ class NavigationHandler{
         AppFrame mainAppFrame = ((AppFrame)this.getMap().get("RecipeList").getRoot());
         String username = mainAppFrame.getUserHandler().getUserName();
         int index = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).get(r.getTitle().getText()).getIndex();;
-        String shareUrl = "http://localhost:8100/share/" + username + "/" + index;
+        Link l = new Link(username, index);
+        String shareUrl = l.getHTTPLink();
         rd.setShare(shareUrl);
         primaryStage.setScene(s);
     }
