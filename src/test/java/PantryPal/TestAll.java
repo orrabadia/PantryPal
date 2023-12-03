@@ -2286,5 +2286,123 @@ public class TestAll {
             //clear csv
             delCSV();
         }
+
+        @Test//testing of things that filter the recipeList
+        public void StoryTestF5() {
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Hot Dog", "Lunch", "hot dogs", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+
+            filteredList = FilterHandler.filterMealType(testList, "Breakfast");
+            //Should only be one Breakfast item populated in the list
+            assertEquals("Cereal", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            filteredList = FilterHandler.filterMealType(testList, "Lunch");
+            //Should only be one Lunch item populated in the list 
+            assertEquals("Hot Dog", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            filteredList = FilterHandler.filterMealType(testList, "Dinner");
+            //Should only be one Dinner item populated in the list 
+            assertEquals("BLT", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            filteredList = FilterHandler.filterMealType(testList, "All");
+            //All recipes should populate the list
+            assertEquals("Hot Dog",filteredList.get(0).getTitle());
+            assertEquals("BLT", filteredList.get(1).getTitle());
+            assertEquals("Cereal", filteredList.get(2).getTitle());
+            assertEquals(3, filteredList.size());
+
+
+        }
+
+        @Test
+        //testing Breakfast filter 
+        public void UnitTestF5BreakfastFilter() {
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Hot Dog", "Lunch", "hot dogs", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            Recipe r4 = new Recipe("Toast", "Breakfast", "toast", "cook" );
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+            testList.add(r4);
+
+            filteredList = FilterHandler.filterMealType(testList, "Breakfast");
+            assertEquals("Cereal", filteredList.get(0).getTitle());
+            assertEquals("Toast", filteredList.get(1).getTitle());
+            assertEquals(2,filteredList.size());
+        }
+
+         @Test
+        //testing Breakfast filter 
+        public void UnitTestF5LunchFilter() {
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Hot Dog", "Lunch", "hot dogs", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            Recipe r4 = new Recipe("Tomato Soup", "Lunch", "tomato", "cook" );
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+            testList.add(r4);
+
+            filteredList = FilterHandler.filterMealType(testList, "Lunch");
+            assertEquals("Hot Dog", filteredList.get(0).getTitle());
+            assertEquals("Tomato Soup", filteredList.get(1).getTitle());
+            assertEquals(2,filteredList.size());
+        }
+
+         @Test
+        //testing Breakfast filter 
+        public void UnitTestF5DinnerFilter() {
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Hot Dog", "Lunch", "hot dogs", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            Recipe r4 = new Recipe("Pizza", "Dinner", "pizza", "cook" );
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+            testList.add(r4);
+
+            filteredList = FilterHandler.filterMealType(testList, "Dinner");
+            assertEquals("BLT", filteredList.get(0).getTitle());
+            assertEquals("Pizza", filteredList.get(1).getTitle());
+            assertEquals(2,filteredList.size());
+        }
+
+         @Test
+        //testing Breakfast filter 
+        public void UnitTestF5AllFilter() {
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Hot Dog", "Lunch", "hot dogs", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            Recipe r4 = new Recipe("Toast", "Breakfast", "toast", "cook" );
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+            testList.add(r4);
+
+            filteredList = FilterHandler.filterMealType(testList, "All");
+            assertEquals("Hot Dog", filteredList.get(0).getTitle());
+            assertEquals("BLT", filteredList.get(1).getTitle());
+            assertEquals("Cereal", filteredList.get(2).getTitle());
+            assertEquals("Toast", filteredList.get(3).getTitle());
+            assertEquals(4,filteredList.size());
+        }
     }
 

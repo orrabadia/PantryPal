@@ -242,7 +242,9 @@ class UIRecipeList extends VBox { // extends HBox?
             Collections.sort(list,comp);
         }
 
-        list = FilterHandler.filterMealType(list, filterType);
+        //Calls on handler to filter the list 
+        list = FilterHandler.filterMealType(list, filterType); 
+
         for(Recipe r : list){
             int index = r.getIndex();
             String title = r.getTitle();
