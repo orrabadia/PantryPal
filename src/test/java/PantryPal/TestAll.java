@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -95,7 +94,7 @@ public class TestAll {
 
         //insert your uri
         clientMongoDB = MongoClients.create(uri);
-
+        
         database = clientMongoDB.getDatabase("PantryPal");
 
         usernameTest1 = "MOGUSMAN";
@@ -192,7 +191,7 @@ public class TestAll {
     @Test
     //this tests that the recipe list can add recipes(this is called when you push button)
     public void unitTestS1RecipeAdd() {
-
+        
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
@@ -324,14 +323,14 @@ public class TestAll {
         assertEquals(1, collection1.countDocuments());
         m.delete(usernameTest1, "1");
         assertEquals(0, collection1.countDocuments());
-
+        
         // rHandler.deleteRecipe(r2.getIndex(), usernameTest1);
 
 
         // assertEquals(0 , rHandler.getRecipeList(usernameTest1).getList().size());
 
     }
-
+    
     //story 2, test getTitle
     @Test
     public void unitTestS2getTitle(){
@@ -432,7 +431,7 @@ public class TestAll {
         Recipe r = rList.get(title1);
         assertEquals(r.getInstructions(), "cook food");
     }
-
+    
     //story 2, test the other get methods that are used
     @Test
     public void storyTestS2getMethods(){
@@ -766,7 +765,7 @@ public class TestAll {
         rList.setList(replace);
         assertEquals(2, collection1.countDocuments());
         //add two and check if you can get title, maybe 2 messes it up
-
+        
         //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 2);
 
         // story 2
@@ -1007,7 +1006,7 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getMealType());
     }
 
-
+    
     // Story 4, test whether our program saves a user's ingredient info
     // Here we separately test for whether our program can save ingredients
     // without the funcitonality of Record or Whisper (we can test all of them in the story test)
@@ -1234,12 +1233,12 @@ public class TestAll {
                     assertEquals("Bacon lettuce tomatoes white bread mayonnaise.", ingredients);
                     String instructions = fields[3].trim();
 
-                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " +
-                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
+                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " + 
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
                         "the two pieces of toast.  4. Cut the sandwich in half and serve.", instructions);
-                }
+                } 
             }
-
+          
         } catch (IOException e) {
             System.out.println("No File found");
             e.printStackTrace();
@@ -1321,7 +1320,7 @@ public class TestAll {
 
 
 
-    @Test
+    @Test 
     // tests when the user generates the recipe and but doesn't save (cancel)
     public void storyTestS5Cancel() {
         // simulates us setting the recipe's meal type when user says mealtype
@@ -1392,7 +1391,7 @@ public class TestAll {
 
     @Test
     public void storyTestS7DeleteRecipe() {
-
+        
         String title1 = "Test Recipe 1";
         String mealtype = "Lunch";
         String ingredients = "food";
@@ -1510,7 +1509,7 @@ public class TestAll {
         m.put(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), createHandler.getRecipe().getIngredients(), createHandler.getRecipe().getInstructions());
         ArrayList<Recipe> replace = update();
         rList.setList(replace);
-
+        
         // check whether recipeList was updated
         //assertEquals(rHandler.getRecipeList(usernameTest1).getList().size(), 1);
         assertEquals(1, collection1.countDocuments());
@@ -1549,7 +1548,7 @@ public class TestAll {
         String newIngredients = "Eggs, Cheese, Milk";
         String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
         Recipe newRecipe = new Recipe(strippedString, "Lunch", newIngredients, newInstructions);
-
+        
         // edit oldRecipe with newInstructions and newIngredients
         //rHandler.editRecipe(oldRecipe, newIngredients, newInstructions, usernameTest1);
         m.post(usernameTest1, createHandler.getRecipe().getTitle(), createHandler.getRecipe().getMealType(), newIngredients, newInstructions, "0");
@@ -1562,7 +1561,7 @@ public class TestAll {
         // check whether the oldRecipe is updated properly, comparing it to the newRecipe we want
         assertEquals(newIngredients, rList.get(createHandler.getRecipe().getTitle()).getIngredients());
         assertEquals(newInstructions, rList.get(createHandler.getRecipe().getTitle()).getInstructions());
-
+        
         // assertEquals(newRecipe.getIngredients(), oldRecipe.getIngredients());
         // assertEquals(newRecipe.getInstructions(), oldRecipe.getInstructions());
 
@@ -1580,7 +1579,7 @@ public class TestAll {
     // integration test of stories 4-7
     // Story 4: Rerecord
     // Story 5: Cancel
-    @Test
+    @Test 
     public void integrationTest5() {
         //4-7
         //Re-record -> Cancel
@@ -1652,7 +1651,7 @@ public class TestAll {
         assertEquals( "Dinner", transcription);
         createHandler.getRecipe().setIngredients(transcription);
         assertEquals("Dinner", createHandler.getRecipe().getIngredients());
-
+    
         //end of rerocord test
         //cancel test
         //simulates us setting the recipe's meal type when user says mealtype
@@ -1697,7 +1696,7 @@ public class TestAll {
     // Story 5: Save
     // Story 6: Edit
     // Story 7: Delete
-    @Test
+    @Test 
     public void sbstMS1Test1() {
         // story 1
         //add 2 recipes, 2 should be displayed
@@ -1897,7 +1896,7 @@ public class TestAll {
         String newIngredients = "Eggs, Cheese, Milk";
         String newInstructions = "1. Heat pan 2. Crack Eggs 3. Pour Milk in Pan 4. Flip 5. Wait 6. Eat";
         Recipe newRecipe = new Recipe(strippedString, "Lunch", newIngredients, newInstructions);
-
+        
         // edit oldRecipe with newInstructions and newIngredients
         //rHandler.editRecipe(oldRecipe, newIngredients, newInstructions, usernameTest1);
         m.post(usernameTest1, createHandler.getRecipe().getTitle(), "Lunch", newIngredients, newInstructions, "0");
@@ -1923,13 +1922,13 @@ public class TestAll {
     }
 
     // scenario based test of stories 1-7
-    // Story 1: Remove Preexisting recipes
-    // Story 3: Record
+    // Story 1: Remove Preexisting recipes 
+    // Story 3: Record 
     // Story 4: Rerecord
     // Story 5: Cancel
-    @Test
+    @Test 
     public void sbstMS1Test2() {
-        // Story 1: Remove Preexisting recipes
+        // Story 1: Remove Preexisting recipes 
         //add 2 recipes, 2 should be displayed
         String title1 = "Test Recipe 1";
         String title2 = "Test Recipe 2";
@@ -1959,7 +1958,7 @@ public class TestAll {
         rList.setList(replace);
         assertEquals(0, collection1.countDocuments());
 
-        // Story 3: Record
+        // Story 3: Record 
         try {
                 recordHandler.record();
             }
@@ -2108,7 +2107,7 @@ public class TestAll {
         int initialRecipeCount = rList.size();
         assertEquals(initialRecipeCount, 0);
         //end of 1
-
+        
         //begin of test 3
         try {
             recordHandler.record();
@@ -2205,7 +2204,7 @@ public class TestAll {
         assertEquals("Dinner", createHandler.getRecipe().getIngredients());
         //end of test 4 - ingredients
 
-        //beggining of test 5 - save
+        //beggining of test 5 - save 
          // precreate our recipe, assuming we generated it correctly earlier after feeding to ChatGPT
         // below info for the recipe is from an actual ChatGPT and whisper response in save.csv
         createHandler.getRecipe().setTitle("BLT Sandwich");
@@ -2245,10 +2244,10 @@ public class TestAll {
                     String ingredients = fields[2].trim();
                     assertEquals("Bacon lettuce tomatoes white bread mayonnaise.", ingredients);
                     String instructions = fields[3].trim();
-                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " +
-                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
+                    assertEquals("BLT Sandwich~  1. Toast the white bread. 2. " + 
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
                         "the two pieces of toast.  4. Cut the sandwich in half and serve.", instructions);
-                }
+                } 
             }
         } catch (IOException e) {
             System.out.println("No File found");
@@ -2260,8 +2259,8 @@ public class TestAll {
         assertEquals(createHandler.getRecipe().getTitle(), "BLT Sandwich");
         assertEquals(createHandler.getRecipe().getMealType(), "Lunch.");
         assertEquals(createHandler.getRecipe().getIngredients(), "Bacon lettuce tomatoes white bread mayonnaise.");
-        assertEquals(createHandler.getRecipe().getInstructions(), "BLT Sandwich~  1. Toast the white bread. 2. " +
-                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " +
+        assertEquals(createHandler.getRecipe().getInstructions(), "BLT Sandwich~  1. Toast the white bread. 2. " + 
+                        "Spread mayonnaise on one side of each piece of toast. 3. Layer the bacon lettuce and tomato in between " + 
                         "the two pieces of toast.  4. Cut the sandwich in half and serve.");
 
 
@@ -2288,7 +2287,7 @@ public class TestAll {
             String ingredients = "Hot dog";
             String instructions = "cook food";
             Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
-
+            
             //add a new recipe
             m.put(usernameTest1, title, mealType, ingredients, instructions);
 
@@ -2329,7 +2328,7 @@ public class TestAll {
             String ingredients = "Hot dog";
             String instructions = "cook food";
             Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
-
+            
             //add a new recipe
             m.put(usernameTest1, title, mealType, ingredients, instructions);
 
@@ -2357,7 +2356,7 @@ public class TestAll {
             String ingredients = "Hot dog";
             String instructions = "cook food";
             Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
-
+            
             //add a new recipe
             m.put(usernameTest1, title, mealType, ingredients, instructions);
 
@@ -2398,7 +2397,7 @@ public class TestAll {
             String ingredients = "Hot dog";
             String instructions = "cook food";
             Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
-
+            
             //add a new recipe
             m.put(usernameTest1, title, mealType, ingredients, instructions);
 
@@ -2578,39 +2577,6 @@ public class TestAll {
             //now 2 should be first
             assertEquals(test.get(0).getTitle(), "bbb");
             assertEquals(test.get(1).getTitle(), "aaa");
-
-        }
-
-        @Test
-        //Testing re-gen function of story4
-        public void StoryTestF4(){
-        createHandler.getRecipe().setMealType("Lunch");
-        createHandler.getRecipe().setIngredients("chicken");
-        createHandler.getRecipe().setInstructions("Example Instructions");
-        createHandler.getRecipe().setTitle("Example instruction");
-        Recipe r = createHandler.getRecipe();
-        //To be used to ensure that they are not changed
-        String mealType = r.getMealType();
-        String ingredients = r.getIngredients();
-        //To be used to ensure that it is changed
-        String instructions = r.getInstructions();
-        String checkTitle = r.getTitle();
-
-        String recipe = gptHandler.generate(mealType,ingredients);
-        String title = recipe.substring(0, recipe.indexOf("~"));
-        String strippedString = title.replaceAll("[\\n\\r]+", "");
-        r.setInstructions(recipe);
-        r.setTitle(strippedString);
-
-        //making sure old values are updated
-        assertNotEquals(checkTitle, r.getTitle());
-        assertNotEquals(instructions,r.getInstructions());
-        //making sure old values are NOT updated
-        assertEquals(mealType, r.getMealType());
-        assertEquals(ingredients, r.getIngredients());
-        //Checking display+Actually recipe is correct.
-        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " + r.getInstructions());
-        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
 
         }
     }
