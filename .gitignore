@@ -17,9 +17,6 @@
 .gradle
 /build/
 
-#csv
-*.csv
-
 # Package Files #
 *.jar
 *.war
