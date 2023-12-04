@@ -90,8 +90,10 @@ public class TestAll {
 
         gptHandler = new GPTHandler(true);
 
+        String uri = System.getenv("MONGODB_CONNECTION_STRING");
+
         //insert your uri
-        clientMongoDB = MongoClients.create( "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority");
+        clientMongoDB = MongoClients.create(uri);
         
         database = clientMongoDB.getDatabase("PantryPal");
 
@@ -120,8 +122,15 @@ public class TestAll {
      }
 
     public void deleteRecording() {
-        String fileName = "recording.wav";
+        String fileName = "src/main/java/Model/PantryPal/recording.wav";
         File file = new File(fileName);
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        fileName = "src/main/java/View/PantryPal/recording.wav";
+        file = new File(fileName);
 
         if (file.exists()) {
             file.delete();
@@ -452,7 +461,7 @@ public class TestAll {
         assertEquals(r.getInstructions(), "cook food");
     }
 
-    // Story 3, test that when you press the Record button (and press stop record), recording.wav is made
+    // Story 3, test that when you press the Record button (and press stop record), src/main/java/Model/PantryPal/recording.wav is made
     @Test
     public void unitTestS3Record() {
         try {
@@ -462,16 +471,16 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
     }
 
-    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // Story 3, test that the "functionality" of getting src/main/java/Model/PantryPal/recording.wav and processing
 
     // it in Whisper and see whether it's text matches what it should be
     @Test
     public void unitTestS3Whisper() {
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/View/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -503,7 +512,7 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
         try {
             assertEquals( "Dinner", whisperHandler.transcribe());
@@ -535,9 +544,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -596,7 +608,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -609,7 +621,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -674,9 +688,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -768,7 +785,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -781,7 +798,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -867,9 +886,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -917,7 +939,7 @@ public class TestAll {
     }
 
 
-    // Story 4, test that when you press the Record button (and press stop record), recording.wav is made
+    // Story 4, test that when you press the Record button (and press stop record), src/main/java/Model/PantryPal/recording.wav is made
     @Test
     public void unitTestS4Record() {
         try {
@@ -927,15 +949,15 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
     }
 
-    // Story 3, test that the "functionality" of getting recording.wav and processing
+    // Story 3, test that the "functionality" of getting src/main/java/Model/PantryPal/recording.wav and processing
     // it in Whisper and see whether it's text matches what it should be
     @Test
     public void unitTestS4Whisper() {
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -967,7 +989,7 @@ public class TestAll {
         catch (IOException e1){
             System.err.println("IOException");
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/Model/PantryPal/recording.wav");
         assertEquals(true, file.exists());
         String transcription = "";
         try {
@@ -1004,9 +1026,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1065,7 +1090,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1078,7 +1103,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1403,9 +1430,9 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/Model/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1564,7 +1591,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1577,7 +1604,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1703,7 +1732,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -1716,7 +1745,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1935,9 +1966,12 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
@@ -1992,7 +2026,7 @@ public class TestAll {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
-        file = new File("recording.wav");
+        file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
 
         // second record
@@ -2005,7 +2039,9 @@ public class TestAll {
         }
         assertEquals(true, file.exists());
 
-        audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
 
         try {
             AudioSystem.write(
@@ -2079,20 +2115,12 @@ public class TestAll {
         catch (IOException e1) {
             e1.printStackTrace();
         }
-        File file = new File("recording.wav");
+        File file = new File("src/main/java/View/PantryPal/recording.wav");
         assertEquals(true, file.exists());
-        //end of 3
 
-        //begin of test 4 - Ingredients
-        try {
-                recordHandler.record();
-            }
-        catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-        }
-        assertEquals(true, file.exists());
-        File audioFile = new File("recording.wav");
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        File audioFile = new File("src/main/java/Model/PantryPal/recording.wav");
          // the number of samples of audio per second.
         // 44100 represents the typical sample rate for CD-quality audio.
         float sampleRate = 44100;
@@ -2124,6 +2152,44 @@ public class TestAll {
             System.err.println("IOException");
         }
         String transcription = "";
+        try {
+            transcription = whisperHandler.transcribe();
+        }
+        catch (IOException e1) {
+            System.err.println("IOException");
+        }
+        catch (URISyntaxException e2){
+                System.err.println("URISyntaxException");
+        }
+
+        assertEquals( "Dinner", transcription);
+        createHandler.getRecipe().setMealType(transcription);
+        assertEquals("Dinner", createHandler.getRecipe().getMealType());
+
+        //end of 3
+
+        //begin of test 4 - Ingredients
+        try {
+                recordHandler.record();
+            }
+        catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+        }
+        assertEquals(true, file.exists());
+
+        // Server not active during JUnit, so we "simulate" recording.wav being transferred up
+
+        try {
+            AudioSystem.write(
+                        audioInputStream,
+                        AudioFileFormat.Type.WAVE,
+                        audioFile);
+        }
+        catch (IOException e1){
+            System.err.println("IOException");
+        }
+        transcription = "";
         try {
             transcription = whisperHandler.transcribe();
         }
@@ -2251,6 +2317,108 @@ public class TestAll {
             assertEquals(0, collection1.countDocuments());
         }
 
+        @Test
+        //user adds, edits, and deletes a recipe
+        public void UnitTestF1Add() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+        }
+
+        @Test
+        //user edits a recipe
+        public void UnitTestF1Edit() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //edit that recipe
+            m.post(usernameTest1, title, mealType, "two hot dogs", instructions, "0");
+            //check if ingredients changed
+            replace = update();
+            rList.setList(replace);
+            assertEquals("two hot dogs", rList.get(title).getIngredients());
+
+            //delete the recipe
+            m.delete(usernameTest1, "0");
+
+            //collection should now be empty
+            assertEquals(0, collection1.countDocuments());
+        }
+
+        @Test
+        //user edits a recipe
+        public void UnitTestF1Delete() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //delete the recipe
+            m.delete(usernameTest1, "0");
+
+            //collection should now be empty
+            assertEquals(0, collection1.countDocuments());
+        }
         public void delCSV(){
             String filePath = "./users.csv"; // Replace with the file path of the CSV file to delete
 
@@ -2276,6 +2444,9 @@ public class TestAll {
             //login is ui and cannot be tested, server cannot be tested
             //thus we test the actual csv methods that are being called
 
+            //no unit tests for these because you test save by calling load and vice versa
+            //so doing one for load would just be the same as this
+            delCSV();
             ArrayList<String> details = AutoLogin.load();
             //this should be empty as there is no csv
             AutoLogin.save(usernameTest1, passwordTest1);
@@ -2285,6 +2456,128 @@ public class TestAll {
             assertEquals(passwordTest1, details.get(1));
             //clear csv
             delCSV();
+        }
+
+        @Test
+        //testing of things that sort the list
+        public void StoryTestF6(){
+            ArrayList<Recipe> test = new ArrayList<>();
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            Recipe r2 = new Recipe("test2", mealType, ingredients, instructions);
+            r1.setIndex(0);
+            r2.setIndex(1);
+            test.add(r1);
+            test.add(r2);
+
+            //right now 1 should be before 2, reverse then 2 should be first
+            test = SortHandler.sortRevChronological(test);
+            assertEquals(test.get(0).getTitle(), "test2");
+            assertEquals(test.get(1).getTitle(), "test1");
+
+            test = SortHandler.sortAlphabetical(test);
+            //now 1 should be first
+            assertEquals(test.get(0).getTitle(), "test1");
+            assertEquals(test.get(1).getTitle(), "test2");
+
+            test = SortHandler.sortRevAlphabetical(test);
+            //now 2 should be first
+            assertEquals(test.get(0).getTitle(), "test2");
+            assertEquals(test.get(1).getTitle(), "test1");
+
+            test = SortHandler.sortChronological(test);
+            //now 1 should be first
+            assertEquals(test.get(0).getTitle(), "test1");
+            assertEquals(test.get(1).getTitle(), "test2");
+        }
+
+        @Test
+        //testing of things that sort the list
+        public void UnitTestF6RevChron(){
+            ArrayList<Recipe> test = new ArrayList<>();
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            Recipe r2 = new Recipe("test2", mealType, ingredients, instructions);
+            r1.setIndex(0);
+            r2.setIndex(1);
+            test.add(r1);
+            test.add(r2);
+
+            //right now 1 should be before 2, reverse then 2 should be first
+            test = SortHandler.sortRevChronological(test);
+            assertEquals(test.get(0).getTitle(), "test2");
+            assertEquals(test.get(1).getTitle(), "test1");
+        }
+
+        @Test
+        //testing of things that sort the list
+        public void UnitTestF6Chron(){
+            ArrayList<Recipe> test = new ArrayList<>();
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+            Recipe r2 = new Recipe("test2", mealType, ingredients, instructions);
+            //add in opposite order
+            r1.setIndex(1);
+            r2.setIndex(0);
+            test.add(r1);
+            test.add(r2);
+
+            test = SortHandler.sortChronological(test);
+            //now 1 should be first
+            assertEquals(test.get(0).getTitle(), "test2");
+            assertEquals(test.get(1).getTitle(), "test1");
+        }
+
+        @Test
+        //testing of things that sort the list
+        public void UnitTestF6Alpha(){
+            ArrayList<Recipe> test = new ArrayList<>();
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe("bbb", mealType, ingredients, instructions);
+            Recipe r2 = new Recipe("aaa", mealType, ingredients, instructions);
+            r1.setIndex(0);
+            r2.setIndex(1);
+            test.add(r1);
+            test.add(r2);
+
+            test = SortHandler.sortAlphabetical(test);
+            //now 1 should be first
+            assertEquals(test.get(0).getTitle(), "aaa");
+            assertEquals(test.get(1).getTitle(), "bbb");
+        }
+
+        @Test
+        //testing of things that sort the list
+        public void UnitTestF6RevAlpha(){
+            ArrayList<Recipe> test = new ArrayList<>();
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe("aaa", mealType, ingredients, instructions);
+            Recipe r2 = new Recipe("bbb", mealType, ingredients, instructions);
+            r1.setIndex(0);
+            r2.setIndex(1);
+            test.add(r1);
+            test.add(r2);
+
+            test = SortHandler.sortRevAlphabetical(test);
+            //now 2 should be first
+            assertEquals(test.get(0).getTitle(), "bbb");
+            assertEquals(test.get(1).getTitle(), "aaa");
+
         }
     }
 
