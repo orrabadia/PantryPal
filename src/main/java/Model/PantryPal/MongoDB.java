@@ -31,13 +31,19 @@ import org.json.JSONObject;
 public class MongoDB {
     public static void main(String[] args) {
         //for testing
+        MongoDB m = new MongoDB();
+        //m.put("MOGUSMAN", "hot dog soup", "breakfast", "hot dogs", "cook hot dog");
+        //m.put("MOGUSMAN", null, null, null, null);
+        //System.out.println(m.get("MOGUSMAN"));
+        m.get("MOGUSMAN");
+        // for username/ passwords
     }
 
     private MongoClient mongoClient;
 
     public MongoDB(){
         // Replace the placeholder with your MongoDB deployment's connection string
-        String uri = "";
+        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority";
         
         // Establish MongoDB connection
         this.mongoClient = MongoClients.create(uri);
@@ -87,29 +93,7 @@ public class MongoDB {
         String instructions) {
         MongoDatabase database = this.mongoClient.getDatabase("PantryPal");
         MongoCollection<Document> collection = database.getCollection(username);
-        int check = (int)collection.countDocuments();
-        if(check == 0){
-            //do nothing, if nothing in there it should be 0
-        } else {
-            // get highest index currently
-            FindIterable<Document> iterable = collection.find();
-            int maxValue = Integer.MIN_VALUE; // Initialize with minimum possible integer value
-
-            for (Document document : iterable) {
-                // Assuming yourField contains integers
-                int fieldValue = Integer.parseInt(document.getString("index"));
-                
-                // Check if fieldValue is greater than maxValue
-                if (fieldValue > maxValue) {
-                    maxValue = fieldValue;
-                }
-            }
-
-            // Print the highest value found
-            System.out.println("Highest value in 'index': " + maxValue);
-            check = maxValue+1;
-        }
-        String index = String.valueOf(check);
+        String index = Integer.toString((int)collection.countDocuments());
         
         //index is current amount of things in the collection, this is how we will store creation order
         String[] headers = new String[] { "title", "mealType", "ingredients", "instructions" , "index"};
