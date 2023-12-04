@@ -192,19 +192,47 @@ class UIRecipeList extends VBox { // extends HBox?
         ArrayList<Recipe> list = rHandler.getRecipeList(((UserAccDisplay)this.nHandler.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).getList();
         System.out.println("LIST SIZE:" + list.size());
         //sort last to first
+        class revchronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r2.getIndex(), r1.getIndex());
+            }
+        }
+        class chronComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return Integer.compare(r1.getIndex(), r2.getIndex());
+            }
+        }
+        class alphaComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return r1.getTitle().compareTo(r2.getTitle());
+            }
+        }
+        class revAlphaComparator implements Comparator<Recipe>{
+            @Override
+            public int compare(Recipe r1, Recipe r2){
+                return r2.getTitle().compareTo(r1.getTitle());
+            }
+        }
 
         if(sortorder == 0){
             //sort backwards if order 0
-            list = SortHandler.sortRevChronological(list);
+            revchronComparator comp = new revchronComparator();
+            Collections.sort(list, comp);
         } else if (sortorder == 1){
             //1 is oldest to newest
-            list = SortHandler.sortChronological(list);
+            chronComparator comp = new chronComparator();
+            Collections.sort(list, comp);
         } else if (sortorder == 2){
             //2 is alphabetical
-            list = SortHandler.sortAlphabetical(list);
+            alphaComparator comp = new alphaComparator();
+            Collections.sort(list,comp);
         } else if (sortorder == 3){
             //3 is reverse alphabetical
-            list = SortHandler.sortRevAlphabetical(list);
+            revAlphaComparator comp = new revAlphaComparator();
+            Collections.sort(list,comp);
         }
         for(Recipe r : list){
             int index = r.getIndex();
@@ -738,7 +766,7 @@ class RecordAppFrame extends FlowPane {
                 String trans2 = transcription.toLowerCase();
                 System.out.println(trans2);
                 //sometimes it adds periods and its weird delete those
-                trans2 = trans2.replaceAll("\\.", "");
+                trans2 = trans2.replace(".", "");
 
                 if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
                     createHandler.getRecipe().setMealType(transcription);
@@ -760,7 +788,7 @@ class RecordAppFrame extends FlowPane {
             else {
                 transcription = reqHandler.performAudioRequest("PUT");
                 //sometimes it adds periods and its weird delete those
-                transcription = transcription.replaceAll("\\.", "");
+                transcription = transcription.replace(".", "");
                 createHandler.getRecipe().setIngredients(transcription);
                 l.setText("Ingredients:" + createHandler.getRecipe().getIngredients());
 
