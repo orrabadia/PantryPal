@@ -36,13 +36,14 @@ class UIRecipe extends HBox { // extend HBox
     private Button displayButton;
     private String ingredients; // change to different data struct?
     private String recipeInstructions; // change to different data struct?
+    private int DBindex; //index of recipe(same as recipe index used througout app)
     // add UI variables
 
     /*
      * Constructor for Recipe class
      *
      */
-    UIRecipe(Text title, Text mealType, String ingredients, String recipeInstructions, NavigationHandler handler) {
+    UIRecipe(Text title, Text mealType, String ingredients, String recipeInstructions, int DBindex , NavigationHandler handler) {
         this.handler = handler;
         // is being displayed
         this.title = title;
@@ -50,6 +51,7 @@ class UIRecipe extends HBox { // extend HBox
         this.ingredients = ingredients;
         this.recipeInstructions = recipeInstructions;
         this.mealType = mealType;
+        this.DBindex = DBindex;
 
         // copied from lab 1, to display
         this.setPrefSize(500, 20); // sets size of task
@@ -96,6 +98,10 @@ class UIRecipe extends HBox { // extend HBox
 
     Label getIndex() {
         return this.index;
+    }
+
+    int getDBIndex(){
+        return this.DBindex;
     }
 
     Text getMealType() {
@@ -212,7 +218,7 @@ class UIRecipeList extends VBox { // extends HBox?
             String mealType = r.getMealType();
             String ingredients = r.getIngredients();
             String instructions = r.getInstructions();
-            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, nHandler);
+            UIRecipe uiR = new UIRecipe(new Text(title), new Text(mealType), ingredients, instructions, index, nHandler);
             this.getChildren().add(uiR);
             this.updateRecipeIndices();
         }
@@ -990,6 +996,7 @@ class RecipeDisplay extends BorderPane {
     private Button deleteButton;
 
     private NavigationHandler handler;
+    private ImageDisplayHandler iHandler;
     private UIRecipe r;
 
 
@@ -1023,6 +1030,10 @@ class RecipeDisplay extends BorderPane {
 
         // Call Event Listeners for the Buttons
         addListeners();
+    }
+
+    public void setIDHandler(ImageDisplayHandler i){
+        this.iHandler = i;
     }
 
     public void setUIR(UIRecipe recipe){
@@ -1132,10 +1143,12 @@ class RecipeDisplay extends BorderPane {
         deleteButton.setOnAction(e -> {
 
             AppFrame mainAppFrame = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot());
-            
-            int indexValue = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler()
-            .getUserName()).get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
-            //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
+            //get username from handler
+            String username = ((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler().getUserName();
+            String title = r.getTitle().getText();
+            //get index of recipe(the one used in backend)
+            int indexValue = mainAppFrame.getRecipeHandler().getRecipeList(username).get(title).getIndex();
+            //delete recipe
             mainAppFrame.getRecipeHandler().deleteRecipe(indexValue, mainAppFrame.getUserHandler().getUserName());
             mainAppFrame.getRecipeList().updateList(handler);
 
