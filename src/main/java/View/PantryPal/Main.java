@@ -614,30 +614,6 @@ class GPTResultsDisplay extends BorderPane{
         cancelButton.setOnAction(e->{
             nHandler.menu();
         });
-
-        Button reGenButton = footer.getReGenButton();
-        reGenButton.setOnAction(e->{
-            /*Recipe r = createHandler.getRecipe();
-                    String mealtype = r.getMealType();
-                    System.out.println("mealType " + mealtype);
-                    String ingredients = r.getIngredients();
-                    System.out.println("ingredients " + ingredients);
-                    String recipe = reqHandler.performGenerateRequest("PUT", mealtype, ingredients);
-                    String title = recipe.substring(0,recipe.indexOf("~"));
-                    //take out the newlines and returns for formatting
-                    String strippedString = title.replaceAll("[\\n\\r]+", "");
-                    r.setInstructions(recipe);
-                    r.setTitle(strippedString); */
-                RequestHandler reqHandler = ((RecordAppFrame)this.nHandler.getMap().get("RecordIngredients").getRoot()).getRequestHandler();
-                Recipe Rrecipe = cHandler.getRecipe();
-                System.out.println( "MEALTYPE: " + Rrecipe.getMealType().toString() + " INGREDIENTS: " + Rrecipe.getIngredients());
-                String recipe = reqHandler.performGenerateRequest("PUT", Rrecipe.getMealType().toString(), Rrecipe.getIngredients());
-                //ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
-                Rrecipe.setInstructions(recipe);
-                GPTResultsDisplay gptResD = (GPTResultsDisplay)this.nHandler.getMap().get("GptResults").getRoot();
-                VBox vBox = (VBox)gptResD.getCenter();
-                ((ScrollPane)vBox.getChildren().get(1)).setContent(createScrollableBox(recipe));
-        });
     }
 
     // Helper method to create a scrollable text box
@@ -739,10 +715,6 @@ class RecordAppFrame extends FlowPane {
 
         // Add the listeners to the buttons
         addListeners();
-    }
-
-    public RequestHandler getRequestHandler(){
-        return reqHandler;
     }
 
     public void addListeners() {
