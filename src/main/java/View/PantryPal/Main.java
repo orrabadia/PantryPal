@@ -618,7 +618,6 @@ class RecordAppFrame extends FlowPane {
 
 
 
-
         if (name == "meal") {
             instructions = new Label("Please record your meal type");
             transcriptionLabel = new Label("Please say the meal type you want:");
@@ -643,12 +642,6 @@ class RecordAppFrame extends FlowPane {
 
         this.getChildren().add(backButton);
 
-        //added so that continue button is not continuously added
-        continueButton = new Button("Continue");
-        this.getChildren().add(continueButton);
-        continueButton.setVisible(false);
-
-
         // Add the listeners to the buttons
         addListeners();
     }
@@ -672,32 +665,16 @@ class RecordAppFrame extends FlowPane {
             rHandler.stop();
             //RESULT OF TRANSCRIPTION STORED HERE
             String transcription = "";
-            //continueButton = new Button("Continue");
-            //this.getChildren().add(continueButton);
-            //added
-            continueButton.setVisible(true);
-            if (name == "meal") {    
+            continueButton = new Button("Continue");
+            this.getChildren().add(continueButton);
+            if (name == "meal") {
                 transcription = reqHandler.performAudioRequest("PUT");
-                //new line
-                String trans2 = transcription.toLowerCase();
-                System.out.println(trans2);
+                createHandler.getRecipe().setMealType(transcription);
+                l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
-                if(trans2.equals("Breakfast.")|| trans2.equals("Lunch.") || trans2.equals("Dinner.")){
-                    createHandler.getRecipe().setMealType(transcription);
-                    l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
-
-                    continueButton.setOnAction(e1->{
-                        handler.recordIngredients(createHandler);
-                    });
-                }else{
-                    l.setText("Error: Not a valid meal type. Please try again.");
-                }
-                //createHandler.getRecipe().setMealType(transcription);
-                //l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
-
-                //continueButton.setOnAction(e1->{
-                    //handler.recordIngredients(createHandler);
-                //});
+                continueButton.setOnAction(e1->{
+                    handler.recordIngredients(createHandler);
+                });
             }
             else {
                 transcription = reqHandler.performAudioRequest("PUT");

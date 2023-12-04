@@ -31,8 +31,6 @@ public class Server {
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
-    
-    //HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(data));
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 
     server.start();
