@@ -2602,6 +2602,7 @@ public class TestAll {
         r.setInstructions(recipe);
         r.setTitle(strippedString);
 
+        
         //making sure old values are updated
         assertNotEquals(checkTitle, r.getTitle());
         assertNotEquals(instructions,r.getInstructions());
