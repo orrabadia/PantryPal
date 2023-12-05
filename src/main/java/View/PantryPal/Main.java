@@ -321,6 +321,7 @@ class DisplayFooter extends HBox {
 class GPTFooter extends HBox {
     private Button saveButton;
     private Button cancelButton;
+    private Button reGenButton;
     GPTFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -331,10 +332,13 @@ class GPTFooter extends HBox {
 
         saveButton = new Button("Save");
         cancelButton = new Button("Cancel");
+        reGenButton = new Button("Regenerate");
         saveButton.setStyle(defaultButtonStyle);
         cancelButton.setStyle(defaultButtonStyle);
+        reGenButton.setStyle(defaultButtonStyle);
         this.getChildren().add(saveButton);
         this.getChildren().add(cancelButton);
+        this.getChildren().add(reGenButton);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -343,6 +347,9 @@ class GPTFooter extends HBox {
     }
     public Button getCancelButton(){
         return cancelButton;
+    }
+    public Button getReGenButton(){
+        return reGenButton;
     }
 }
 
@@ -615,6 +622,18 @@ class GPTResultsDisplay extends BorderPane{
         cancelButton.setOnAction(e->{
             nHandler.menu();
         });
+        Button reGenButton = footer.getReGenButton();
+        reGenButton.setOnAction(e->{
+             RequestHandler reqHandler = ((RecordAppFrame)this.nHandler.getMap().get("RecordIngredients").getRoot()).getRequestHandler();
+            Recipe Rrecipe = cHandler.getRecipe();
+            System.out.println( "MEALTYPE: " + Rrecipe.getMealType().toString() + " INGREDIENTS: " + Rrecipe.getIngredients());
+            String recipe = reqHandler.performGenerateRequest("PUT", Rrecipe.getMealType().toString(), Rrecipe.getIngredients());
+            //ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
+            Rrecipe.setInstructions(recipe);
+            GPTResultsDisplay gptResD = (GPTResultsDisplay)this.nHandler.getMap().get("GptResults").getRoot();
+            VBox vBox = (VBox)gptResD.getCenter();
+            ((ScrollPane)vBox.getChildren().get(1)).setContent(createScrollableBox(recipe));
+        });
     }
 
     // Helper method to create a scrollable text box
@@ -716,6 +735,10 @@ class RecordAppFrame extends FlowPane {
 
         // Add the listeners to the buttons
         addListeners();
+    }
+
+    public RequestHandler getRequestHandler(){
+        return reqHandler;
     }
 
     public void addListeners() {
