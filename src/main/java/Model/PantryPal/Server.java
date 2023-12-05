@@ -30,7 +30,7 @@ public class Server {
     );
 
     //HttpContext context = server.createContext("/", new RequestHandler(data));
-    HttpContext recipecontext = server.createContext("/recipe", new RecipeRequestListener(data));
+    HttpContext recipecontext = server.createContext("/recipe", new RecipeRequestListener(data, i));
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));

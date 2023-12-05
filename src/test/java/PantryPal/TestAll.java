@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -2578,6 +2578,105 @@ public class TestAll {
             assertEquals(test.get(0).getTitle(), "bbb");
             assertEquals(test.get(1).getTitle(), "aaa");
 
+        }
+
+        @Test
+        //test image generation
+        public void StoryTestF3(){
+            //cannot test ui/server, so test imagedisplayhandler
+            //with mocked images
+            //how workflow works is that dallehandler requests url from server, server generates it and returns url
+            //server makes sure we dont recreate if we already did using imagedisplayhandler
+            String user = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+            MockImageGenerator m = new MockImageGenerator();
+            String title = "hot dog soup";
+            String ingredients = "hot dogs";
+            String index = "0";
+
+            String url = "";
+
+            //this is the code that is ran in server when we send a reqeuest for an image
+            //when we generate a url, we pass a user + index identifier in http request and associate recipe with user
+            //user should not be in there
+            assertFalse(i.getImageMap().containsKey(user));
+            i.setUser(user);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(user));
+            //if exists in map(should not), then generate and store
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+            try {
+                url = m.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), user);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+            
+            //when a recipe is deleted it also deletes from imagedisplayhandler
+            //now we test the delete method, because server is not up
+            i.delete(user, Integer.parseInt(index));
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+        }
+
+        @Test
+        public void UnitTestF3setUser(){
+            String user = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+
+            assertFalse(i.getImageMap().containsKey(user));
+            i.setUser(user);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(user));
+        }
+
+        @Test
+        public void UnitTestF3store(){
+            String user = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+
+            assertFalse(i.getImageMap().containsKey(user));
+            i.setUser(user);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(user));
+
+            try {
+                i.store("AMONG US", 0, user);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt("0")));
+            assertEquals(i.getUrl(Integer.parseInt("0")),  "AMONG US");
+
+        }
+
+        @Test
+        public void UnitTestF3delete(){
+            String user = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+
+            assertFalse(i.getImageMap().containsKey(user));
+            i.setUser(user);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(user));
+
+            try {
+                i.store("AMONG US", 0, user);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt("0")));
+            assertEquals(i.getUrl(Integer.parseInt("0")),  "AMONG US");
+
+            //delete from map
+            i.delete(user, Integer.parseInt("0"));
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt("0")));
         }
     }
 

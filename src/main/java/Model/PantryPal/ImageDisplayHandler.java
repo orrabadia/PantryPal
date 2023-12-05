@@ -60,11 +60,6 @@ public class ImageDisplayHandler {
         return this.userMap.get(index);
     }
 
-    /** method to get filepath given index-returns null if nonexistent*/
-    String getFilePath(Integer index){
-        return userMap.get(index);
-    }
-
     //method to create filepath and downlaod+store image(username/index)-given url string and index
     //note now filehandler must catch this
     /** stores url in map */
@@ -97,6 +92,10 @@ public class ImageDisplayHandler {
      HashMap<Integer, String> getUserMap(){
         return this.userMap;
      }
+
+    HashMap<String, HashMap<Integer, String>> getImageMap(){
+        return this.images;
+    }
 
     void delete(String user, int index){
         this.userMap.remove(index);    

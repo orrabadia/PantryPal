@@ -20,6 +20,9 @@
 #csv
 *.csv
 
+#ignore images
+/images/*
+
 # Package Files #
 *.jar
 *.war

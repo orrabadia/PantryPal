@@ -6,6 +6,14 @@ import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -60,7 +68,7 @@ class NavigationHandler{
      * takes a recipe, link this with new recipe button
      * creates new recipe page, adds to map, displays it
      */
-    void displayRecipe(UIRecipe r){
+    void displayRecipe(UIRecipe r) throws IOException, InterruptedException, URISyntaxException{
         //get the display page and set its content
         Scene s = pageList.get(DISPLAY_RECIPE);
         RecipeDisplay rd = (RecipeDisplay)s.getRoot();
@@ -68,6 +76,34 @@ class NavigationHandler{
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
+
+        //get url, download image and display
+        AppFrame main = (AppFrame)this.pageList.get(RECIPE_LIST).getRoot();
+        String username = main.getUserHandler().getUserName();
+        String index = String.valueOf(r.getDBIndex());
+        DallEHandler d = new DallEHandler();
+        String url = d.generate(r.getTitle().getText(), username, index, r.getIngredients());
+        System.out.println("GENERATED LINK: "+ url);
+        //create images directory in view
+        Path imagesDir = Paths.get("images");
+        if (!Files.exists(imagesDir)) {
+            Files.createDirectory(imagesDir);
+        }
+
+        Path imagePath = imagesDir.resolve(username + " " +index + ".jpg");
+        if (!Files.exists(imagePath)) {
+            // If it doesn't exist, download and save the image
+            try (InputStream in = new URI(url).toURL().openStream()) {
+                Files.copy(in, imagePath);
+                System.out.println("Image saved successfully: " + imagePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // If it already exists, handle the case accordingly (for example, do nothing or display a message)
+            System.out.println("Image with index " + index + " already exists.");
+        }
+        rd.setImg(imagePath.toString());
         primaryStage.setScene(s);
     }
 

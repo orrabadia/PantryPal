@@ -1,5 +1,7 @@
 package PantryPal;
 import com.sun.net.httpserver.*;
+import com.sun.prism.Image;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -8,11 +10,13 @@ public class RecipeRequestListener implements HttpHandler{
     private final Map<String, String> data;
     private RecipeList rList;
     private MongoDB m;
+    private ImageDisplayHandler i;
 
 
-    public RecipeRequestListener(Map<String, String> data) {
+    public RecipeRequestListener(Map<String, String> data, ImageDisplayHandler i) {
       this.data = data;
       rList = new RecipeList();
+      this.i = i;
       //initialze recipelist with data from our backend
       rList.refresh();
       m = new MongoDB();
@@ -191,6 +195,7 @@ public class RecipeRequestListener implements HttpHandler{
         //returns csv
         //return rList.stringify();
         m.delete(username, index);
+        i.delete(username, Integer.parseInt(index));
         scanner.close();
         return "Success";
 
