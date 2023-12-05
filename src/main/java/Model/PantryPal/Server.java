@@ -1,5 +1,6 @@
 package PantryPal;
 import com.sun.net.httpserver.*;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class Server {
     // create a map to store data
     Map<String, String> data = new HashMap<>();
 
+    
 
     // create a server
     HttpServer server = HttpServer.create(
@@ -31,6 +33,7 @@ public class Server {
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
+    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(data));
     
     //HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(data));
     //add new handlers for each type
