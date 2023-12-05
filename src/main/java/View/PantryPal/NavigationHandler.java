@@ -104,6 +104,10 @@ class NavigationHandler{
             System.out.println("Image with index " + index + " already exists.");
         }
         rd.setImg(imagePath.toString());
+
+        Link l = new Link(username, Integer.parseInt(index));
+        String shareUrl = l.getHTTPLink();
+        rd.setShare(shareUrl);
         primaryStage.setScene(s);
     }
 

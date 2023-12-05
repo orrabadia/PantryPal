@@ -43,7 +43,10 @@ public class GenerateRequestListener implements HttpHandler {
         this.ingredients = ingredients;
 
         GPTHandler g = new GPTHandler();
+        System.out.println("created GPTHandler on server");
         String recipe = g.generate(mealType, ingredients);
+
+        System.out.println("server recipe: " + recipe);
 
         return recipe;
     }

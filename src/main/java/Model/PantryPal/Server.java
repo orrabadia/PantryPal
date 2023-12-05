@@ -1,5 +1,6 @@
 package PantryPal;
 import com.sun.net.httpserver.*;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class Server {
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
     HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(i));
+    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(data));
     
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 
