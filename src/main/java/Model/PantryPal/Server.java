@@ -36,7 +36,7 @@ public class Server {
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
     HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(i));
-    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(data));
+    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(i));
     
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 

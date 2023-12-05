@@ -2583,10 +2583,13 @@ public class TestAll {
             String ingredients = "food";
             String instructions = "cook food";
 
-            // the HTML content you see below should match the info from above
-            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
+            //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
 
-            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=\"https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg\"><br></h1></body></html>");
+            // the HTML content you see below should match the info from above
+            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: Test Recipe 1<br>Meal Type: Lunch<br>Ingredients: food<br>Instructions: cook food<br><img src=https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg><br></h1></body></html>");
         }
 
         // Feature 7, demonstrating that you can see a recipe from a shared link
@@ -2619,9 +2622,12 @@ public class TestAll {
             String testingredients = recipeJSON.getString("ingredients");
             String testinstructions = recipeJSON.getString("instructions");
 
+                        //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
             // the HTML content you see below should match the info from above
-            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
-            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
 
             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
 
@@ -2670,8 +2676,11 @@ public class TestAll {
             String testingredients = recipeJSON.getString("ingredients");
             String testinstructions = recipeJSON.getString("instructions");
 
-             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
-            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+            //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
 
             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
 
@@ -2715,8 +2724,11 @@ public class TestAll {
             String testingredients = recipeJSON.getString("ingredients");
             String testinstructions = recipeJSON.getString("instructions");
 
-             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions);
-            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+                        //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+             HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
 
             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
 
@@ -2739,8 +2751,8 @@ public class TestAll {
             testinstructions = recipeJSON.getString("instructions");
 
             // our HTML page should match the correct one
-             htmlB = new HTMLBuilder(title1, newMeal,newIngredients, newInstructions);
-             htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions);
+             htmlB = new HTMLBuilder(title1, newMeal,newIngredients, newInstructions, banana);
+             htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
              assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
         }
 
