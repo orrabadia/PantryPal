@@ -1220,7 +1220,7 @@ class RecipeDisplay extends BorderPane {
             if (this.footer.getBackButton().getText() == "Back"){
                 // here we'll make our shareButton visible and our shareLink invisible
                 this.footer.getShareButton().setVisible(true);
-                ((TextField)((VBox)this.getCenter()).getChildren().get(2)).setVisible(false);
+                ((TextField)((VBox)this.getCenter()).getChildren().get(3)).setVisible(false);
                 // return back to main menu
                 handler.menu();
             } else {
@@ -1310,7 +1310,7 @@ class RecipeDisplay extends BorderPane {
         Button shareButton = footer.getShareButton();
         shareButton.setOnAction(e -> {
             shareButton.setVisible(false);
-            TextField share = ((TextField)((VBox)this.getCenter()).getChildren().get(2));
+            TextField share = ((TextField)((VBox)this.getCenter()).getChildren().get(3));
             share.setVisible(true);
 
             //(((TextField)((VBox)this.getCenter()).getChildren().get(2)).getContent()).setText(shareUrl);
