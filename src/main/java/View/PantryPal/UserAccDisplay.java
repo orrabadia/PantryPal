@@ -31,6 +31,8 @@ class UserAccDisplay extends BorderPane {
     private Button signUpButton;
     private CheckBox rememberMe;
     private Label inputAlert;
+    private TextField user;
+    private TextField pass;
 
 
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 300px; -fx-pref-height: 100px; -fx-text-fill: red;";
@@ -53,8 +55,8 @@ class UserAccDisplay extends BorderPane {
         centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
 
         // Create two scrollable boxes with text
-        TextField user = new TextField();
-        TextField pass = new TextField();
+        this.user = new TextField();
+        this.pass = new TextField();
 
         user.setStyle(defaultTextFieldStyle);
         pass.setStyle(defaultTextFieldStyle);
@@ -99,6 +101,15 @@ class UserAccDisplay extends BorderPane {
         return this.uHandler;
     }
 
+    public boolean remembered(){
+        return this.rememberMe.isSelected();
+    }
+
+    public void load(String user, String pass){
+        this.user.setText(user);
+        this.pass.setText(pass);
+    }
+
 
     public void addListeners(){
 
@@ -139,6 +150,8 @@ class UserAccDisplay extends BorderPane {
             System.out.println("REMEMBER ME");
             AutoLogin.save(username,password);
         } else {
+            //if not remembered, dont load next time
+            AutoLogin.clear();
             System.out.println("DONT REMEMBER");
         }
 
@@ -186,12 +199,24 @@ class UserAccDisplay extends BorderPane {
         String ret = uHandler.getUser(username, password );
         System.out.println(ret + "RETTTTTTTTTTTTTTTTTTTTT");
 
+        //if does not exist already
         if (ret.contains("JSONException")){
             uHandler.putUser(username, password);
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).clear();
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(defaultTextFieldStyle);
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(defaultTextFieldStyle);
+
+            //add remember on signup
+            boolean remembered = rememberMe.isSelected();
+            if(remembered){
+                System.out.println("REMEMBER ME");
+                AutoLogin.save(username,password);
+            } else {
+                //if not remembered, dont load next time
+                AutoLogin.clear();
+                System.out.println("DONT REMEMBER");
+            }
 
             uHandler.setUser(username);
             AppFrame root = new AppFrame(this.nhandler, uHandler);

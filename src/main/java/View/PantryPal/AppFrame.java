@@ -94,6 +94,14 @@ class AppFrame extends BorderPane {
         //reset sort order and button
         this.sortOrder = 0;
         sortBox.setValue("Newest to Oldest");
+        //on logout load details
+        UserAccDisplay login = (UserAccDisplay)nHandler.getMap().get("UserSL").getRoot();
+        ArrayList<String> details = AutoLogin.load();
+        if(!details.isEmpty() && login.remembered()){
+            String user = details.get(0);
+            String pass = details.get(1);
+            login.load(user, pass);
+        }
         nHandler.userSL();
     });
 

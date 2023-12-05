@@ -2437,7 +2437,7 @@ public class TestAll {
             }
         }
 
-        //Feature 1, automatic login
+        //Feature 2, automatic login
         @Test
         //user remembers password, loads in again later
         public void StoryTestF2() {
@@ -2456,6 +2456,28 @@ public class TestAll {
             assertEquals(passwordTest1, details.get(1));
             //clear csv
             delCSV();
+        }
+
+        @Test
+        //user remembers password, loads in again later
+        public void UnitTestF2Del() {
+            //test deleting of the csv
+            delCSV();
+            ArrayList<String> details = AutoLogin.load();
+            //this should be empty as there is no csv
+            AutoLogin.save(usernameTest1, passwordTest1);
+            //load checks if there is a csv, and also reads from it, so load should work
+            details = AutoLogin.load();
+            assertEquals(usernameTest1, details.get(0));
+            assertEquals(passwordTest1, details.get(1));
+            //clear csv
+
+            String filePath = "./users.csv";
+            File file = new File(filePath);
+            //should exist before, then not
+            assertTrue(file.exists());
+            AutoLogin.clear();
+            assertFalse(file.exists());
         }
 
         @Test//testing of things that filter the recipeList
