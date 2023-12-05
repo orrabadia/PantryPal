@@ -684,9 +684,8 @@ class GPTResultsDisplay extends BorderPane{
         });
         Button reGenButton = footer.getReGenButton();
         reGenButton.setOnAction(e->{
-             RequestHandler reqHandler = ((RecordAppFrame)this.nHandler.getMap().get("RecordIngredients").getRoot()).getRequestHandler();
+            RequestHandler reqHandler = ((RecordAppFrame)this.nHandler.getMap().get("RecordIngredients").getRoot()).getRequestHandler();
             Recipe Rrecipe = cHandler.getRecipe();
-            System.out.println( "MEALTYPE: " + Rrecipe.getMealType().toString() + " INGREDIENTS: " + Rrecipe.getIngredients());
             String recipe = reqHandler.performGenerateRequest("PUT", Rrecipe.getMealType().toString(), Rrecipe.getIngredients());
             //ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
             Rrecipe.setInstructions(recipe);
