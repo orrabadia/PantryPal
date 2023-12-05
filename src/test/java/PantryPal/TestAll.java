@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -90,7 +91,7 @@ public class TestAll {
 
         gptHandler = new GPTHandler(true);
 
-        String uri = System.getenv("MONGODB_CONNECTION_STRING");
+        String uri =System.getenv("MONGODB_CONNECTION_STRING");
 
         //insert your uri
         clientMongoDB = MongoClients.create(uri);
@@ -2475,12 +2476,12 @@ public class TestAll {
             assertEquals(1, filteredList.size());
 
             filteredList = FilterHandler.filterMealType(testList, "Lunch");
-            //Should only be one Lunch item populated in the list 
+            //Should only be one Lunch item populated in the list
             assertEquals("Hot Dog", filteredList.get(0).getTitle());
             assertEquals(1, filteredList.size());
 
             filteredList = FilterHandler.filterMealType(testList, "Dinner");
-            //Should only be one Dinner item populated in the list 
+            //Should only be one Dinner item populated in the list
             assertEquals("BLT", filteredList.get(0).getTitle());
             assertEquals(1, filteredList.size());
 
@@ -2495,7 +2496,7 @@ public class TestAll {
         }
 
         @Test
-        //testing Breakfast filter 
+        //testing Breakfast filter
         public void UnitTestF5BreakfastFilter() {
             ArrayList<Recipe> testList = new ArrayList<>();
             ArrayList<Recipe> filteredList = new ArrayList<>();
@@ -2515,7 +2516,7 @@ public class TestAll {
         }
 
          @Test
-        //testing Breakfast filter 
+        //testing Breakfast filter
         public void UnitTestF5LunchFilter() {
             ArrayList<Recipe> testList = new ArrayList<>();
             ArrayList<Recipe> filteredList = new ArrayList<>();
@@ -2535,7 +2536,7 @@ public class TestAll {
         }
 
          @Test
-        //testing Breakfast filter 
+        //testing Breakfast filter
         public void UnitTestF5DinnerFilter() {
             ArrayList<Recipe> testList = new ArrayList<>();
             ArrayList<Recipe> filteredList = new ArrayList<>();
@@ -2555,7 +2556,7 @@ public class TestAll {
         }
 
          @Test
-        //testing Breakfast filter 
+        //testing Breakfast filter
         public void UnitTestF5AllFilter() {
             ArrayList<Recipe> testList = new ArrayList<>();
             ArrayList<Recipe> filteredList = new ArrayList<>();
@@ -2864,6 +2865,40 @@ public class TestAll {
             //now 2 should be first
             assertEquals(test.get(0).getTitle(), "bbb");
             assertEquals(test.get(1).getTitle(), "aaa");
+
+        }
+
+        @Test
+        //Testing re-gen function of story4
+        public void StoryTestF4(){
+        createHandler.getRecipe().setMealType("Lunch");
+        createHandler.getRecipe().setIngredients("chicken");
+        createHandler.getRecipe().setInstructions("Example Instructions");
+        createHandler.getRecipe().setTitle("Example instruction");
+        Recipe r = createHandler.getRecipe();
+        //To be used to ensure that they are not changed
+        String mealType = r.getMealType();
+        String ingredients = r.getIngredients();
+        //To be used to ensure that it is changed
+        String instructions = r.getInstructions();
+        String checkTitle = r.getTitle();
+
+        String recipe = gptHandler.generate(mealType,ingredients);
+        String title = recipe.substring(0, recipe.indexOf("~"));
+        String strippedString = title.replaceAll("[\\n\\r]+", "");
+        r.setInstructions(recipe);
+        r.setTitle(strippedString);
+
+
+        //making sure old values are updated
+        assertNotEquals(checkTitle, r.getTitle());
+        assertNotEquals(instructions,r.getInstructions());
+        //making sure old values are NOT updated
+        assertEquals(mealType, r.getMealType());
+        assertEquals(ingredients, r.getIngredients());
+        //Checking display+Actually recipe is correct.
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " + r.getInstructions());
+        assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
 
         }
     }

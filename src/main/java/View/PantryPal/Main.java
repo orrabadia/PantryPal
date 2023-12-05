@@ -169,7 +169,7 @@ class UIRecipeList extends VBox { // extends HBox?
     }
 
     /**
-     * 
+     *
      * Updates list based on what is currently in backend
      * takes behavior based on what style of sort you want to use-default is newest first(0)
      * later add more to have different sorting orders
@@ -178,7 +178,7 @@ class UIRecipeList extends VBox { // extends HBox?
 
         //get sortorder from appframe
         int sortorder;
-        //get filterType from appframe 
+        //get filterType from appframe
         String filterType;
          try {
             AppFrame a = (AppFrame)nHandler.getMap().get("RecipeList").getRoot();
@@ -214,8 +214,8 @@ class UIRecipeList extends VBox { // extends HBox?
             list = SortHandler.sortRevAlphabetical(list);
         }
 
-        //Calls on handler to filter the list 
-        list = FilterHandler.filterMealType(list, filterType); 
+        //Calls on handler to filter the list
+        list = FilterHandler.filterMealType(list, filterType);
 
         for(Recipe r : list){
             int index = r.getIndex();
@@ -329,7 +329,7 @@ class DisplayFooter extends HBox {
         return backButton;
     }
 
-    public Button getDeleteButton(){ 
+    public Button getDeleteButton(){
         return deleteButton;
     }
 
@@ -342,6 +342,7 @@ class DisplayFooter extends HBox {
 class GPTFooter extends HBox {
     private Button saveButton;
     private Button cancelButton;
+    private Button reGenButton;
     GPTFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -352,10 +353,13 @@ class GPTFooter extends HBox {
 
         saveButton = new Button("Save");
         cancelButton = new Button("Cancel");
+        reGenButton = new Button("Regenerate");
         saveButton.setStyle(defaultButtonStyle);
         cancelButton.setStyle(defaultButtonStyle);
+        reGenButton.setStyle(defaultButtonStyle);
         this.getChildren().add(saveButton);
         this.getChildren().add(cancelButton);
+        this.getChildren().add(reGenButton);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -365,12 +369,15 @@ class GPTFooter extends HBox {
     public Button getCancelButton(){
         return cancelButton;
     }
+    public Button getReGenButton(){
+        return reGenButton;
+    }
 }
 
 class UserAccFooter extends HBox {
     private Button logInButton;
     private Button signUpButton;
-   
+
     UserAccFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -394,7 +401,7 @@ class UserAccFooter extends HBox {
     public Button getSignUpButton(){
         return signUpButton;
     }
-    
+
 }
 
 /*
@@ -432,7 +439,7 @@ class AppFrame extends BorderPane {
     //private String defaultTextFieldStyle;
     private int sortOrder;
     private ComboBox<String> sortBox;
-    
+
     private String filterType;
     private ComboBox<String> filterBox;
 
@@ -455,7 +462,7 @@ class AppFrame extends BorderPane {
         recipeList = new UIRecipeList(rHandler,nHandler);
         // Initialise the recipelist footer Object
         footer = new ListFooter();
-        
+
         ScrollPane Scroller = new ScrollPane(recipeList);
         Scroller.setFitToHeight(true);
         Scroller.setFitToWidth(true);
@@ -479,14 +486,14 @@ class AppFrame extends BorderPane {
     public void addListeners()
     {
     newRecipeButton.setOnAction(e -> {
-      
+
         //send to record page, and also add a recipe for test purposes
         CreateHandler createHandler = new CreateHandler();
         nHandler.recordMeal(createHandler);
     });
 
     logOutButton.setOnAction(e1 ->{
-        //reset filter to default 
+        //reset filter to default
         this.filterType = "All";
 
         //reset sort order and button
@@ -515,6 +522,7 @@ class AppFrame extends BorderPane {
         recipeList.updateList(nHandler);
     });
 
+
     filterBox.setOnAction(e3-> {
         String filter = filterBox.getValue();
         if(filter.equals("All")) {
@@ -536,7 +544,7 @@ class AppFrame extends BorderPane {
         }
         recipeList.updateList(nHandler);
     });
-    
+
     }
 
     // public void debugAddRecipe(String title, String meal, String ingredients, String recipeinstructions){
@@ -558,7 +566,7 @@ class AppFrame extends BorderPane {
     public UIRecipeList getRecipeList(){
         return this.recipeList;
     }
-    
+
     public UserHandler getUserHandler() {
         return this.uHandler;
     }
@@ -658,7 +666,7 @@ class GPTResultsDisplay extends BorderPane{
             System.out.println("1");
             HashMap<String,Scene> pagelist = nHandler.getPageList();
             //System.out.println(pagelist.get("RecipeList").getRoot().getClass().toString());
-            AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot(); 
+            AppFrame rlist = (AppFrame)pagelist.get("RecipeList").getRoot();
             RecipeHandler recipeHandler = rlist.getRecipeHandler();
             //add recipe to backend, check new backend, return to menu()
             recipeHandler.addRecipe(cHandler.getRecipe(), rlist.getUserHandler().getUserName());
@@ -673,6 +681,17 @@ class GPTResultsDisplay extends BorderPane{
         Button cancelButton = footer.getCancelButton();
         cancelButton.setOnAction(e->{
             nHandler.menu();
+        });
+        Button reGenButton = footer.getReGenButton();
+        reGenButton.setOnAction(e->{
+            RequestHandler reqHandler = ((RecordAppFrame)this.nHandler.getMap().get("RecordIngredients").getRoot()).getRequestHandler();
+            Recipe Rrecipe = cHandler.getRecipe();
+            String recipe = reqHandler.performGenerateRequest("PUT", Rrecipe.getMealType().toString(), Rrecipe.getIngredients());
+            //ScrollPane scrollPane2 = createScrollableBox("Instructions: "+ cHandler.getRecipe().getInstructions());
+            Rrecipe.setInstructions(recipe);
+            GPTResultsDisplay gptResD = (GPTResultsDisplay)this.nHandler.getMap().get("GptResults").getRoot();
+            VBox vBox = (VBox)gptResD.getCenter();
+            ((ScrollPane)vBox.getChildren().get(1)).setContent(createScrollableBox(recipe));
         });
     }
 
@@ -777,6 +796,10 @@ class RecordAppFrame extends FlowPane {
         addListeners();
     }
 
+    public RequestHandler getRequestHandler(){
+        return reqHandler;
+    }
+
     public void addListeners() {
         // Start Button
         startButton.setOnAction(e -> {
@@ -800,7 +823,7 @@ class RecordAppFrame extends FlowPane {
             //this.getChildren().add(continueButton);
             //added
             continueButton.setVisible(true);
-            if (name == "meal") {    
+            if (name == "meal") {
                 transcription = reqHandler.performAudioRequest("PUT");
                 //new line
                 String trans2 = transcription.toLowerCase();
@@ -811,7 +834,7 @@ class RecordAppFrame extends FlowPane {
                 if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
                     //createHandler.getRecipe().setMealType(transcription);
                     //deletes all periods from transcriptions
-                    transcription = transcription.replaceAll("\\.", ""); 
+                    transcription = transcription.replaceAll("\\.", "");
                     //Transcriptions first letter capatilized and rest lowercase to remain consistent in UI
                     transcription = transcription.substring(0,1).toUpperCase() + transcription.substring(1).toLowerCase();
                     createHandler.getRecipe().setMealType(transcription);
@@ -873,8 +896,8 @@ class UserAccDisplay extends BorderPane {
     private Button signUpButton;
     private CheckBox rememberMe;
     private Label inputAlert;
-    
-    
+
+
     String defaultLabelStyle = "-fx-font: 13 arial; -fx-pref-width: 300px; -fx-pref-height: 100px; -fx-text-fill: red;";
     String badFieldStyle = "-fx-border-color: red ; -fx-border-width: 2px ;";
     String defaultTextFieldStyle = "-fx-border-color: #F0F8FF ; -fx-border-width: 2px ;";
@@ -931,7 +954,7 @@ class UserAccDisplay extends BorderPane {
         inputAlert = new Label();
         inputAlert.setStyle(defaultLabelStyle);
         inputAlert.setVisible(false);
-        ((VBox)this.getCenter()).getChildren().add(inputAlert);        
+        ((VBox)this.getCenter()).getChildren().add(inputAlert);
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -946,7 +969,7 @@ class UserAccDisplay extends BorderPane {
 
     Button logButton = footer.getLogInButton();
     logButton.setOnAction(e1->{
-         /*will have to check whether or not the username is a collection within the database. 
+         /*will have to check whether or not the username is a collection within the database.
             If it is -> Check that password is correct (will probably have to create a new collection within the database that only has username and passwords)
             if both correct-> set username as the inputted username and use the collection associated with it, and lead to the recipe list
             if password incorrect -> say password is incorrect
@@ -957,7 +980,7 @@ class UserAccDisplay extends BorderPane {
         String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
 
         System.out.println(uHandler.getUser(username,password) + "THIS IS WHAT IS BEING RETURNED IN LOG BUTTON");
-        
+
         //correct password, log in to their recipe list
         if (password.equals(uHandler.getUser(username, password))) {
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
@@ -983,11 +1006,11 @@ class UserAccDisplay extends BorderPane {
         } else {
             System.out.println("DONT REMEMBER");
         }
-        
+
 
 
     });
-    
+
     Button signUpButton = footer.getSignUpButton();
     signUpButton.setOnAction( e1-> {
 
@@ -998,8 +1021,8 @@ class UserAccDisplay extends BorderPane {
         done - if it is not -> insert username and password into the user collection (within the database), create a new collection named the username, go to recipe list*/
         String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
         String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
-        
-        
+
+
         // password length control for signup
         if (username.length() < 1 || password.length() < 1){
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
@@ -1007,7 +1030,7 @@ class UserAccDisplay extends BorderPane {
             inputAlert.setText("Username or Password too short");
             inputAlert.setVisible(true);
             return;
-            
+
         } else if(username.contains(",") || password.contains(",")){
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
             ((TextField)((VBox)this.getCenter()).getChildren().get(1)).setStyle(badFieldStyle);
@@ -1025,9 +1048,9 @@ class UserAccDisplay extends BorderPane {
             return "Error: " + e.getMessage();
             ret = null;
         }*/
-        String ret = uHandler.getUser(username, password ); 
+        String ret = uHandler.getUser(username, password );
         System.out.println(ret + "RETTTTTTTTTTTTTTTTTTTTT");
-        
+
         if (ret.contains("JSONException")){
             uHandler.putUser(username, password);
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).clear();
@@ -1045,10 +1068,10 @@ class UserAccDisplay extends BorderPane {
             ((TextField)((VBox)this.getCenter()).getChildren().get(0)).setStyle(badFieldStyle);
             inputAlert.setText("Username: \""+username+"\" taken. Please try again.");
             inputAlert.setVisible(true);
-            
+
         }
     });
-        
+
     }
 
 }
@@ -1111,7 +1134,7 @@ class RecipeDisplay extends BorderPane {
     public void setUIR(UIRecipe recipe){
         this.r = recipe;
     }
-  
+
 
     public void setTitle(String s){
         //called when displaying from handler, handler has blank one by default
@@ -1145,7 +1168,7 @@ class RecipeDisplay extends BorderPane {
         share.setText(s);
     }
 
-    
+
 
     public void addListeners()
     {
@@ -1162,7 +1185,7 @@ class RecipeDisplay extends BorderPane {
                 //reverts the displayed ingredients back to orriginal (what is being saved in the rlist (not UIRList))
                //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(((AppFrame)this.handler
                //.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList().get(r.getTitle().getText()).getIngredients());
-               
+
                ((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(0)).getContent()).setText(r.getIngredients());
                //reverts the displayed instructions back to orriginal (what is being saved in the rlist (not UIRList))
                //((TextArea)((ScrollPane)((VBox)this.getCenter()).getChildren().get(1)).getContent()).setText(((AppFrame)this.handler
@@ -1181,7 +1204,7 @@ class RecipeDisplay extends BorderPane {
             }
         });
 
-        Button editButton = footer.getEditButton();        
+        Button editButton = footer.getEditButton();
         editButton.setOnAction(e -> {
 
             if (this.footer.getEditButton().getText() == "Edit") {
@@ -1203,7 +1226,7 @@ class RecipeDisplay extends BorderPane {
                     */
 
                    /*ArrayList<Recipe> rList = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot()).getRecipeHandler().getRecipeList();
-                   
+
                    for (Recipe temp : rList){
                         if(temp.getTitle() == r.getTitle().getText()){
                             break;
@@ -1229,7 +1252,7 @@ class RecipeDisplay extends BorderPane {
         deleteButton.setOnAction(e -> {
 
             AppFrame mainAppFrame = ((AppFrame)this.handler.getMap().get("RecipeList").getRoot());
-            
+
             int indexValue = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.handler.getMap().get("UserSL").getRoot()).getUHandler()
             .getUserName()).get(r.getTitle().getText()).getIndex(); //Convert Index label to string to int
             //mainAppFrame.getRecipeHandler().deleteRecipe(r.getTitle().getText().toString());
@@ -1238,7 +1261,7 @@ class RecipeDisplay extends BorderPane {
 
             //then call update UI recipe
             handler.menu();
-            
+
         });
 
         Button shareButton = footer.getShareButton();
@@ -1251,7 +1274,7 @@ class RecipeDisplay extends BorderPane {
 
             //((TextArea)((TextField)((VBox)this.getCenter()).getChildren().get(2)).getContent()).setVisible(true);
 
-            
+
             // TextField shareLink = new TextField();
             // shareLink.setText(shareUrl);
             // shareLink.setEditable(false);
@@ -1283,7 +1306,7 @@ public class Main extends Application {
         //appframe is initialized without navhandler
         //set its thing to primarystage
         NavigationHandler handler = new NavigationHandler();
-     
+
         handler.setStage(primaryStage);
         //each UI element must have access to handler if it wants to do navigation
         // Create scene of mentioned size with the border pane
@@ -1310,16 +1333,16 @@ public class Main extends Application {
             //show red bold text where servers unreachable
             statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             statusLabel.setText("Server is unreachable, please try again later :(");
-    
+
             VBox root = new VBox(20);
             root.getChildren().add(statusLabel);
-    
+
             Scene scene = new Scene(root, 300, 50);
             primaryStage.setTitle("Server Status");
             primaryStage.setScene(scene);
-    
+
             primaryStage.show();
-        }  
+        }
     }
 
     public static void main(String[] args) {
