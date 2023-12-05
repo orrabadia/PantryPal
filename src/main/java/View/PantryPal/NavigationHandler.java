@@ -68,6 +68,12 @@ class NavigationHandler{
         rd.setTitle(r.getTitle().getText());
         rd.setIngredients(r.getIngredients().toString());
         rd.setInstructions(r.getRecipeInstructions().toString());
+        AppFrame mainAppFrame = ((AppFrame)this.getMap().get("RecipeList").getRoot());
+        String username = mainAppFrame.getUserHandler().getUserName();
+        int index = mainAppFrame.getRecipeHandler().getRecipeList(((UserAccDisplay)this.getMap().get("UserSL").getRoot()).getUHandler().getUserName()).get(r.getTitle().getText()).getIndex();;
+        Link l = new Link(username, index);
+        String shareUrl = l.getHTTPLink();
+        rd.setShare(shareUrl);
         primaryStage.setScene(s);
     }
 

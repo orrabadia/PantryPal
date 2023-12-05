@@ -176,6 +176,27 @@ public class MongoDB {
         collection.deleteOne(filter);
     }
 
+
+    public String getRecipe(String username, String index) {
+        MongoDatabase database = mongoClient.getDatabase("PantryPal");
+        MongoCollection<Document> collection = database.getCollection(username);
+        Bson filter = eq("index", index);
+
+        //find the specific recipe via index
+        FindIterable<Document> result = collection.find(filter);
+
+        // should only be one
+        Document document = result.first();
+
+        // return if found, blank if not
+        if (document != null) {
+            return document.toJson();
+        } else {
+            return "{}";
+        }
+    }
+
+
     public void post(String username, String title, String mealtype, String ingredients, String instructions, String index) {
         MongoDatabase database = mongoClient.getDatabase("PantryPal");
         MongoCollection<Document> collection = database.getCollection(username);

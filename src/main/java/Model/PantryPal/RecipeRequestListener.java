@@ -63,7 +63,6 @@ public class RecipeRequestListener implements HttpHandler{
       ret = ret.replaceAll("[\n\r]", "");
       System.out.println("REQUESTLISTENER RET: " + ret);
       return ret;
-
       }
 
     private String handlePost(HttpExchange httpExchange) throws IOException {
