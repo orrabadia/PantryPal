@@ -46,7 +46,7 @@ public class ImageDisplayHandler {
         this.userMap = null;
     }
 
-    /**associate this map with user, called every time you display*/
+    /**associate this map with user, called in reqlistener every time you display*/
     void setUser(String user){
         this.userMap = images.get(user);
         if(this.userMap == null){
@@ -55,10 +55,9 @@ public class ImageDisplayHandler {
         }
     }
 
-    /** method to get url from dalle */
-    String getUrl(String title, String ingredients){
-        DallEHandler d = new DallEHandler();
-        return d.generate(title, ingredients);
+    /** return current url from map*/
+    String getUrl(int index){
+        return this.userMap.get(index);
     }
 
     /** method to get filepath given index-returns null if nonexistent*/
@@ -68,21 +67,31 @@ public class ImageDisplayHandler {
 
     //method to create filepath and downlaod+store image(username/index)-given url string and index
     //note now filehandler must catch this
+    /** stores url in map */
     void store(String url, int index, String username) throws IOException, InterruptedException, URISyntaxException{
-        // create images directory in view
-        Path imagesDir = Paths.get("images");
-        if (!Files.exists(imagesDir)) {
-            Files.createDirectory(imagesDir);
-        }
+        // // create images directory in view
+        // Path imagesDir = Paths.get("images");
+        // if (!Files.exists(imagesDir)) {
+        //     Files.createDirectory(imagesDir);
+        // }
 
-        // download  image and save it as username/index.jpg in the 'images' directory
-        try (InputStream in = new URI(url).toURL().openStream()) {
-            Path imagePath = Paths.get("images", username + "/" + index + ".jpg");
-            Files.copy(in, imagePath);
-            this.userMap.put(index, imagePath.toString());
-        }
+        // // download  image and save it as username/index.jpg in the 'images' directory
+        // try (InputStream in = new URI(url).toURL().openStream()) {
+        //     Path imagePath = Paths.get("images", username + "/" + index + ".jpg");
+        //     Files.copy(in, imagePath);
+        //     this.userMap.put(index, imagePath.toString());
+        // }
+        this.userMap.put(index, url);
 
-        //TODO: SET IN MAP
+    }
+
+    /**check if already exists in current user map */
+    boolean check(int index){
+        boolean ret = true;
+        if(this.userMap.get(index) == null){
+            ret = false;
+        }
+        return ret;
     }
 
      HashMap<Integer, String> getUserMap(){

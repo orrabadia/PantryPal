@@ -19,6 +19,9 @@ public class Server {
     // create a map to store data
     Map<String, String> data = new HashMap<>();
 
+    // imagedisplayhandler to handle images and track if they are already generated
+    ImageDisplayHandler i = new ImageDisplayHandler();
+
 
     // create a server
     HttpServer server = HttpServer.create(
@@ -31,7 +34,7 @@ public class Server {
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
-    HttpContext imagecontext = server.createContext("/image", new ImageRequestListener());
+    HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(i));
     
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 

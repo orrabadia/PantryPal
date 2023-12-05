@@ -10,6 +10,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -888,7 +890,7 @@ class UserAccDisplay extends BorderPane {
         String username = ((TextField)((VBox)this.getCenter()).getChildren().get(0)).getText();
         String password = ((TextField)((VBox)this.getCenter()).getChildren().get(1)).getText();
 
-        System.out.println(uHandler.getUser(username,password) + "THIS IS WHAT IS BEING RETURNED IN LOG BUTTON");
+        System.out.println(uHandler.getUser(username,password) + "<-Returned password");
         
         //correct password, log in to their recipe list
         if (password.equals(uHandler.getUser(username, password))) {
@@ -991,6 +993,7 @@ class UserAccDisplay extends BorderPane {
 class RecipeDisplay extends BorderPane {
     private Header header;
     private DisplayFooter footer;
+    private ImageView imgView;
     private Button editButton;
     private Button backButton;
     private Button deleteButton;
@@ -1010,15 +1013,23 @@ class RecipeDisplay extends BorderPane {
 
         // Create a VBox in the center
         VBox centerBox = new VBox();
-        centerBox.setSpacing(10); // Adjust the spacing between scrollable boxes
+        centerBox.setSpacing(10);
+        //get image and display
+        imgView = new ImageView();
+        try {
+            FileInputStream input = new FileInputStream("./miku.JPG");
+            Image image = new Image(input);
 
-        // Create two scrollable boxes with text
+            imgView.setImage(image);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         ScrollPane scrollPane1 = createScrollableBox("Ingredients: ");
         ScrollPane scrollPane2 = createScrollableBox("Instructions: ");
         // ScrollPane scrollPane1 = createScrollableBox("Ingredients: " + r.getIngredients().toString());
         // ScrollPane scrollPane2 = createScrollableBox("Instructions: " + r.getRecipeInstructions().toString());
 
-        centerBox.getChildren().addAll(scrollPane1, scrollPane2);
+        centerBox.getChildren().addAll(imgView, scrollPane1, scrollPane2);
 
         // Set the VBox in the center of the BorderPane
         this.setCenter(centerBox);

@@ -43,6 +43,8 @@ public class RecipeRequestListener implements HttpHandler{
         //httpExchange.getResponseHeaders().set("Content-Type", "application/json");
         httpExchange.sendResponseHeaders(200, response.length());
         OutputStream outStream = httpExchange.getResponseBody();
+        System.out.println("WRITING TO OUTSTREAM");
+        System.out.println(response);
         outStream.write(response.getBytes());
         outStream.close();
        

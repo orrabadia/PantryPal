@@ -7,11 +7,11 @@ import java.util.*;
 import org.json.*;
 public class ImageRequestListener implements HttpHandler {
     private DallE d;
-  
-    //TODO: all this has to do is call dalle method and return the url string
+    private ImageDisplayHandler i;
 
-    public ImageRequestListener(){
+    public ImageRequestListener(ImageDisplayHandler i){
         d = new ImageGenerator();
+        this.i = i;
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -47,12 +47,20 @@ public class ImageRequestListener implements HttpHandler {
       String[] recipeValues = imageData.split(",");
       String title = recipeValues[0];
       String ingredients = recipeValues[1];
-
+      String user = recipeValues[2];
+      String index = recipeValues[3];
       scanner.close();
 
       String ret = "ERROR";
       try {
+        i.setUser(user);
+        //if exist use, if not generate 
+        if(i.check(Integer.parseInt(index))){
+          ret = i.getUrl(Integer.parseInt(index));
+        } else {
           ret = d.generateRecipeImage(title, ingredients);
+        }
+        i.store(ret, Integer.parseInt(index), user);
       } catch (IOException e1) {
           System.out.println("IOEXCEPTION" + e1.toString());
       } catch (InterruptedException e2) {

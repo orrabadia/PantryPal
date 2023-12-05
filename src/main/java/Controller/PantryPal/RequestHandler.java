@@ -81,16 +81,18 @@ public class RequestHandler {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder responseBuilder = new StringBuilder();
             String line;
-
             while ((line = in.readLine()) != null) {
-                if(line.equals("")){
+                if(line.isEmpty()){
                     System.out.println("cringe");
                 }
                 responseBuilder.append(line);
-                //System.out.println("REQUSTHANDLER RESPONSE:" + line);
+                System.out.println("line length:" + line.length());
             }
 
             in.close();
+            System.out.println("GET RESPONSE BEGINS HERE 1:" );
+            System.out.println(responseBuilder.toString());
+            System.out.println("GET RESPONSE BEGINS HERE 2:" );
             return responseBuilder.toString();
             //return new list, which should always be returned 
             // String response = in.readLine();
@@ -185,7 +187,7 @@ public class RequestHandler {
         }
     }
 
-    public String performImageRequest(String method, String title, String ingredients){
+    public String performImageRequest(String method, String title, String user, String index, String ingredients){
         // Implement your HTTP request logic here and return the response
         try {
             String urlString = "http://localhost:8100/image/";
@@ -196,7 +198,7 @@ public class RequestHandler {
             //if post or put write to outstream
             if (method.equals("POST")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-                out.write(title + "," + ingredients );
+                out.write(title + "," + ingredients + "," + user + "," + index);
                 out.flush(); 
                 out.close();
             }

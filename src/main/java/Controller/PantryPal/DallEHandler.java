@@ -10,7 +10,7 @@ public class DallEHandler {
     }
 
     // return string of url, will download and save image locally
-    public String generate(String title, String ingredients){
-        return r.performImageRequest("POST", title, ingredients);
+    public String generate(String title, String user, String index, String ingredients){
+        return r.performImageRequest("POST", title, user, index, ingredients);
     }
 }
