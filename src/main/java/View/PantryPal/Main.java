@@ -67,8 +67,8 @@ class UIRecipe extends HBox { // extend HBox
         //this.getChildren().add(title);
 
         HBox hbox = new HBox();
+        hbox.getChildren().add(mealType);
         hbox.getChildren().add(title);
-
         //TODO: fix THE SPACING AND PUT IT AT THE RIGHT IDK HOW TO DO IT
 
         //add display recipe button
@@ -140,6 +140,7 @@ class UIRecipeList extends VBox { // extends HBox?
     //private RecipeList rList;
     private NavigationHandler nHandler;
     private RecipeHandler rHandler;
+    private FilterHandler fHandler;
 
 
     //u handler parameter?
@@ -148,6 +149,7 @@ class UIRecipeList extends VBox { // extends HBox?
         //this.rList.setList(rHandler.getRecipeList());
         this.rHandler = rHandler;
         this.nHandler = nHandler;
+        this.fHandler = fHandler;
         this.updateList(nHandler);
         // UI elements
         this.setSpacing(5); // sets spacing between tasks
@@ -176,12 +178,17 @@ class UIRecipeList extends VBox { // extends HBox?
 
         //get sortorder from appframe
         int sortorder;
+        //get filterType from appframe
+        String filterType;
          try {
             AppFrame a = (AppFrame)nHandler.getMap().get("RecipeList").getRoot();
             sortorder = a.getSortOrder();
+            filterType = a.getFilterType();
+
         } catch (NullPointerException e) {
             // if you get nullpointer, this means it hasn't been initialized yet(first call), set to 0
             sortorder = 0;
+            filterType = "All";
         }
 
         //takes behavior based on what style of sort you want to use-default is revchron
@@ -206,6 +213,10 @@ class UIRecipeList extends VBox { // extends HBox?
             //3 is reverse alphabetical
             list = SortHandler.sortRevAlphabetical(list);
         }
+
+        //Calls on handler to filter the list
+        list = FilterHandler.filterMealType(list, filterType);
+
         for(Recipe r : list){
             int index = r.getIndex();
             String title = r.getTitle();
@@ -237,6 +248,7 @@ class ListFooter extends HBox {
     private Button newRecipeButton;
     private Button logOutButton;
     private ComboBox<String> sortBox;
+    private ComboBox<String> filterBox;
     ListFooter() {
         this.setPrefSize(500, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -256,7 +268,12 @@ class ListFooter extends HBox {
         //default value
         sortBox.setValue("Newest to Oldest");
 
-        this.getChildren().addAll(logOutButton, newRecipeButton, sortBox);
+        //dropdown for filter
+        filterBox = new ComboBox<>();
+        filterBox.getItems().addAll("All", "Breakfast", "Lunch", "Dinner");
+        filterBox.setValue("All");
+
+        this.getChildren().addAll(logOutButton, newRecipeButton, sortBox, filterBox);
         this.setAlignment(Pos.CENTER);
     }
 
@@ -270,6 +287,10 @@ class ListFooter extends HBox {
 
     public ComboBox<String> getSortBox(){
         return this.sortBox;
+    }
+
+    public ComboBox<String> getFilterBox() {
+        return this.filterBox;
     }
 }
 
@@ -419,7 +440,11 @@ class AppFrame extends BorderPane {
     private int sortOrder;
     private ComboBox<String> sortBox;
 
+    private String filterType;
+    private ComboBox<String> filterBox;
+
     AppFrame(NavigationHandler handler, UserHandler uHandler) {
+        this.filterType = "All";
         this.sortOrder = 0;
         this.nHandler = handler;
         // Initialise the header Object
@@ -452,6 +477,7 @@ class AppFrame extends BorderPane {
         newRecipeButton = footer.getNewRecipeButton();
         logOutButton = footer.getLogOutButton();
         sortBox = footer.getSortBox();
+        filterBox = footer.getFilterBox();
 
         // Call Event Listeners for the Buttons
         addListeners();
@@ -467,6 +493,9 @@ class AppFrame extends BorderPane {
     });
 
     logOutButton.setOnAction(e1 ->{
+        //reset filter to default
+        this.filterType = "All";
+
         //reset sort order and button
         this.sortOrder = 0;
         sortBox.setValue("Newest to Oldest");
@@ -489,6 +518,29 @@ class AppFrame extends BorderPane {
             System.out.println("SORTORDER IS " +sortOrder);
         } else {
             System.out.println("Unimplemented sorting method");
+        }
+        recipeList.updateList(nHandler);
+    });
+
+
+    filterBox.setOnAction(e3-> {
+        String filter = filterBox.getValue();
+        if(filter.equals("All")) {
+            this.filterType = "All";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Breakfast")) {
+            this.filterType = "Breakfast";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Lunch")) {
+            this.filterType = "Lunch";
+            System.out.println("FILTER TYPE IS " + filterType);
+        }
+        else if(filter.equals("Dinner")) {
+            this.filterType = "Dinner";
+            System.out.println("FILTER TYPE IS " + filterType);
+
         }
         recipeList.updateList(nHandler);
     });
@@ -529,6 +581,14 @@ class AppFrame extends BorderPane {
 
     public int getSortOrder(){
         return this.sortOrder;
+    }
+
+    public void setFilterType(String fil) {
+        this.filterType = fil;
+    }
+
+    public String getFilterType() {
+        return this.filterType;
     }
 
 }
@@ -773,6 +833,11 @@ class RecordAppFrame extends FlowPane {
                 trans2 = trans2.replaceAll("\\.", "");
 
                 if(trans2.contains("breakfast")|| trans2.contains("lunch") || trans2.contains("dinner")){
+                    //createHandler.getRecipe().setMealType(transcription);
+                    //deletes all periods from transcriptions
+                    transcription = transcription.replaceAll("\\.", "");
+                    //Transcriptions first letter capatilized and rest lowercase to remain consistent in UI
+                    transcription = transcription.substring(0,1).toUpperCase() + transcription.substring(1).toLowerCase();
                     createHandler.getRecipe().setMealType(transcription);
                     l.setText("Meal Type:" + createHandler.getRecipe().getMealType());
 
