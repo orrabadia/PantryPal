@@ -28,6 +28,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.unset;
@@ -3032,6 +3033,684 @@ public class TestAll {
         //Checking display+Actually recipe is correct.
         assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " + r.getInstructions());
         assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+        }
+
+        //Integration tests of Features 1,2,7 
+        // Feature 1: User adds a recipe and edits it 
+        // Feature 2: User saves their username/password  
+        // Feature 7: Demonstrate that we can see recipe from shared link 
+        @Test
+        public void integrationMS2Test1() {
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            delCSV();
+            ArrayList<String> details = AutoLogin.load();
+            //this should be empty as there is no csv
+            AutoLogin.save(usernameTest1, passwordTest1);
+            //load checks if there is a csv, and also reads from it, so load should work
+            details = AutoLogin.load();
+            assertEquals(usernameTest1, details.get(0));
+            assertEquals(passwordTest1, details.get(1));
+            //clear csv
+            delCSV();
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //edit that recipe
+            ingredients = "two hot dogs";
+            m.post(usernameTest1, title, mealType, "two hot dogs", instructions, "0");
+            //check if ingredients changed
+            replace = update();
+            rList.setList(replace);
+            assertEquals("two hot dogs", rList.get(title).getIngredients());
+
+            //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+            // the HTML content you see below should match the info from above
+            HTMLBuilder htmlB = new HTMLBuilder(title, mealType,ingredients, instructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), "<html><body><h1>Title: test1<br>Meal Type: Breakfast<br>Ingredients: two hot dogs<br>Instructions: cook food<br><img src=https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg><br></h1></body></html>");
+
+            assertEquals(1, collection1.countDocuments());
+
+            // the user has shared a link to their friend and the friend uses that link to search up the recipe
+            // in their browser
+            // we'll assume the query is correct and the username and index is extracted out
+            String username = usernameTest1;
+            // is 0 because it's the first recipe ever made, also is string because we extract it out
+            String index = "0";
+
+            // we'll simulate getting the recipe info from the database
+
+            String recipeString = m.getRecipe(username, index);
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
+
+                        //used in f7 tests
+            banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+            // the HTML content you see below should match the info from above
+            htmlB = new HTMLBuilder(title, mealType,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+        }
+
+        //Integration tests of Features 1,2,7 
+        // Feature 1: User adds a recipe and deletes it 
+        // Feature 2: User does not save their username/password   
+        // Feature 7: Demonstrate changes to shared recipe when edited in app/cannot access when it is deleted
+        @Test
+        public void integrationMS2Test2() {
+            delCSV();
+            ArrayList<String> details = AutoLogin.load();
+            //this should be empty as there is no csv bc the user did not save their login info 
+            String filePath = "./users.csv";
+            File file = new File(filePath);
+            assertFalse(file.exists());
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            System.out.println(replace.toString());
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //delete the recipe
+            m.delete(usernameTest1, "0");
+            //collection should now be empty
+            assertEquals(0, collection1.countDocuments());
+
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+            assertEquals(1, collection1.countDocuments());
+
+            String username = usernameTest1;
+            // is 0 because it's the first recipe ever made, also is string because we extract it out
+            String index = "0";
+             // we'll simulate getting the recipe info from the database
+
+            String recipeString = m.getRecipe(username, index);
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
+
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+            HTMLBuilder htmlB = new HTMLBuilder(title, mealType,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+
+            // now we'll edit the recipe
+            // except the title since the user can't edit that
+            String newMeal = "Dinner";
+            String newIngredients = "Honey, Bread";
+            String newInstructions = "smear honey, eat";
+            m.post(usernameTest1, title, newMeal, newIngredients, newInstructions, "0");
+            assertEquals(1, collection1.countDocuments());
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+
+            recipeString = m.getRecipe(username, index);
+            recipeJSON = new JSONObject(recipeString);
+            testtitle = recipeJSON.getString("title");
+            testmealType = recipeJSON.getString("mealType");
+            testingredients = recipeJSON.getString("ingredients");
+            testinstructions = recipeJSON.getString("instructions");
+
+            // our HTML page should match the correct one
+             htmlB = new HTMLBuilder(title, newMeal,newIngredients, newInstructions, banana);
+             htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+
+            //Now we will delete the recipe and see that we cannot get the HTML page for it 
+            m.delete(username, "0");
+            assertEquals(0, collection1.countDocuments());
+
+            // now we'll see if we can see the recipe if we try the link again (we shouldn't)
+            // because we can't get it, that means our code can't create the HTML page and display an error
+            recipeString = m.getRecipe(username, index);
+            assertEquals("{}", recipeString);
+        }
+
+        //Integration tests of Features 3,5,6 
+        // Feature 3: Checks that image map correctly adds the user and stores the image url at index 
+        // Feature 5: Filter recipes for Breakfast and Lunch 
+        // Feature 6: Sort recipes chronological and then alphabetical 
+        @Test
+        public void integrationMS2Test3() {
+            //cannot test ui/server, so test imagedisplayhandler
+            //with mocked images
+            //how workflow works is that dallehandler requests url from server, server generates it and returns url
+            //server makes sure we dont recreate if we already did using imagedisplayhandler
+            String username = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+            MockImageGenerator m = new MockImageGenerator();
+            String title = "Pizza";
+            String ingredients = "Cheese";
+            String index = "0";
+
+            String url = "";
+
+            //this is the code that is ran in server when we send a reqeuest for an image
+            //when we generate a url, we pass a user + index identifier in http request and associate recipe with user
+            //user should not be in there
+            assertFalse(i.getImageMap().containsKey(username));
+            i.setUser(username);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(username));
+            //if exists in map(should not), then generate and store
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+            try {
+                url = m.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), username);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+            
+            //Filter the recipeList using Breakfast and Lunch filters
+            //ArrayList<Recipe> sortedList = new ArrayList<>();
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Pizza", "Lunch", "cheese", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            r1.setIndex(0);
+            r2.setIndex(1);
+            r3.setIndex(2);
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+
+            filteredList = FilterHandler.filterMealType(testList, "Breakfast");
+            //Should only be one Breakfast item populated in the list
+            assertEquals("Cereal", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            filteredList = FilterHandler.filterMealType(testList, "Lunch");
+            //Should only be one Lunch item populated in the list
+            assertEquals("Pizza", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            testList = SortHandler.sortChronological(testList);
+            //Sorts recipes based on chronological date added
+            assertEquals(testList.get(0).getTitle(), "Pizza");
+            assertEquals(testList.get(1).getTitle(), "BLT");
+            assertEquals(testList.get(2).getTitle(), "Cereal");
+
+            testList = SortHandler.sortAlphabetical(testList);
+            //Sorts recipes based on Alphabetical 
+            assertEquals(testList.get(0).getTitle(), "BLT");
+            assertEquals(testList.get(1).getTitle(), "Cereal");
+            assertEquals(testList.get(2).getTitle(), "Pizza");
+
+            
+        }
+
+         //Integration tests of Features 3,4,5,6 
+        // Feature 3: Delete user from Map 
+        // Feature 4: Regenerate Recipe 
+        // Feature 5: Filter recipes for All recipes and Dinner 
+        // Feature 6: Sort recipes reverse chronological and then reverse alphabetical 
+        @Test
+        public void integrationMS2Test4() {
+            //cannot test ui/server, so test imagedisplayhandler
+            //with mocked images
+            //how workflow works is that dallehandler requests url from server, server generates it and returns url
+            //server makes sure we dont recreate if we already did using imagedisplayhandler
+            String username = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+            MockImageGenerator m = new MockImageGenerator();
+            String title = "Pizza";
+            String ingredients = "Cheese";
+            String index = "0";
+
+            String url = "";
+
+            //this is the code that is ran in server when we send a reqeuest for an image
+            //when we generate a url, we pass a user + index identifier in http request and associate recipe with user
+            //user should not be in there
+            assertFalse(i.getImageMap().containsKey(username));
+            i.setUser(username);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(username));
+            //if exists in map(should not), then generate and store
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+            try {
+                url = m.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), username);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+            
+            //when a recipe is deleted it also deletes from imagedisplayhandler
+            //now we test the delete method, because server is not up
+            i.delete(username, Integer.parseInt(index));
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+
+            //Filter recipes 
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe("Pizza", "Lunch", "cheese", "cook");
+            Recipe r2 = new Recipe("BLT", "Dinner", "blt", "cook");
+            Recipe r3 = new Recipe("Cereal", "Breakfast", "cereal", "put in milk");
+            r1.setIndex(0);
+            r2.setIndex(1);
+            r3.setIndex(2);
+            testList.add(r1);
+            testList.add(r2);
+            testList.add(r3);
+
+            filteredList = FilterHandler.filterMealType(testList, "Dinner");
+            //Should only be one Dinner item populated in the list
+            assertEquals("BLT", filteredList.get(0).getTitle());
+            assertEquals(1, filteredList.size());
+
+            filteredList = FilterHandler.filterMealType(testList, "All");
+            //All recipes should populate the list
+            assertEquals("Pizza",filteredList.get(0).getTitle());
+            assertEquals("BLT", filteredList.get(1).getTitle());
+            assertEquals("Cereal", filteredList.get(2).getTitle());
+            assertEquals(3, filteredList.size());
+
+            testList = SortHandler.sortRevChronological(testList);
+            //Recipes sorted by reverse chronological
+            assertEquals(testList.get(0).getTitle(), "Cereal");
+            assertEquals(testList.get(1).getTitle(), "BLT");
+            assertEquals(testList.get(2).getTitle(), "Pizza");
+
+            testList = SortHandler.sortRevAlphabetical(testList);
+            //Recipes sorted by reverse Alphabetical 
+            assertEquals(testList.get(0).getTitle(), "Pizza");
+            assertEquals(testList.get(1).getTitle(), "Cereal");
+            assertEquals(testList.get(2).getTitle(), "BLT");
+
+            //Mocking regeneration of a new recipe  
+            createHandler.getRecipe().setMealType("Lunch");
+            createHandler.getRecipe().setIngredients("chicken");
+            createHandler.getRecipe().setInstructions("Example Instructions");
+            createHandler.getRecipe().setTitle("Example instruction");
+            Recipe r = createHandler.getRecipe();
+            //To be used to ensure that they are not changed
+            String mealType = r.getMealType();
+            ingredients = r.getIngredients();
+            //To be used to ensure that it is changed
+            String instructions = r.getInstructions();
+            String checkTitle = r.getTitle();
+
+            String recipe = gptHandler.generate(mealType,ingredients);
+            title = recipe.substring(0, recipe.indexOf("~"));
+            String strippedString = title.replaceAll("[\\n\\r]+", "");
+            r.setInstructions(recipe);
+            r.setTitle(strippedString);
+
+
+            //making sure old values are updated
+            assertNotEquals(checkTitle, r.getTitle());
+            assertNotEquals(instructions,r.getInstructions());
+            //making sure old values are NOT updated
+            assertEquals(mealType, r.getMealType());
+            assertEquals(ingredients, r.getIngredients());
+            //Checking display+Actually recipe is correct.
+            assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " + r.getInstructions());
+            assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+        }
+
+
+        // Feature 1 (5), Feature 1 (3), Feature 2 (1), Feature 6 (1), Feature 7 (1 then 2), Feature 3 (1), Feature 5 (1 with Feature 4 (1) and Feature 6 (2), 2)
+        // Feature 1 (5) The server is down
+        // Feature 1 (3) - User has an account
+        // Feature 2 (1) - User has auto-login enabled
+        // Feature 6 (1) - User has multiple recipes and is in default order 
+        // Feature 7 (1 then 2) (That webpage contains the same recipe display info that the user would have access to locally. But then deletes) 
+        // Feature 3 (1) - User clicks display recipe
+        // Feature 5 (1 with Feature 4 (1) and Feature 6 (2), 2) - User adding recipe, user regenerates recipe, recipe then added with tag and recipes 
+        // should be in default order, then they only filter for lunch recipes
+        @Test
+        public void sbstMS2Test1() {
+            String user = usernameTest1;
+            ImageDisplayHandler i = new ImageDisplayHandler();
+            MockImageGenerator mig = new MockImageGenerator();
+
+            String url = "";
+            
+            // Feature 1 (5)
+            // if the server is down (which we can't really test for, then the user just waits a bit)
+
+            // server is back up
+
+            // Feature 1 (3)
+            // user has an account, but we already added it earlier so they log in
+
+            // user decides to test out the capabilities of the app, with add, edit, and delete (StoryTestF1)
+            //login is ui and cannot be tested, server cannot be tested
+            //thus we test the mongodb methods that are being called
+
+            String index = "0";
+
+            String title = "test1";
+            String mealType = "Breakfast";
+            String ingredients = "Hot dog";
+            String instructions = "cook food";
+            Recipe r1 = new Recipe(title, mealType, ingredients, instructions);
+
+            // image is generated as well
+            //this is the code that is ran in server when we send a reqeuest for an image
+            //when we generate a url, we pass a user + index identifier in http request and associate recipe with user
+            //user should not be in there
+            assertFalse(i.getImageMap().containsKey(user));
+            i.setUser(user);
+            //test if it added the user
+            assertTrue(i.getImageMap().containsKey(user));
+            //if exists in map(should not), then generate and store
+            assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
+            try {
+                url = mig.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), user);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+
+            //get user list from mongo and replace current one
+            ArrayList<Recipe> replace = update();
+            rList.setList(replace);
+
+            Recipe r2 = rList.get(title);
+            assertEquals(r1.getTitle(), r2.getTitle());
+            assertEquals(r1.getMealType(), r2.getMealType());
+            assertEquals(r1.getIngredients(), r2.getIngredients());
+            assertEquals(r1.getInstructions(), r2.getInstructions());
+
+            //edit that recipe
+            m.post(usernameTest1, title, mealType, "two hot dogs", instructions, "0");
+            //check if ingredients changed
+            replace = update();
+            rList.setList(replace);
+            assertEquals("two hot dogs", rList.get(title).getIngredients());
+
+            //delete the recipe
+            m.delete(usernameTest1, "0");
+
+            //collection should now be empty
+            assertEquals(0, collection1.countDocuments());
+
+            // image associated with it should be gone too
+            i.delete(usernameTest1, 0);
+            assertFalse(i.check(Integer.parseInt(index)));
+
+
+            // user logsout
+
+            // user decides to test auto-login - Feature 2 (1) (StoryTestF2)
+            delCSV();
+            ArrayList<String> details = AutoLogin.load();
+            //this should be empty as there is no csv
+            AutoLogin.save(usernameTest1, passwordTest1);
+            //load checks if there is a csv, and also reads from it, so load should work
+            details = AutoLogin.load();
+            assertEquals(usernameTest1, details.get(0));
+            assertEquals(passwordTest1, details.get(1));
+            //clear csv
+            delCSV();
+
+            // user decides to create a recipe to then be shared - Feature 7 (1) - StoryTestF7Delete
+            // a recipe was added to user1
+            String title1 = "Test Recipe 1";
+            String mealtype = "Lunch";
+            ingredients = "food";
+            instructions = "cook food";
+            m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+            assertEquals(1, collection1.countDocuments());
+
+            // image should be generated here
+            try {
+                url = mig.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), user);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+
+            // the user has shared a link to their friend and the friend uses that link to search up the recipe
+            // in their browser
+            // we'll assume the query is correct and the username and index is extracted out
+             // the HTML content you see below should match the info from above
+             String username = usernameTest1;
+
+             // we'll simulate getting the recipe info from the database
+
+            String recipeString = m.getRecipe(username, index);
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
+
+            //used in f7 tests
+            // should be able to get our new url from here, just like in code
+            String banana = i.getUrl(Integer.parseInt(index));
+
+            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+
+            // but now the user wants to delete their shared recipe, meaning the page
+            // won't share - Feature 7 (2)
+
+            // now we'll delete the recipe
+            m.delete(usernameTest1, "0");
+            assertEquals(0, collection1.countDocuments());
+
+            // image associated with it should be gone too
+            i.delete(usernameTest1, 0);
+            assertFalse(i.check(Integer.parseInt(index)));
+
+            // now we'll see if we can see the recipe if we try the link again (we shouldn't)
+            // because we can't get it, that means our code can't create the HTML page and display an error
+            recipeString = m.getRecipe(username, index);
+            assertEquals("{}", recipeString);
+
+
+            // user tries to create a new recipe, but then regenerates their results (Story Test F4) - Feature 4 (1)
+            createHandler.getRecipe().setMealType("Lunch");
+            createHandler.getRecipe().setIngredients("chicken");
+            createHandler.getRecipe().setInstructions("Example Instructions");
+            createHandler.getRecipe().setTitle("Example instruction");
+            Recipe r = createHandler.getRecipe();
+
+            // generate an image when we first create
+            try {
+                url = mig.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), user);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+
+
+            //To be used to ensure that they are not changed
+            mealType = r.getMealType();
+            ingredients = r.getIngredients();
+            //To be used to ensure that it is changed
+            instructions = r.getInstructions();
+            String checkTitle = r.getTitle();
+
+            // user presses regeneration button below
+
+            // make sure we delete our old image
+            // image associated with it should be gone too
+            i.delete(usernameTest1, 0);
+            assertFalse(i.check(Integer.parseInt(index)));
+
+            String recipe = gptHandler.generate(mealType,ingredients);
+            title = recipe.substring(0, recipe.indexOf("~"));
+            String strippedString = title.replaceAll("[\\n\\r]+", "");
+            r.setInstructions(recipe);
+            r.setTitle(strippedString);
+
+            // generate an image when we regenerate
+            try {
+                url = mig.generateRecipeImage(title, ingredients);
+                i.store(url, Integer.parseInt(index), user);
+            } catch (Exception e) {
+                System.out.println("ERROR" + e);
+            }
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+
+            //making sure old values are updated
+            assertNotEquals(checkTitle, r.getTitle());
+            assertNotEquals(instructions,r.getInstructions());
+            //making sure old values are NOT updated
+            assertEquals(mealType, r.getMealType());
+            assertEquals(ingredients, r.getIngredients());
+            //Checking display+Actually recipe is correct.
+            assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " + r.getInstructions());
+            assertEquals("Instructions: Diet Plan ~ Maybe you should just go on a diet.","Instructions: " +createHandler.getRecipe().getInstructions());
+
+            title = r.getTitle();
+            instructions = r.getInstructions();
+
+            // user adds the recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+            assertEquals(1, collection1.countDocuments());
+
+            // will update the recipeList to reflect this
+            replace = update();
+            rList.setList(replace);
+
+            // User clicks display recipe to see the recipe they just made (StoryTestF3) - Feature 3 (1)
+
+            // see if we can get the recently made recipe and it's image
+            r = rList.get(title);
+            String title0 = title;
+            assertEquals(r.getTitle(), title);
+            assertEquals(r.getInstructions(), instructions);
+            assertEquals(r.getIngredients(), ingredients);
+            assertEquals(r.getMealType(), mealType);
+            //now test if the map has what we want
+            assertTrue(i.check(Integer.parseInt(index)));
+            assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
+
+            // user decides to add some more new recipes, one dinner and one breakfast
+            // each time we add a recipe, we want to make sure that the recipes are being added in chronological order
+            // Feature 6 (1) - UnitTestF6Chron
+            title = "Steak";
+            mealType = "Dinner";
+            ingredients = "Beef";
+            instructions = "Cook";
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+            assertEquals(2, collection1.countDocuments());
+
+            // will update the recipeList to reflect this
+            replace = update();
+            rList.setList(replace);
+
+            // in our UI, we have a separate ArrayList<Recipe> that is based on recipe list
+            ArrayList<Recipe> listDisplay = rList.getList();
+
+            // we have been in chronological order by default
+            assertEquals(listDisplay.get(0).getTitle(), title0);
+            assertEquals(listDisplay.get(1).getTitle(), "Steak");
+
+            title = "Eggs";
+            mealType = "Breakfast";
+            ingredients = "Yolk";
+            instructions = "Boil";
+            //add a new recipe
+            m.put(usernameTest1, title, mealType, ingredients, instructions);
+            assertEquals(3, collection1.countDocuments());
+
+            // will update the recipeList to reflect this
+            replace = update();
+            rList.setList(replace);
+
+            // in our UI, we have a separate ArrayList<Recipe> that is based on recipe list
+            listDisplay = rList.getList();
+
+            // we have been in chronological order by default
+            assertEquals(listDisplay.get(0).getTitle(), title0);
+            assertEquals(listDisplay.get(1).getTitle(), "Steak");
+            assertEquals(listDisplay.get(2).getTitle(), "Eggs");
+
+            // Now it's noon and the user wants to see only their lunch recipes
+            // Feature 5 (2) - UnitTestF5LunchFilter
+            // there should only be 1 lunch item
+            listDisplay = FilterHandler.filterMealType(listDisplay, "Lunch");
+            assertEquals(title0, listDisplay.get(0).getTitle());
+            assertEquals(1,listDisplay.size());
 
         }
     }
