@@ -93,16 +93,23 @@ class NavigationHandler{
         }
 
         Path imagePath = imagesDir.resolve(username + " " +index + ".jpg");
-        if (!Files.exists(imagePath)) {
-            // If it doesn't exist, download and save the image
-            try (InputStream in = new URI(url).toURL().openStream()) {
-                Files.copy(in, imagePath);
-                System.out.println("Image saved successfully: " + imagePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Image with index " + index + " already exists.");
+        // if (!Files.exists(imagePath)) {
+        //     // If it doesn't exist, download and save the image
+        //     try (InputStream in = new URI(url).toURL().openStream()) {
+        //         Files.copy(in, imagePath);
+        //         System.out.println("Image saved successfully: " + imagePath);
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     }
+        // } else {
+        //     System.out.println("Image with index " + index + " already exists.");
+        // }
+        //replace every time regardless
+        try (InputStream in = new URI(url).toURL().openStream()) {
+            Files.copy(in, imagePath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Image saved successfully: " + imagePath);
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
         rd.setImg(imagePath.toString());
 
