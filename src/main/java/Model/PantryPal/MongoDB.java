@@ -37,8 +37,7 @@ public class MongoDB {
 
     public MongoDB(){
         // USE THE SYSTEM GETENV WHEN COMMITTING TO GITHUB OTHERWISE TESTS WILL NOT WORK
-        //String uri = System.getenv("MONGODB_CONNECTION_STRING");
-        String uri = "mongodb+srv://orrabadia:yDIYYtTjsP0REJcl@cluster0.0b39ssz.mongodb.net/?retryWrites=true&w=majority";
+        String uri = System.getenv("MONGODB_CONNECTION_STRING");
 
         
 
