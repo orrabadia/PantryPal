@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class Server {
+    
+
     // initialize server port and hostname
-    private static final int SERVER_PORT = 8100;
-    private static final String SERVER_HOSTNAME = "localhost";
+    private static final int SERVER_PORT = Integer.parseInt(EnvironmentHandler.loadEnv("SERVER_PORT"));
+    private static final String SERVER_HOSTNAME = EnvironmentHandler.loadEnv("SERVER_HOST");
 
   public static void main(String[] args) throws IOException {
 
@@ -20,7 +22,9 @@ public class Server {
     // create a map to store data
     Map<String, String> data = new HashMap<>();
 
-    
+    // imagedisplayhandler to handle images and track if they are already generated
+    ImageDisplayHandler i = new ImageDisplayHandler();
+
 
     // create a server
     HttpServer server = HttpServer.create(
@@ -29,13 +33,13 @@ public class Server {
     );
 
     //HttpContext context = server.createContext("/", new RequestHandler(data));
-    HttpContext recipecontext = server.createContext("/recipe", new RecipeRequestListener(data));
+    HttpContext recipecontext = server.createContext("/recipe", new RecipeRequestListener(data, i));
     HttpContext audiocontext = server.createContext("/audio", new AudioRequestListener(data));
     HttpContext generatecontext = server.createContext("/generate", new GenerateRequestListener());
     HttpContext usercontext = server.createContext("/user", new UserRequestListener(data));
-    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(data));
+    HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(i));
+    HttpContext sharecontext = server.createContext("/share", new ShareRequestListener(i));
     
-    //HttpContext imagecontext = server.createContext("/image", new ImageRequestListener(data));
     //add new handlers for each type
     server.setExecutor(threadPoolExecutor); 
     server.start();

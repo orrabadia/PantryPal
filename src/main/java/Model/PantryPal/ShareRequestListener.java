@@ -11,11 +11,11 @@ import org.json.JSONObject;
 
 public class ShareRequestListener implements HttpHandler {
 
-    private final Map<String, String> data;
+    private ImageDisplayHandler i;
     private MongoDB m;
       
-    public ShareRequestListener(Map<String, String> data) {
-      this.data = data;
+    public ShareRequestListener(ImageDisplayHandler i) {
+      this.i = i;
       m = new MongoDB();
     }
 
@@ -57,7 +57,9 @@ public class ShareRequestListener implements HttpHandler {
           String ingredients = recipeJSON.getString("ingredients");
           String instructions = recipeJSON.getString("instructions");
 
-          HTMLBuilder htmlB = new HTMLBuilder(title, mealType,ingredients, instructions);
+          String url = i.getUrl(Integer.parseInt(index));
+
+          HTMLBuilder htmlB = new HTMLBuilder(title, mealType,ingredients, instructions,url);
   
           // encode HTML content
           httpExchange.getResponseHeaders().set("Content-Type", "text/html");

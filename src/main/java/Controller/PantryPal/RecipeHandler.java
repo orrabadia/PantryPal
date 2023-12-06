@@ -49,6 +49,7 @@ public class RecipeHandler {
 
         //Added index field 
         String newList = reqHandler.performRecipeRequest("GET", "", "", "", "", -1, username);
+        System.out.println("NEWLIST" + newList);
         JSONArray test = new JSONArray(newList);
         ArrayList<Recipe> replace = new ArrayList<>();
         //System.out.println("RHANDLER : Printing keys and values:");

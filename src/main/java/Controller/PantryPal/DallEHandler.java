@@ -4,31 +4,18 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class DallEHandler {
-    private DallE d;
+    private RequestHandler r;
     DallEHandler(){
-        d = new ImageGenerator();
-    }
-    
-    DallEHandler(boolean mock){
-        //if constructed with mock true, then mock it for testing purposes
-        if (mock) {
-            d = new MockImageGenerator();
-        }
+        r = new RequestHandler();
     }
 
-    // don't know if it should be void return type
-    public String generate(String title, String ingredients){
-        String ret = "ERROR";
-        try {
-            d.generateRecipeImage(title, ingredients);
-            ret = "SUCCESS";
-        } catch (IOException e1) {
-            System.out.println("IOEXCEPTION" + e1.toString());
-        } catch (InterruptedException e2) {
-            System.out.println("INTERRUPTEDEXCEPTION" + e2.toString());
-        } catch (URISyntaxException e3){
-            System.out.println("URISYNTAXEXCEPTION" + e3.toString());
-        }
-        return ret;
+    /** return string of url, will download and save image locally */
+    public String generate(String title, String user, String index, String ingredients){
+        return r.performImageRequest("POST", title, user, index, ingredients);
+    }
+
+    /** delete image from server, used when showing temp image before saving recipe */
+    public void delete(String user, String index){
+        r.performImageRequest("DELETE", "", user, index, "");
     }
 }

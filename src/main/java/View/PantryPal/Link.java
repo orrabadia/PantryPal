@@ -7,7 +7,11 @@ public class Link {
         this.username = username;
         this.index = index;
     }
+
+    private static final String SERVER_PORT = EnvironmentHandler.loadEnv("SERVER_PORT");
+    private static final String USER_HOSTNAME = EnvironmentHandler.loadEnv("USER_HOST");
+
     public String getHTTPLink() {
-        return "http://localhost:8100/share/" + username + "/" + index;
+        return "http://" + USER_HOSTNAME + ":" + SERVER_PORT + "/share/" + username + "/" + index;
     }
 }

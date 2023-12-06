@@ -6,27 +6,22 @@ import java.net.*;
 import java.util.*;
 import org.json.*;
 public class ImageRequestListener implements HttpHandler {
-    private MongoDB mongoDB;
-    private final Map<String, String> data;
-  
-    //may need to add more?
+    private DallE d;
+    private ImageDisplayHandler i;
 
-    public ImageRequestListener(Map<String, String> data){
-        this.data = data;
-        mongoDB = new MongoDB();
-        
+    public ImageRequestListener(ImageDisplayHandler i){
+        d = new ImageGenerator();
+        this.i = i;
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String response = "Request Received";
         String method = httpExchange.getRequestMethod();
         try {
-            if (method.equals("GET")) {
-              response = handleGet(httpExchange);
-              //response = handleGet(httpExchange);
-              httpExchange.getResponseHeaders().set("Content-Type", "application/json");
-            } else if (method.equals("PUT")) {
-                response = handlePut(httpExchange);
+            if (method.equals("POST")) {
+              response = handlePost(httpExchange);
+            } else if (method.equals("DELETE")) {
+              response = handleDelete(httpExchange);
             } else {
               throw new Exception("Not Valid Request Method");
             }
@@ -44,50 +39,59 @@ public class ImageRequestListener implements HttpHandler {
        
     }
 
-    
-
-    //** return password */
-    private String handleGet(HttpExchange httpExchange) throws IOException {
-      // Converting the JSON array to a string
-      //note that this has to be a single string with no newlines before you send it back
-      String username = "";
-      URI uri = httpExchange.getRequestURI();
-      String query = uri.getRawQuery();
-      if (query != null) {
-        username = query.substring(query.indexOf("=") + 1);
-        System.out.println(username);
+    /** delete image from server */
+    private String handleDelete(HttpExchange httpExchange) throws IOException{
+      InputStream inStream = httpExchange.getRequestBody();
+      Scanner scanner = new Scanner(inStream);
+      String imageData = scanner.nextLine();
+      String[] recipeValues = imageData.split(",");
+      String user = recipeValues[0];
+      String index = recipeValues[1];
+      scanner.close();
+      String ret = "Failure";
+      //delete from server
+      i.setUser(user);
+      i.delete(user, Integer.parseInt(index));
+      //if not there good
+      if(!i.check(Integer.parseInt(index))){
+        ret = "Success";
       }
-      
-      String check = mongoDB.find(username);
-      JSONObject details = new JSONObject(check);
-      //check = check.replaceAll("[\n\r]", "");
-
-      System.out.println("REQUESTLISTENER RET: " + check);
-      String pass = details.getString(username);
-      System.out.println(username + " password is: " + pass +  " :END");
-
-      return pass;
-
+      return ret;
     }
 
-    private String handlePut(HttpExchange httpExchange) throws IOException {
-      //parse username from query
-      String username = "";
-      URI uri = httpExchange.getRequestURI();
-      String query = uri.getRawQuery();
-      if (query != null) {
-        username = query.substring(query.indexOf("=") + 1);
-      }
-        InputStream inStream = httpExchange.getRequestBody();
-        Scanner scanner = new Scanner(inStream);
-        String putData = scanner.nextLine();
-        String[] userCredentials = putData.split(",");
-        String user = userCredentials[0];
-        String pass = userCredentials[1];
+    
 
-        mongoDB.putUsername(user, pass);
-        scanner.close();
-        return "Success";
+    //** return url of generated image */
+    private String handlePost(HttpExchange httpExchange) throws IOException {
+      InputStream inStream = httpExchange.getRequestBody();
+      Scanner scanner = new Scanner(inStream);
+      String imageData = scanner.nextLine();
+      String[] recipeValues = imageData.split(",");
+      String title = recipeValues[0];
+      String ingredients = recipeValues[1];
+      String user = recipeValues[2];
+      String index = recipeValues[3];
+      scanner.close();
+
+      String ret = "ERROR";
+      try {
+        i.setUser(user);
+        //if exist use, if not generate 
+        if(i.check(Integer.parseInt(index))){
+          ret = i.getUrl(Integer.parseInt(index));
+        } else {
+          ret = d.generateRecipeImage(title, ingredients);
+        }
+        i.store(ret, Integer.parseInt(index), user);
+      } catch (IOException e1) {
+          System.out.println("IOEXCEPTION" + e1.toString());
+      } catch (InterruptedException e2) {
+          System.out.println("INTERRUPTEDEXCEPTION" + e2.toString());
+      } catch (URISyntaxException e3){
+          System.out.println("URISYNTAXEXCEPTION" + e3.toString());
+      }
+      return ret;
+
     }
 
 

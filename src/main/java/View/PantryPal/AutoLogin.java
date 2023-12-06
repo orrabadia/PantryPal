@@ -1,6 +1,7 @@
 package PantryPal;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 public class AutoLogin {
     public static void save(String user, String password){
         String filePath = "./users.csv";
+
+        clear();
         //write saved info to csv
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(user + "," + password + "\n");
@@ -34,5 +37,21 @@ public class AutoLogin {
         }
 
         return details;
+    }
+
+    public static void clear(){
+        String filePath = "./users.csv";
+
+        File file = new File(filePath);
+
+        // check if file exists and if so delete it
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("Existing file deleted");
+            } else {
+                System.out.println("Failed to delete users file");
+                return;
+            }
+        }
     }
 }

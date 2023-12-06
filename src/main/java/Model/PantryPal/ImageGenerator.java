@@ -21,7 +21,7 @@ public class ImageGenerator implements DallE {
     private static final String API_KEY = "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";
     private static final String MODEL = "dall-e-2";
 
-    public void generateRecipeImage(String title, String ingredients) throws IOException, InterruptedException, URISyntaxException {
+    public String generateRecipeImage(String title, String ingredients) throws IOException, InterruptedException, URISyntaxException {
 
         // Set request parameters
         String prompt = title + "dish" + "with these ingredients: " + ingredients + "on a table";
@@ -66,13 +66,8 @@ public class ImageGenerator implements DallE {
     
         System.out.println("DALL-E Response:");
         System.out.println(generatedImageURL);
-    
-        // Download the Generated Image to Current Directory
-        try(
-            InputStream in = new URI(generatedImageURL).toURL().openStream())
-        {
-            Files.copy(in, Paths.get("image.jpg"));
-        }
+
+        return generatedImageURL;
     
 
     }
