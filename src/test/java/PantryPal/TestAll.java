@@ -91,7 +91,7 @@ public class TestAll {
 
         gptHandler = new GPTHandler(true);
 
-        String uri =System.getenv("MONGODB_CONNECTION_STRING");
+        String uri = System.getenv("MONGODB_CONNECTION_STRING");
 
         //insert your uri
         clientMongoDB = MongoClients.create(uri);
@@ -2936,7 +2936,7 @@ public class TestAll {
             //now test if the map has what we want
             assertTrue(i.check(Integer.parseInt(index)));
             assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
-            
+
             //when a recipe is deleted it also deletes from imagedisplayhandler
             //now we test the delete method, because server is not up
             i.delete(user, Integer.parseInt(index));
@@ -3036,10 +3036,10 @@ public class TestAll {
 
         }
 
-        //Integration tests of Features 1,2,7 
-        // Feature 1: User adds a recipe and edits it 
-        // Feature 2: User saves their username/password  
-        // Feature 7: Demonstrate that we can see recipe from shared link 
+        //Integration tests of Features 1,2,7
+        // Feature 1: User adds a recipe and edits it
+        // Feature 2: User saves their username/password
+        // Feature 7: Demonstrate that we can see recipe from shared link
         @Test
         public void integrationMS2Test1() {
             //login is ui and cannot be tested, server cannot be tested
@@ -3124,15 +3124,15 @@ public class TestAll {
             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
         }
 
-        //Integration tests of Features 1,2,7 
-        // Feature 1: User adds a recipe and deletes it 
-        // Feature 2: User does not save their username/password   
+        //Integration tests of Features 1,2,7
+        // Feature 1: User adds a recipe and deletes it
+        // Feature 2: User does not save their username/password
         // Feature 7: Demonstrate changes to shared recipe when edited in app/cannot access when it is deleted
         @Test
         public void integrationMS2Test2() {
             delCSV();
             ArrayList<String> details = AutoLogin.load();
-            //this should be empty as there is no csv bc the user did not save their login info 
+            //this should be empty as there is no csv bc the user did not save their login info
             String filePath = "./users.csv";
             File file = new File(filePath);
             assertFalse(file.exists());
@@ -3212,7 +3212,7 @@ public class TestAll {
              htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
              assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
 
-            //Now we will delete the recipe and see that we cannot get the HTML page for it 
+            //Now we will delete the recipe and see that we cannot get the HTML page for it
             m.delete(username, "0");
             assertEquals(0, collection1.countDocuments());
 
@@ -3222,10 +3222,10 @@ public class TestAll {
             assertEquals("{}", recipeString);
         }
 
-        //Integration tests of Features 3,5,6 
-        // Feature 3: Checks that image map correctly adds the user and stores the image url at index 
-        // Feature 5: Filter recipes for Breakfast and Lunch 
-        // Feature 6: Sort recipes chronological and then alphabetical 
+        //Integration tests of Features 3,5,6
+        // Feature 3: Checks that image map correctly adds the user and stores the image url at index
+        // Feature 5: Filter recipes for Breakfast and Lunch
+        // Feature 6: Sort recipes chronological and then alphabetical
         @Test
         public void integrationMS2Test3() {
             //cannot test ui/server, so test imagedisplayhandler
@@ -3259,7 +3259,7 @@ public class TestAll {
             //now test if the map has what we want
             assertTrue(i.check(Integer.parseInt(index)));
             assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
-            
+
             //Filter the recipeList using Breakfast and Lunch filters
             //ArrayList<Recipe> sortedList = new ArrayList<>();
             ArrayList<Recipe> testList = new ArrayList<>();
@@ -3291,19 +3291,19 @@ public class TestAll {
             assertEquals(testList.get(2).getTitle(), "Cereal");
 
             testList = SortHandler.sortAlphabetical(testList);
-            //Sorts recipes based on Alphabetical 
+            //Sorts recipes based on Alphabetical
             assertEquals(testList.get(0).getTitle(), "BLT");
             assertEquals(testList.get(1).getTitle(), "Cereal");
             assertEquals(testList.get(2).getTitle(), "Pizza");
 
-            
+
         }
 
-         //Integration tests of Features 3,4,5,6 
-        // Feature 3: Delete user from Map 
-        // Feature 4: Regenerate Recipe 
-        // Feature 5: Filter recipes for All recipes and Dinner 
-        // Feature 6: Sort recipes reverse chronological and then reverse alphabetical 
+         //Integration tests of Features 3,4,5,6
+        // Feature 3: Delete user from Map
+        // Feature 4: Regenerate Recipe
+        // Feature 5: Filter recipes for All recipes and Dinner
+        // Feature 6: Sort recipes reverse chronological and then reverse alphabetical
         @Test
         public void integrationMS2Test4() {
             //cannot test ui/server, so test imagedisplayhandler
@@ -3337,13 +3337,13 @@ public class TestAll {
             //now test if the map has what we want
             assertTrue(i.check(Integer.parseInt(index)));
             assertEquals(i.getUrl(Integer.parseInt(index)),  "https://assets.teenvogue.com/photos/5ab665d06d36ed4396878433/master/pass/GettyImages-519526540.jpg");
-            
+
             //when a recipe is deleted it also deletes from imagedisplayhandler
             //now we test the delete method, because server is not up
             i.delete(username, Integer.parseInt(index));
             assertFalse(i.getUserMap().containsKey(Integer.parseInt(index)));
 
-            //Filter recipes 
+            //Filter recipes
             ArrayList<Recipe> testList = new ArrayList<>();
             ArrayList<Recipe> filteredList = new ArrayList<>();
             Recipe r1 = new Recipe("Pizza", "Lunch", "cheese", "cook");
@@ -3375,12 +3375,12 @@ public class TestAll {
             assertEquals(testList.get(2).getTitle(), "Pizza");
 
             testList = SortHandler.sortRevAlphabetical(testList);
-            //Recipes sorted by reverse Alphabetical 
+            //Recipes sorted by reverse Alphabetical
             assertEquals(testList.get(0).getTitle(), "Pizza");
             assertEquals(testList.get(1).getTitle(), "Cereal");
             assertEquals(testList.get(2).getTitle(), "BLT");
 
-            //Mocking regeneration of a new recipe  
+            //Mocking regeneration of a new recipe
             createHandler.getRecipe().setMealType("Lunch");
             createHandler.getRecipe().setIngredients("chicken");
             createHandler.getRecipe().setInstructions("Example Instructions");
@@ -3417,10 +3417,10 @@ public class TestAll {
         // Feature 1 (5) The server is down
         // Feature 1 (3) - User has an account
         // Feature 2 (1) - User has auto-login enabled
-        // Feature 6 (1) - User has multiple recipes and is in default order 
-        // Feature 7 (1 then 2) (That webpage contains the same recipe display info that the user would have access to locally. But then deletes) 
+        // Feature 6 (1) - User has multiple recipes and is in default order
+        // Feature 7 (1 then 2) (That webpage contains the same recipe display info that the user would have access to locally. But then deletes)
         // Feature 3 (1) - User clicks display recipe
-        // Feature 5 (1 with Feature 4 (1) and Feature 6 (2), 2) - User adding recipe, user regenerates recipe, recipe then added with tag and recipes 
+        // Feature 5 (1 with Feature 4 (1) and Feature 6 (2), 2) - User adding recipe, user regenerates recipe, recipe then added with tag and recipes
         // should be in default order, then they only filter for lunch recipes
         @Test
         public void sbstMS2Test1() {
@@ -3429,7 +3429,7 @@ public class TestAll {
             MockImageGenerator mig = new MockImageGenerator();
 
             String url = "";
-            
+
             // Feature 1 (5)
             // if the server is down (which we can't really test for, then the user just waits a bit)
 
@@ -3711,6 +3711,167 @@ public class TestAll {
             listDisplay = FilterHandler.filterMealType(listDisplay, "Lunch");
             assertEquals(title0, listDisplay.get(0).getTitle());
             assertEquals(1,listDisplay.size());
+        }
+        @Test
+        public void sbstMS2Test2(){
+            //F1: Cannot test/is being tested in other sbst
+
+            /*
+            * start of F7:1
+            * Click create a recipe and go through the steps to create a new recipe. Then click on the display recipe and click the share recipe button.
+            * A unique URL should be displayed in a section labeled “Shareable Link”.  (User story 7 scenario 1)
+            */
+            String title1 = "Test Recipe 1";
+            String mealtype = "Lunch";
+            String ingredients = "food";
+            String instructions = "cook food";
+            m.put(usernameTest1, title1, mealtype, ingredients, instructions);
+            assertEquals(1, collection1.countDocuments());
+
+            // the user has shared a link to their friend and the friend uses that link to search up the recipe
+            // in their browser
+            // we'll assume the query is correct and the username and index is extracted out
+            String username = usernameTest1;
+            // is 0 because it's the first recipe ever made, also is string because we extract it out
+            String index = "0";
+
+            // we'll simulate getting the recipe info from the database
+
+            String recipeString = m.getRecipe(username, index);
+
+            // we'll extract out the parts from the returned JSON and see if they match
+            // this demonstrates the other person can see the info of the recipe
+            JSONObject recipeJSON = new JSONObject(recipeString);
+            String testtitle = recipeJSON.getString("title");
+            String testmealType = recipeJSON.getString("mealType");
+            String testingredients = recipeJSON.getString("ingredients");
+            String testinstructions = recipeJSON.getString("instructions");
+
+                        //used in f7 tests
+            String banana = "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg";
+
+            // the HTML content you see below should match the info from above
+            HTMLBuilder htmlB = new HTMLBuilder(title1, mealtype,ingredients, instructions, banana);
+            HTMLBuilder htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+
+            assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+            //end of F7:1
+
+            //start of F7:3
+            /*
+            * Click the edit button within the recipe display and make some changes to the recipe.
+            * When you go back to the URL for that recipe, the changes should be reflected in
+            * the webpage. (User story 7 scenario 3)
+            */
+            // a recipe was added to user1
+            String newMeal = "Dinner";
+            String newIngredients = "Honey, Bread";
+            String newInstructions = "smear honey, eat";
+            m.post(usernameTest1, title1, newMeal, newIngredients, newInstructions, "0");
+            assertEquals(1, collection1.countDocuments());
+
+            recipeString = m.getRecipe(username, index);
+            recipeJSON = new JSONObject(recipeString);
+            testtitle = recipeJSON.getString("title");
+            testmealType = recipeJSON.getString("mealType");
+            testingredients = recipeJSON.getString("ingredients");
+            testinstructions = recipeJSON.getString("instructions");
+
+            // our HTML page should match the correct one
+             htmlB = new HTMLBuilder(title1, newMeal,newIngredients, newInstructions, banana);
+             htmlB2 = new HTMLBuilder(testtitle, testmealType, testingredients, testinstructions, banana);
+             assertEquals(htmlB.buildHTML().toString(), htmlB2.buildHTML().toString());
+            //end of F7:3
+
+            /*
+            * Go back to the recipe display page and choose the filter by meal type button. Click all 3 switches and then click apply.
+            * You should be directed back to the main recipe display but it should be empty (User story 5, feature 4).
+            */
+            //start of F5:4
+            ArrayList<Recipe> testList = new ArrayList<>();
+            ArrayList<Recipe> filteredList = new ArrayList<>();
+            Recipe r1 = new Recipe(testtitle,testmealType,testingredients,testinstructions);
+            r1.setIndex(0);
+            testList.add(r1);
+
+            filteredList = FilterHandler.filterMealType(testList, "Lunch");
+            assertEquals(0,filteredList.size());
+            //end of F5:4
+
+            /*
+            * Choose the filter by meal type button once again, but choose to toggle an arbitrary tag and click apply. You should be directed back to the
+            * main display but the display should be populated with recipes that have the particular tag.(User story 5, feature 3).
+            */
+            //start of F5:3
+            filteredList = FilterHandler.filterMealType(testList, "Dinner");
+            assertEquals(1,filteredList.size());
+            //end of F5:3
+
+            //start of F6:3
+            /*
+             * Choose to sort the recipes by alphabetical order.
+             * The recipes should then be displayed in alphabetical order. (User story 6, scenario 3).
+             */
+            Recipe r2 = new Recipe("title2", mealtype, ingredients, instructions);
+            r2.setIndex(1);
+            testList.add(r2);
+
+            testList = SortHandler.sortAlphabetical(testList);
+            //now 1 should be first
+            assertEquals(testList.get(0).getTitle(), r1.getTitle());
+            assertEquals(testList.get(1).getTitle(), r2.getTitle());
+            //end of F6:3
+
+            //start of F6:4
+            /*
+             * Then choose to create a new recipe and go through the steps to create the recipe. The new recipe should be created and populated
+             * in a spot relative to the other recipes based upon its alphabetical value. (User story 6, scenario 4)
+             */
+            Recipe r3 = new Recipe("A",mealtype,ingredients,instructions);
+            r3.setIndex(2);
+            testList.add(r3);
+            testList = SortHandler.sortAlphabetical(testList);
+            assertEquals(testList.get(0).getTitle(), r3.getTitle());
+            assertEquals(testList.get(1).getTitle(), r1.getTitle());
+            assertEquals(testList.get(2).getTitle(), r2.getTitle());
+
+            //end of F6:4
+
+            //start of F6:7
+            /*
+             * Choose to revert back to default sorted order.The recipe display should then be displayed
+             * in chronological order (User story 6, scenario 7).
+             */
+            testList = SortHandler.sortChronological(testList);
+            assertEquals(testList.get(0).getTitle(), r1.getTitle());
+            assertEquals(testList.get(1).getTitle(), r2.getTitle());
+            assertEquals(testList.get(2).getTitle(), r3.getTitle());
+            //end of F6:7
+
+            //start of F6:5
+            /*
+             * Then choose to sort the recipes in reverse-chronological order. The recipes should then be
+             *  displayed in reverse chronological order (User story 6, scenario 5).
+             */
+            testList = SortHandler.sortRevChronological(testList);
+            assertEquals(testList.get(0).getTitle(), r3.getTitle());
+            assertEquals(testList.get(1).getTitle(), r2.getTitle());
+            assertEquals(testList.get(2).getTitle(), r1.getTitle());
+            //end of F6:5
+
+            //start of F6:6
+            /*
+             * Then choose to create a new recipe and go through the steps to create the recipe. The new recipe should be created and populated in a spot relative to the
+             * other recipes based upon its reverse chronological value. (User story 6, scenario 6).
+             */
+            Recipe r4 = new Recipe("B", mealtype,ingredients,instructions);
+            r4.setIndex(3);
+            testList.add(r4);
+            testList = SortHandler.sortRevChronological(testList);
+            assertEquals(testList.get(0).getTitle(), r4.getTitle());
+            assertEquals(testList.get(1).getTitle(), r3.getTitle());
+            assertEquals(testList.get(2).getTitle(), r2.getTitle());
+            assertEquals(testList.get(3).getTitle(), r1.getTitle());;
 
         }
     }
