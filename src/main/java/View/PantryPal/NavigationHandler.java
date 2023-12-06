@@ -2,6 +2,7 @@ package PantryPal;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.management.RuntimeErrorException;
@@ -13,6 +14,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -100,7 +102,6 @@ class NavigationHandler{
                 e.printStackTrace();
             }
         } else {
-            // If it already exists, handle the case accordingly (for example, do nothing or display a message)
             System.out.println("Image with index " + index + " already exists.");
         }
         rd.setImg(imagePath.toString());
@@ -111,9 +112,63 @@ class NavigationHandler{
         primaryStage.setScene(s);
     }
 
-    void showGPTResults(GPTResultsDisplay g){
+    void showGPTResults(GPTResultsDisplay g) throws IOException, InterruptedException, URISyntaxException{
         //show gpt results page
         Scene s = new Scene(g, 500, 600);
+        //first we must get the temporary index(what it would be after saving)
+        //access rhandler from main
+        AppFrame main = (AppFrame)this.pageList.get(RECIPE_LIST).getRoot();
+        RecipeHandler r = main.getRecipeHandler();
+        String username = main.getUserHandler().getUserName();
+        ArrayList<Recipe> checklist = r.getRecipeList(username).getList();
+        //find the largest index in checklist
+        int largest = 0;
+        for(Recipe check: checklist){
+            int i = check.getIndex();
+            if(i>largest){
+                largest = i;
+            }
+        }
+        //increment largest so this is what it would be
+        largest++;
+        //largest is now the index we will use
+        g.setIndex(largest);
+        g.setUser(username);
+        //get recipe info and generate a link
+        DallEHandler d = new DallEHandler();
+        String title = g.getCreateHandler().getRecipe().getTitle();
+        String ingredients = g.getCreateHandler().getRecipe().getIngredients();
+        String url = d.generate(title, username, String.valueOf(largest), ingredients);
+        //ASSOCIATE IHANDLER WITH GPT DISPLAy
+        g.setDallE(d);
+        //create images directory in view
+        Path imagesDir = Paths.get("images");
+        if (!Files.exists(imagesDir)) {
+            Files.createDirectory(imagesDir);
+        }
+
+        Path imagePath = imagesDir.resolve(username + " " +largest + ".jpg");
+        // if (!Files.exists(imagePath)) {
+        //     // if doesnt exist download and save
+        //     try (InputStream in = new URI(url).toURL().openStream()) {
+        //         Files.copy(in, imagePath);
+        //         System.out.println("Image saved successfully: " + imagePath);
+        //     } catch (IOException e) {
+        //         e.printStackTrace();
+        //     }
+        // } else {
+        //     System.out.println("Image with index " + largest + " already exists.");
+        // }
+
+        //download and replace current image
+        try (InputStream in = new URI(url).toURL().openStream()) {
+            Files.copy(in, imagePath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Image saved successfully: " + imagePath);
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+        //set the image to be the recipe
+        g.setImg(imagePath.toString());
         pageList.put(GPT_RESULTS, s);
         primaryStage.setScene(s);
     }

@@ -193,12 +193,17 @@ public class RequestHandler {
             String urlString = "http://localhost:8100/image/";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
+            conn.setRequestMethod(method);
             conn.setDoOutput(true);
             //if post or put write to outstream
             if (method.equals("POST")) {
                 OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
                 out.write(title + "," + ingredients + "," + user + "," + index);
+                out.flush(); 
+                out.close();
+            } else if (method.equals("DELETE")) {
+                OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+                out.write(user + "," + index);
                 out.flush(); 
                 out.close();
             }

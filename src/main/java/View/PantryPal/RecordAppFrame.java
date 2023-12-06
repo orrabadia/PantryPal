@@ -195,10 +195,16 @@ class RecordAppFrame extends FlowPane {
                     String title = recipe.substring(0,recipe.indexOf("~"));
                     //take out the newlines and returns for formatting
                     String strippedString = title.replaceAll("[\\n\\r]+", "");
+                    strippedString = strippedString.replaceAll(":", "");
+                    strippedString = strippedString.replaceAll("\\.", "");
                     r.setInstructions(recipe);
                     r.setTitle(strippedString);
                     GPTResultsDisplay results = new GPTResultsDisplay(handler, createHandler);
-                    handler.showGPTResults(results);
+                    try {
+                        handler.showGPTResults(results);
+                    } catch (Exception e2) {
+                        System.out.println("ERROR WITH GPT RESULTS" + e2.toString());
+                    }
                     //System.out.println(title +"TITLE LEFT+RECIPE RIGHT " +recipe  + " ");
                     //System.out.println(mealtype +"+ " +ingredients  + " " + createHandler.getRecipe().getTitle());
                 });

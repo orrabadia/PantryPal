@@ -20,6 +20,8 @@ public class ImageRequestListener implements HttpHandler {
         try {
             if (method.equals("POST")) {
               response = handlePost(httpExchange);
+            } else if (method.equals("DELETE")) {
+              response = handleDelete(httpExchange);
             } else {
               throw new Exception("Not Valid Request Method");
             }
@@ -35,6 +37,26 @@ public class ImageRequestListener implements HttpHandler {
         outStream.write(response.getBytes());
         outStream.close();
        
+    }
+
+    /** delete image from server */
+    private String handleDelete(HttpExchange httpExchange) throws IOException{
+      InputStream inStream = httpExchange.getRequestBody();
+      Scanner scanner = new Scanner(inStream);
+      String imageData = scanner.nextLine();
+      String[] recipeValues = imageData.split(",");
+      String user = recipeValues[0];
+      String index = recipeValues[1];
+      scanner.close();
+      String ret = "Failure";
+      //delete from server
+      i.setUser(user);
+      i.delete(user, Integer.parseInt(index));
+      //if not there good
+      if(!i.check(Integer.parseInt(index))){
+        ret = "Success";
+      }
+      return ret;
     }
 
     
