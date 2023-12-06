@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class Server {
+    
+
     // initialize server port and hostname
-    private static final int SERVER_PORT = 8100;
-    private static final String SERVER_HOSTNAME = "localhost";
+    private static final int SERVER_PORT = Integer.parseInt(EnvironmentHandler.loadEnv("SERVER_PORT"));
+    private static final String SERVER_HOSTNAME = EnvironmentHandler.loadEnv("SERVER_HOST");
 
   public static void main(String[] args) throws IOException {
 

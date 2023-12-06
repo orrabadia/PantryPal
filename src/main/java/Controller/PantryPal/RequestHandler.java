@@ -11,9 +11,14 @@ import java.nio.file.Files;
 import java.net.URI;
 
 public class RequestHandler {
+
+    private static final String SERVER_PORT = EnvironmentHandler.loadEnv("SERVER_PORT");
+    private static final String USER_HOSTNAME = EnvironmentHandler.loadEnv("USER_HOST");
+
+    
     public String performUserRequest(String method, String user, String password){
         try{
-            String urlString = "http://localhost:8100/user";
+            String urlString = "http://" + USER_HOSTNAME + ":" + SERVER_PORT + "/user/";
             if (user != null) {
                 urlString += "?=" + user;
             }
@@ -62,7 +67,7 @@ public class RequestHandler {
     public String performRecipeRequest(String method, String title, String mealtype, String ingredients, String instructions, int index, String query) {
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = "http://localhost:8100/recipe/";
+            String urlString = "http://" + USER_HOSTNAME + ":" + SERVER_PORT + "/recipe/";
             if (query != null) {
                 urlString += "?=" + query;
             }
@@ -113,7 +118,7 @@ public class RequestHandler {
         
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = "http://localhost:8100/audio";
+            String urlString = "http://" + USER_HOSTNAME + ":" + SERVER_PORT + "/audio/";;
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
@@ -190,7 +195,7 @@ public class RequestHandler {
     public String performImageRequest(String method, String title, String user, String index, String ingredients){
         // Implement your HTTP request logic here and return the response
         try {
-            String urlString = "http://localhost:8100/image/";
+            String urlString = "http://" + USER_HOSTNAME + ":" + SERVER_PORT + "/image/";
             URL url = new URI(urlString).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod(method);
